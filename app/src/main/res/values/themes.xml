@@ -2,8 +2,14 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.Zakrni" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimary">@color/brown</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorSurface">@color/beige</item>
     </style>
 
     <style name="Theme.Zakrni" parent="Base.Theme.Zakrni" />
+    
+    <style name="BottomNavigationActiveIndicator">
+        <item name="android:color">@color/brown</item>
+    </style>
 </resources>
