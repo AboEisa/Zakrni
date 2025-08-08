@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <item
+        android:id="@+id/nav_names_of_allah"
+        android:title="أسماء الله الحسنى"
+        android:icon="@drawable/ic_names_allah" />
+    
+    <item
+        android:id="@+id/nav_dhikr"
+        android:title="التسبيح الذكر"
+        android:icon="@drawable/ic_dhikr" />
+    
+    <item
+        android:id="@+id/nav_supplication"
+        android:title="الدعاء"
+        android:icon="@drawable/ic_supplication" />
+    
+    <item
+        android:id="@+id/nav_hadith"
+        android:title="الحديث"
+        android:icon="@drawable/ic_hadith" />
+    
+    <item
+        android:id="@+id/nav_remembrance"
+        android:title="الذكر"
+        android:icon="@drawable/ic_remembrance" />
+    
+    <item
+        android:id="@+id/nav_qibla"
+        android:title="القبلة"
+        android:icon="@drawable/ic_qibla" />
+    
+</menu>
