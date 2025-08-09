@@ -15,6 +15,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Zakrni">
         <activity
+            android:name=".clean.ui.HomeActivity"
+            android:exported="false" />
+        <activity
             android:name=".clean.ui.MainActivity"
             android:exported="true">
             <intent-filter>
