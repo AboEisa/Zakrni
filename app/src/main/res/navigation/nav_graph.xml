@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/allCategoriesFragment">
+
+    <fragment
+        android:id="@+id/allCategoriesFragment"
+        android:name="com.example.zakrni.AllCategoriesFragment"
+        android:label="fragment_all_categories"
+        tools:layout="@layout/fragment_all_categories" >
+        <action
+            android:id="@+id/action_allCategoriesFragment_to_allMediaFragment"
+            app:destination="@id/allMediaFragment" />
+        <action
+            android:id="@+id/action_allCategoriesFragment_to_playerTimesFragment"
+            app:destination="@id/playerTimesFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/allMediaFragment"
+        android:name="com.example.zakrni.AllMediaFragment"
+        android:label="fragment_all_media"
+        tools:layout="@layout/fragment_all_media" >
+        <action
+            android:id="@+id/action_allMediaFragment_to_playerTimesFragment"
+            app:destination="@id/playerTimesFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/playerTimesFragment"
+        android:name="com.example.zakrni.PlayerTimesFragment"
+        android:label="fragment_player_times"
+        tools:layout="@layout/fragment_player_times" />
+</navigation>
