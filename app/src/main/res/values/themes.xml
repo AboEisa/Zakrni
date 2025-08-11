@@ -7,7 +7,7 @@
 
     <style name="Theme.Zakrni" parent="Base.Theme.Zakrni" />
 
-    <!-- Custom Bottom Navigation Style -->
+    <!-- Custom Bottom Navigation Style - Completely Remove Bottom Space -->
     <style name="CustomBottomNavigationStyle" parent="Widget.Material3.BottomNavigationView">
         <!-- Brown background with rounded corners -->
         <item name="android:background">@drawable/bottom_nav_background</item>
@@ -17,25 +17,46 @@
         <item name="labelVisibilityMode">labeled</item>
         <!-- Remove elevation -->
         <item name="elevation">0dp</item>
-        <!-- Height matching your image exactly -->
-        <item name="android:minHeight">44dp</item>
-        <!-- Padding to ensure text fits -->
-        <item name="android:paddingTop">8dp</item>
-        <item name="android:paddingBottom">8dp</item>
-        <item name="android:paddingStart">16dp</item>
-        <item name="android:paddingEnd">16dp</item>
+        <!-- Set exact height -->
+        <item name="android:layout_height">36dp</item>
+        <item name="android:minHeight">36dp</item>
+        <item name="android:maxHeight">36dp</item>
+        <!-- Remove ALL padding -->
+        <item name="android:paddingTop">0dp</item>
+        <item name="android:paddingBottom">0dp</item>
+        <item name="android:paddingStart">8dp</item>
+        <item name="android:paddingEnd">8dp</item>
+        <!-- Center text vertically -->
+        <item name="android:gravity">center</item>
         <!-- Remove ripple effect -->
         <item name="itemRippleColor">@android:color/transparent</item>
         <!-- Force icon removal -->
         <item name="itemIconSize">0dp</item>
         <item name="itemIconTint">@android:color/transparent</item>
+        <!-- Text appearance -->
+        <item name="itemTextAppearanceActive">@style/BottomNavigationTextActive</item>
+        <item name="itemTextAppearanceInactive">@style/BottomNavigationTextInactive</item>
     </style>
 
-    <!-- Active indicator matching your image shape -->
+    <!-- Text styles for better positioning -->
+    <style name="BottomNavigationTextActive" parent="@style/TextAppearance.Material3.LabelMedium">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="BottomNavigationTextInactive" parent="@style/TextAppearance.Material3.LabelMedium">
+        <item name="android:textSize">11sp</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <!-- Active indicator - smaller and better positioned -->
     <style name="CustomActiveIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
         <item name="android:color">#CC9B76</item>
-        <item name="android:width">80dp</item>
-        <item name="android:height">28dp</item>
-        <item name="cornerRadius">14dp</item>
+        <item name="android:width">75dp</item>
+        <item name="android:height">32dp</item>
+        <item name="cornerRadius">16dp</item>
+        <item name="android:layout_marginTop">2dp</item>
+        <item name="android:layout_marginBottom">2dp</item>
     </style>
 </resources>

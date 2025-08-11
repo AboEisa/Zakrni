@@ -15,7 +15,8 @@
             app:destination="@id/allMediaFragment" />
         <action
             android:id="@+id/action_allCategoriesFragment_to_playerTimesFragment"
-            app:destination="@id/playerTimesFragment" />
+            app:destination="@id/playerTimesFragment"
+             />
     </fragment>
     <fragment
         android:id="@+id/allMediaFragment"
@@ -24,7 +25,8 @@
         tools:layout="@layout/fragment_all_media" >
         <action
             android:id="@+id/action_allMediaFragment_to_playerTimesFragment"
-            app:destination="@id/playerTimesFragment" />
+            app:destination="@id/playerTimesFragment"
+            />
     </fragment>
     <fragment
         android:id="@+id/playerTimesFragment"

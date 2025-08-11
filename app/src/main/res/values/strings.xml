@@ -2,4 +2,19 @@
     <string name="app_name">Zakrni</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="cat_dua">الأدعية</string>
+    <string name="cat_smart_tasbeeh">التسبيح الذكي</string>
+    <string name="cat_allah_names">أسماء الله الحسنى</string>
+    <string name="cat_quran">القرآن</string>
+    <string name="cat_adhkar">الأذكار</string>
+    <string name="cat_hadith">الأحاديث</string>
+    <string name="quran">القرآن الكريم</string>
+    <string name="esha">العشاء</string>
+    <string name="next_player_time">الصلاة التالية: الفجر</string>
+    <string name="daily_ayahs">الآيات اليومية</string>
+    <string name="ayah">ٱلْـحَمْدُ لِلَّهِ رَبِّ ٱلْعَـٰلَمِينَ</string>
+    <string name="player_times">أوقات الصلاة</string>
+    <string name="all_media">كل الوسائط</string>
+    <string name="all_categories">جميع التصنيفات</string>
 </resources>

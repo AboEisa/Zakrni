@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- res/values/colors.xml -->
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Custom colors for bottom navigation -->
+    <color name="selected_text_color">#8B4513</color> <!-- Dark brown for selected text -->
+    <color name="unselected_text_color">#FFFFFF</color> <!-- White for unselected text -->
+    <color name="selected_background">#D4B896</color> <!-- Light brown for selected background -->
+    <color name="nav_background">#8B4513</color> <!-- Dark brown for navigation background -->
 </resources>

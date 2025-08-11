@@ -37,7 +37,7 @@
             android:id="@+id/titleText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="القرآن الكريم"
+            android:text="@string/quran"
             android:textColor="#795547"
             android:textSize="@dimen/_16sdp"
             android:textStyle="bold"
@@ -89,7 +89,7 @@
                     android:id="@+id/prayerName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="العشاء"
+                    android:text="@string/esha"
                     android:textColor="#795547"
                     android:textSize="@dimen/_14sdp"
                     android:textStyle="bold" />
@@ -108,7 +108,7 @@
                     android:id="@+id/nextPrayerLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="الصلاة التالية: الفجر"
+                    android:text="@string/next_player_time"
                     android:textColor="#795547"
                     android:textSize="@dimen/_11sdp"
                     android:layout_marginTop="@dimen/_8sdp" />
@@ -181,7 +181,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="الآيات اليومية"
+                        android:text="@string/daily_ayahs"
                         android:textColor="#FFFFFF"
                         android:textSize="@dimen/_14sdp"
                         android:textStyle="bold" />
@@ -192,12 +192,11 @@
                     android:id="@+id/ayahArabic"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="ٱلْـحَمْدُ لِلَّهِ رَبِّ ٱلْعَـٰلَمِينَ"
+                    android:text="@string/ayah"
                     android:textColor="#FFFFFF"
                     android:textSize="@dimen/_16sdp"
                     android:textStyle="bold"
-                    android:layout_marginTop="@dimen/_8sdp"
-                    />
+                    android:layout_marginTop="@dimen/_8sdp" />
 
                 <TextView
                     android:id="@+id/ayahTranslation"
@@ -206,8 +205,7 @@
                     android:text="All praise and thanks be to the Lord of the worlds."
                     android:textColor="#B0B0B0"
                     android:textSize="@dimen/_12sdp"
-                    android:layout_marginTop="@dimen/_4sdp"
-                     />
+                    android:layout_marginTop="@dimen/_4sdp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -231,32 +229,69 @@
 
     </androidx.cardview.widget.CardView>
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_nav"
+
+    <LinearLayout
+        android:id="@+id/custom_bottom_nav"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        style="@style/CustomBottomNavigationStyle"
-        app:labelVisibilityMode="labeled"
-        app:itemTextColor="#FFFFFF"
-        app:itemIconTint="@android:color/transparent"
-        app:itemIconSize="0dp"
+        android:layout_height="36dp"
+        android:orientation="horizontal"
+        android:background="@drawable/bottom_nav_background"
+        android:gravity="center"
         android:layout_marginStart="@dimen/_18sdp"
         android:layout_marginEnd="@dimen/_18sdp"
         android:layout_marginTop="@dimen/_18sdp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dailyAyahCard"
-        app:menu="@menu/middle_navigation" />
+        app:layout_constraintTop_toBottomOf="@+id/dailyAyahCard">
+
+        <TextView
+            android:id="@+id/nav_prayer_times"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/player_times"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?android:attr/selectableItemBackground" />
+
+        <TextView
+            android:id="@+id/nav_all_media"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/all_media"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?android:attr/selectableItemBackground" />
+
+        <TextView
+            android:id="@+id/nav_all_categories"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/all_categories"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?android:attr/selectableItemBackground" />
+    </LinearLayout>
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/nav_host_fragment"
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
         app:defaultNavHost="true"
-        android:layout_marginTop="@dimen/_20sdp"
-        app:layout_constraintTop_toBottomOf="@id/bottom_nav"
+        android:layout_marginTop="@dimen/_10sdp"
+        app:layout_constraintTop_toBottomOf="@+id/custom_bottom_nav"
         app:layout_constraintBottom_toBottomOf="parent"
         app:navGraph="@navigation/nav_graph" />
 
