@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/allCategoriesFragment"
-        android:name="com.example.zakrni.AllCategoriesFragment"
+        android:name="com.example.zakrni.clean.ui.AllCategoriesFragment"
         android:label="fragment_all_categories"
         tools:layout="@layout/fragment_all_categories" >
         <action
@@ -20,7 +20,7 @@
     </fragment>
     <fragment
         android:id="@+id/allMediaFragment"
-        android:name="com.example.zakrni.AllMediaFragment"
+        android:name="com.example.zakrni.clean.ui.AllMediaFragment"
         android:label="fragment_all_media"
         tools:layout="@layout/fragment_all_media" >
         <action
@@ -30,7 +30,7 @@
     </fragment>
     <fragment
         android:id="@+id/playerTimesFragment"
-        android:name="com.example.zakrni.PlayerTimesFragment"
+        android:name="com.example.zakrni.clean.ui.PlayerTimesFragment"
         android:label="fragment_player_times"
         tools:layout="@layout/fragment_player_times" />
 </navigation>

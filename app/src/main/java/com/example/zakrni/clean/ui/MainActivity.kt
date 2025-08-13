@@ -1,6 +1,7 @@
 package com.example.zakrni.clean.ui
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -12,9 +13,9 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-//    private lateinit var binding: ActivityMainBinding
     private var _binding : ActivityMainBinding ? = null
     private val binding get() = _binding!!
+    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,14 +28,26 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-
+        sharedPreferences = getSharedPreferences("app_prefs", MODE_PRIVATE)
+        checkFirstTimeUser()
         onClick()
     }
 
+    private fun checkFirstTimeUser() {
+        val isFirstTime = sharedPreferences.getBoolean("is_first_time", true)
+
+        if (!isFirstTime) {
+            startActivity(Intent(this, HomeActivity::class.java))
+            finish()
+        }
+        return
+    }
 
     fun onClick(){
         binding.btnStart.setOnClickListener {
+            sharedPreferences.edit().putBoolean("is_first_time", false).apply()
             startActivity(Intent(this, HomeActivity::class.java))
+            finish()
         }
     }
 
