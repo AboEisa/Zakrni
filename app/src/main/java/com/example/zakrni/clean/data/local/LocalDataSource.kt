@@ -1,10 +1,10 @@
 package com.example.zakrni.clean.data.local
 
-import com.example.zakrni.clean.data.network.ApiServices
+import com.example.zakrni.clean.data.network.PrayerApiService
 import javax.inject.Inject
 
 class LocalDataSource @Inject constructor(
-    private val apiServices: ApiServices
+    private val apiServices: PrayerApiService
 ): ILocalDataSource {
 
 
