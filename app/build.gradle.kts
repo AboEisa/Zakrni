@@ -87,4 +87,8 @@ dependencies {
     implementation("androidx.paging:paging-runtime:3.3.0")
     implementation("com.airbnb.android:lottie:6.4.0")
     implementation("com.intuit.sdp:sdp-android:1.1.1")
+
+
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation("com.google.android.gms:play-services-maps:18.1.0")
 }

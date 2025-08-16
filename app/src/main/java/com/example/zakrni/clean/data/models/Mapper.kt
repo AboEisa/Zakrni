@@ -155,4 +155,7 @@ fun Params.mapToDomain(): DomainParams {
         Fajr = Fajr,
         Isha = Isha
     )
+
+
+
 }

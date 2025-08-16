@@ -1,4 +1,4 @@
-package com.example.zakrni.clean.ui
+package com.example.zakrni.clean.ui.views
 
 import android.content.Intent
 import android.content.SharedPreferences
@@ -27,7 +27,6 @@ class MainActivity : AppCompatActivity() {
             view.setPadding(0, systemBars.top, 0, systemBars.bottom)
             insets
         }
-
         sharedPreferences = getSharedPreferences("app_prefs", MODE_PRIVATE)
         checkFirstTimeUser()
         onClick()
