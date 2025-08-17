@@ -1,6 +1,7 @@
 package com.example.zakrni.clean.ui.utils
 
 import com.example.zakrni.clean.ui.models.PresentationTimings
+import com.example.zakrni.clean.ui.models.PresentationPrayerTimesResponse
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -43,7 +44,10 @@ object PrayerTimeUtils {
 
             val prayerTimeInSeconds = prayerCalendar.timeInMillis / 1000
 
-            Quadruple(name, nameArabic, prayerTimeInSeconds, formatTime(hour * 60 + minute))
+            // Convert to 12-hour format without AM/PM
+            val formattedTime = formatTimeTo12Hour(hour, minute)
+
+            Quadruple(name, nameArabic, prayerTimeInSeconds, formattedTime)
         }
 
         var currentPrayer: PrayerInfo? = null
@@ -108,10 +112,22 @@ object PrayerTimeUtils {
         return Pair(currentPrayer, nextPrayer)
     }
 
+    // Convert 24-hour format to 12-hour format without AM/PM
+    private fun formatTimeTo12Hour(hour: Int, minute: Int): String {
+        val hour12 = when {
+            hour == 0 -> 12 // Midnight -> 12
+            hour > 12 -> hour - 12 // PM hours
+            else -> hour // AM hours (1-12)
+        }
+
+        return String.format("%d:%02d", hour12, minute)
+    }
+
+    // DEPRECATED: Keep for backward compatibility
     private fun formatTime(timeInMinutes: Int): String {
         val hour = timeInMinutes / 60
         val minute = timeInMinutes % 60
-        return String.format("%02d:%02d", hour, minute)
+        return formatTimeTo12Hour(hour, minute)
     }
 
     fun formatTimeRemaining(seconds: Long): String {
@@ -125,62 +141,45 @@ object PrayerTimeUtils {
         }
     }
 
-    fun formatHijriDate(hijriDate: String): String {
-        try {
-            // Get current day name in Arabic
-            val dayName = getCurrentDayNameInArabic()
+    // NEW: Use API data for Hijri date formatting
+    fun formatHijriDateFromApi(prayerTimesResponse: PresentationPrayerTimesResponse): String {
+        return with(prayerTimesResponse.data.date) {
+            val dayName = hijri.weekday.ar
+            val day = hijri.day
+            val monthName = hijri.month.ar
+            val year = hijri.year
 
-            // Assuming the API returns hijri date in format "DD-MM-YYYY"
-            val parts = hijriDate.split("-")
-            if (parts.size == 3) {
-                val day = parts[0]
-                val month = parts[1].toInt()
-                val year = parts[2]
-
-                val hijriMonths = arrayOf(
-                    "", "محرم", "صفر", "ربيع الأول", "ربيع الثاني", "جمادى الأولى",
-                    "جمادى الثانية", "رجب", "شعبان", "رمضان", "شوال", "ذو القعدة", "ذو الحجة"
-                )
-
-                val monthName = if (month in 1..12) hijriMonths[month] else ""
-                return "$dayName $day $monthName $year هـ"
-            }
-        } catch (e: Exception) {
-            // Return original if parsing fails
+            "$dayName $day $monthName $year هـ"
         }
+    }
+
+    // NEW: Use API data for Gregorian date formatting
+    fun formatGregorianDateFromApi(prayerTimesResponse: PresentationPrayerTimesResponse): String {
+        return with(prayerTimesResponse.data.date) {
+            val dayName = getCurrentDayNameInArabic() // You can also use gregorian.weekday.en and translate
+            val day = gregorian.day
+            val monthName = translateMonthToArabic(gregorian.month.en)
+            val year = gregorian.year
+
+            "$dayName $day $monthName $year م"
+        }
+    }
+
+    // DEPRECATED: Keep these for backward compatibility but they should be replaced
+    fun formatHijriDate(hijriDate: String): String {
+        // This method should be replaced with formatHijriDateFromApi
+        val parts = hijriDate.split(" ")
+        if (parts.size < 4) return hijriDate // Invalid format
+        val dayName = parts[0] // e.g., "الأحد"
+        val day = parts[1] // e.g., "1"
+        val monthName = parts[2] // e.g., "محرم"
+        val year = parts[3] // e.g., "1445"
+        val hijriDate = "$dayName $day $monthName $year هـ"
         return hijriDate
     }
 
     fun formatGregorianDate(gregorianDate: String): String {
-        try {
-            // Assuming API returns format "DD-MM-YYYY"
-            val inputFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
-            val outputFormat = SimpleDateFormat("dd MMMM yyyy", Locale("ar"))
-            val date = inputFormat.parse(gregorianDate)
-
-            val formattedDate = outputFormat.format(date ?: Date())
-            return "$formattedDate م"
-        } catch (e: Exception) {
-            // Fallback formatting
-            try {
-                val parts = gregorianDate.split("-")
-                if (parts.size == 3) {
-                    val day = parts[0]
-                    val month = parts[1].toInt()
-                    val year = parts[2]
-
-                    val gregorianMonths = arrayOf(
-                        "", "يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو",
-                        "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"
-                    )
-
-                    val monthName = if (month in 1..12) gregorianMonths[month] else ""
-                    return "$day $monthName $year م"
-                }
-            } catch (e: Exception) {
-                // Return original if all parsing fails
-            }
-        }
+        // This method should be replaced with formatGregorianDateFromApi
         return gregorianDate
     }
 
@@ -197,6 +196,24 @@ object PrayerTimeUtils {
             Calendar.FRIDAY -> "الجمعة"
             Calendar.SATURDAY -> "السبت"
             else -> "الأحد" // fallback
+        }
+    }
+
+    private fun translateMonthToArabic(englishMonth: String): String {
+        return when (englishMonth.lowercase()) {
+            "january" -> "يناير"
+            "february" -> "فبراير"
+            "march" -> "مارس"
+            "april" -> "أبريل"
+            "may" -> "مايو"
+            "june" -> "يونيو"
+            "july" -> "يوليو"
+            "august" -> "أغسطس"
+            "september" -> "سبتمبر"
+            "october" -> "أكتوبر"
+            "november" -> "نوفمبر"
+            "december" -> "ديسمبر"
+            else -> englishMonth
         }
     }
 

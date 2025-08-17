@@ -140,10 +140,8 @@ class PrayerTimesFragment : Fragment() {
 
     private fun updateUI(prayerTimes: PresentationPrayerTimesResponse) {
         with(binding) {
-            // Hijri date
-            tvDateHijri.text = PrayerTimeUtils.formatHijriDate(prayerTimes.data.date.hijri.date)
-            // Gregorian date
-            tvDateGregorian.text = PrayerTimeUtils.formatGregorianDate(prayerTimes.data.date.gregorian.date)
+            tvDateHijri.text = PrayerTimeUtils.formatHijriDateFromApi(prayerTimes)
+            tvDateGregorian.text = PrayerTimeUtils.formatGregorianDateFromApi(prayerTimes)
         }
     }
 

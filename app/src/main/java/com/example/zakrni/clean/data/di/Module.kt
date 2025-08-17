@@ -14,24 +14,27 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Qualifier
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
 @Module
 object Module {
 
+    // ✅ Retrofit for Prayer Times (AlAdhan)
     @Provides
     @Singleton
+    @PrayerApi
     fun providePrayerRetrofit(): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://api.aladhan.com/")
+            .baseUrl("https://api.aladhan.com/") // الصلاة + أسماء الله الحسنى
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
 
     @Provides
     @Singleton
-    fun providePrayerApiService(retrofit: Retrofit): PrayerApiService {
+    fun providePrayerApiService(@PrayerApi retrofit: Retrofit): PrayerApiService {
         return retrofit.create(PrayerApiService::class.java)
     }
 
@@ -46,6 +49,41 @@ object Module {
     fun getRepository(remoteDataSource: IRemoteDataSource): IRepo {
         return Repo(remoteDataSource)
     }
+
+    // ✅ Retrofit for Dua & Dhikr
+    @Provides
+    @Singleton
+    @DuaApi
+    fun provideDuaRetrofit(): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl("https://dua-dhikr.vercel.app/") // أدعية + أذكار
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    // ✅ Retrofit for Hadith API
+    @Provides
+    @Singleton
+    @HadithApi
+    fun provideHadithRetrofit(): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl("https://hadithapi.com/") // الأحاديث
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    // ✅ Retrofit for Quran API
+    @Provides
+    @Singleton
+    @QuranApi
+    fun provideQuranRetrofit(): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl("https://api.quran.com/v4/") // القرآن
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    // ✅ Location Manager
     @Provides
     @Singleton
     fun provideLocationManager(@ApplicationContext context: Context): LocationManager {

@@ -161,6 +161,8 @@ class HomeActivity : AppCompatActivity() {
 
     private fun updatePrayerTimesUI(prayerTimes: PresentationPrayerTimesResponse) {
 
+
+
     }
 
     private fun showError(error: String) {
