@@ -35,6 +35,16 @@ class HomeActivity : AppCompatActivity() {
 
     private val prayerTimeViewModel: PrayerTimesViewModel by viewModels()
 
+    // Define which fragments should be full-screen
+    private val fullScreenFragments = mapOf(
+        R.id.hadithFragment to { HadithFragment() },
+        R.id.duaFragment to { DuaFragment() },
+        R.id.azkarFragment to { AzkarFragment() },
+        R.id.quranFragment to { QuranFragment() },
+        R.id.allahNamesFragment to { AllahNamesFragment() },
+        R.id.tasbehFragment to { TasbehFragment() }
+    )
+
     private val locationPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
@@ -151,7 +161,7 @@ class HomeActivity : AppCompatActivity() {
 
     private fun updateNextPrayerInfo(nextPrayer: PrayerTimeUtils.PrayerInfo) {
         with(binding) {
-            nextPrayerLabel.text = "الصلاة التالية:  ${nextPrayer.nameArabic}"
+            nextPrayerLabel.text = "الصلاة التالية :  ${nextPrayer.nameArabic}"
         }
     }
 
@@ -160,8 +170,6 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun updatePrayerTimesUI(prayerTimes: PresentationPrayerTimesResponse) {
-
-
 
     }
 
@@ -180,6 +188,15 @@ class HomeActivity : AppCompatActivity() {
 
         // initial destination
         selectNavItem(R.id.nav_all_categories)
+
+        // Handle destination changes and full-screen fragments
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            if (fullScreenFragments.containsKey(destination.id)) {
+                showFullScreenFragment(destination.id)
+            } else {
+                hideFullScreenFragment()
+            }
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -242,6 +259,80 @@ class HomeActivity : AppCompatActivity() {
                 R.id.allMediaFragment -> selectNavItem(R.id.nav_all_media)
                 R.id.allCategoriesFragment -> selectNavItem(R.id.nav_all_categories)
             }
+        }
+    }
+
+    // Enhanced method to show full-screen fragment with transition
+    private fun showFullScreenFragment(destinationId: Int) {
+        // First hide main content with animation
+        binding.mainContentContainer.animate()
+            .alpha(0f)
+            .setDuration(150)
+            .withEndAction {
+                binding.mainContentContainer.visibility = android.view.View.GONE
+
+                // Show fullscreen container
+                binding.fullscreenFragmentContainer.visibility = android.view.View.VISIBLE
+                binding.fullscreenFragmentContainer.alpha = 0f
+
+                // Get the appropriate fragment
+                val fragmentFactory = fullScreenFragments[destinationId]
+                if (fragmentFactory != null) {
+                    val fragment = fragmentFactory.invoke()
+
+                    // Add fragment with custom animation
+                    supportFragmentManager.beginTransaction()
+                        .setCustomAnimations(
+                            R.anim.animation,
+                            R.anim.animation2,
+                            R.anim.animation3,
+                            R.anim.animation4
+                        )
+                        .replace(R.id.fullscreen_fragment_container, fragment)
+                        .commit()
+
+                    // Animate fullscreen container in
+                    binding.fullscreenFragmentContainer.animate()
+                        .alpha(1f)
+                        .setDuration(300)
+                        .start()
+                }
+            }
+            .start()
+    }
+
+    // Enhanced method to hide full-screen fragment with transition
+    private fun hideFullScreenFragment() {
+        if (binding.fullscreenFragmentContainer.visibility == android.view.View.VISIBLE) {
+            // Animate fullscreen container out
+            binding.fullscreenFragmentContainer.animate()
+                .alpha(0f)
+                .setDuration(150)
+                .withEndAction {
+                    binding.fullscreenFragmentContainer.visibility = android.view.View.GONE
+
+                    // Clear the full-screen container
+                    supportFragmentManager.findFragmentById(R.id.fullscreen_fragment_container)?.let { fragment ->
+                        supportFragmentManager.beginTransaction()
+                            .setCustomAnimations(
+                                R.anim.animation,
+                                R.anim.animation2,
+                                R.anim.animation3,
+                                R.anim.animation4
+                            )
+                            .remove(fragment)
+                            .commit()
+                    }
+
+                    // Show main content with animation
+                    binding.mainContentContainer.visibility = android.view.View.VISIBLE
+                    binding.mainContentContainer.alpha = 0f
+                    binding.mainContentContainer.animate()
+                        .alpha(1f)
+                        .setDuration(300)
+                        .start()
+                }
+                .start()
         }
     }
 

@@ -155,7 +155,76 @@ fun DomainParams.mapToPresentation(): PresentationParams {
         Fajr = Fajr,
         Isha = Isha
     )
+}
 
+// ---------------- Hadith Mappers ----------------
 
+fun DomainHadithResponse.mapToPresentation(): PresentationHadithResponse {
+    return PresentationHadithResponse(
+        status = status,
+        message = message,
+        hadiths = hadiths.mapToPresentation()
+    )
+}
 
+fun DomainHadiths.mapToPresentation(): PresentationHadiths {
+    return PresentationHadiths(
+        currentPage = currentPage,
+        data = data.map { it.mapToPresentation() }, // Map each DomainHadith to PresentationHadith
+        total = total,
+        lastPage = lastPage,
+        nextPageUrl = nextPageUrl,
+        prevPageUrl = prevPageUrl
+    )
+}
+
+fun DomainHadith.mapToPresentation(): PresentationHadith {
+    return PresentationHadith(
+        id = id,
+        book = book?.mapToPresentation(),
+        chapter = chapter?.mapToPresentation(),
+        bookSlug = bookSlug,
+        chapterId = chapterId,
+        hadithArabic = hadithArabic,
+        hadithEnglish = hadithEnglish,
+        hadithUrdu = hadithUrdu,
+        englishNarrator = englishNarrator,
+        urduNarrator = urduNarrator,
+        status = status,
+        volume = volume,
+        headingArabic = headingArabic,
+        headingEnglish = headingEnglish,
+        headingUrdu = headingUrdu,
+        hadithNumber = hadithNumber
+    )
+}
+
+fun DomainBook.mapToPresentation(): PresentationBook {
+    return PresentationBook(
+        id = id,
+        bookName = bookName,
+        bookSlug = bookSlug,
+        writerName = writerName,
+        writerDeath = writerDeath,
+        aboutWriter = aboutWriter
+    )
+}
+
+fun DomainChapter.mapToPresentation(): PresentationChapter {
+    return PresentationChapter(
+        id = id,
+        bookSlug = bookSlug,
+        chapterArabic = chapterArabic,
+        chapterEnglish = chapterEnglish,
+        chapterUrdu = chapterUrdu,
+        chapterNumber = chapterNumber
+    )
+}
+
+fun DomainLink.mapToPresentation(): PresentationLink {
+    return PresentationLink(
+        label = label,
+        url = url,
+        active = active
+    )
 }

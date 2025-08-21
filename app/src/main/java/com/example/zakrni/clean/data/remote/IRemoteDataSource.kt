@@ -1,5 +1,6 @@
 package com.example.zakrni.clean.data.remote
 
+import com.example.zakrni.clean.data.models.HadithResponse
 import com.example.zakrni.clean.data.models.PrayerTimesResponse
 import com.example.zakrni.clean.data.models.Location
 
@@ -11,4 +12,5 @@ interface IRemoteDataSource {
         method: Int = 5
     ): Result<PrayerTimesResponse>
 
+    suspend fun getHadiths(page: Int, limit: Int = 20): Result<HadithResponse>
 }

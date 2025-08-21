@@ -195,7 +195,7 @@ object PrayerTimeUtils {
             Calendar.THURSDAY -> "الخميس"
             Calendar.FRIDAY -> "الجمعة"
             Calendar.SATURDAY -> "السبت"
-            else -> "الأحد" // fallback
+            else -> "الأحد" // default case
         }
     }
 

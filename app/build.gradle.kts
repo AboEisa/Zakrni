@@ -42,6 +42,19 @@ android {
     buildFeatures {
         viewBinding = true
     }
+
+    // ✅ Added packaging block to fix META-INF conflicts
+    packaging {
+        resources {
+            excludes += "META-INF/INDEX.LIST"
+            excludes += "META-INF/io.netty.versions.properties"
+            excludes += "META-INF/DEPENDENCIES"
+            excludes += "META-INF/LICENSE"
+            excludes += "META-INF/LICENSE.txt"
+            excludes += "META-INF/NOTICE"
+            excludes += "META-INF/NOTICE.txt"
+        }
+    }
 }
 
 dependencies {
@@ -88,7 +101,10 @@ dependencies {
     implementation("com.airbnb.android:lottie:6.4.0")
     implementation("com.intuit.sdp:sdp-android:1.1.1")
 
-
     implementation("com.google.android.gms:play-services-location:21.0.1")
     implementation("com.google.android.gms:play-services-maps:18.1.0")
+
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+
+
 }

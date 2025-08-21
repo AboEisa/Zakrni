@@ -2,6 +2,8 @@ package com.example.zakrni.clean.data.models
 
 import com.example.zakrni.clean.domain.models.*
 
+// ---------------- Prayer Mappers ----------------
+
 fun PrayerTimesResponse.mapToDomain(): DomainPrayerTimesResponse {
     return DomainPrayerTimesResponse(
         code = code,
@@ -155,7 +157,76 @@ fun Params.mapToDomain(): DomainParams {
         Fajr = Fajr,
         Isha = Isha
     )
+}
 
+// ---------------- Hadith Mappers ----------------
 
+fun HadithResponse.mapToDomain(): DomainHadithResponse {
+    return DomainHadithResponse(
+        status = status,
+        message = message,
+        hadiths = hadiths.mapToDomain()
+    )
+}
 
+fun Hadiths.mapToDomain(): DomainHadiths {
+    return DomainHadiths(
+        currentPage = current_page,
+        data = `data`.map { it.mapToDomain() },
+        total = total,
+        lastPage = last_page,
+        nextPageUrl = next_page_url,
+        prevPageUrl = prev_page_url?.toString()
+    )
+}
+
+fun Dataa.mapToDomain(): DomainHadith {
+    return DomainHadith(
+        id = id,
+        book = book?.mapToDomain(),
+        chapter = chapter?.mapToDomain(),
+        bookSlug = bookSlug,
+        chapterId = chapterId,
+        hadithArabic = hadithArabic,
+        hadithEnglish = hadithEnglish,
+        hadithUrdu = hadithUrdu,
+        englishNarrator = englishNarrator,
+        urduNarrator = urduNarrator,
+        status = status,
+        volume = volume,
+        headingArabic = headingArabic,
+        headingEnglish = headingEnglish,
+        headingUrdu = headingUrdu,
+        hadithNumber = hadithNumber
+    )
+}
+
+fun Book.mapToDomain(): DomainBook {
+    return DomainBook(
+        id = id,
+        bookName = bookName,
+        bookSlug = bookSlug,
+        writerName = writerName,
+        writerDeath = writerDeath,
+        aboutWriter = aboutWriter?.toString()
+    )
+}
+
+fun Chapter.mapToDomain(): DomainChapter {
+    return DomainChapter(
+        id = id,
+        bookSlug = bookSlug,
+        chapterArabic = chapterArabic,
+        chapterEnglish = chapterEnglish,
+        chapterUrdu = chapterUrdu,
+        chapterNumber = chapterNumber
+    )
+}
+
+fun Link.mapToDomain(): DomainLink {
+    return DomainLink(
+        label = label,
+        url = url,
+        active = active
+    )
 }

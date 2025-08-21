@@ -26,6 +26,7 @@
 
 
             <LinearLayout
+                android:id="@+id/allahNamesFragment"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -56,6 +57,7 @@
 
 
             <LinearLayout
+                android:id="@+id/tasbehFragment"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -87,6 +89,7 @@
 
 
             <LinearLayout
+                android:id="@+id/duaFragment"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -126,6 +129,7 @@
 
 
             <LinearLayout
+                android:id="@+id/hadithFragment"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -156,6 +160,7 @@
 
 
             <LinearLayout
+                android:id="@+id/azkarFragment"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -187,6 +192,7 @@
 
 
             <LinearLayout
+                android:id="@+id/quranFragment"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
