@@ -2,6 +2,8 @@ package com.example.zakrni.clean.ui.models
 
 import com.example.zakrni.clean.domain.models.*
 
+// ---------------- Prayer Times Presentation Mappers ----------------
+
 fun DomainPrayerTimesResponse.mapToPresentation(): PresentationPrayerTimesResponse {
     return PresentationPrayerTimesResponse(
         code = code,
@@ -157,7 +159,32 @@ fun DomainParams.mapToPresentation(): PresentationParams {
     )
 }
 
-// ---------------- Hadith Mappers ----------------
+// ---------------- Allah Names Presentation Mappers ----------------
+
+fun DomainAsmaAlHusnaResponse.mapToPresentation(): PresentationAsmaAlHusnaResponse {
+    return PresentationAsmaAlHusnaResponse(
+        code = code,
+        status = status,
+        data = data.map { it.mapToPresentation() }
+    )
+}
+
+fun DomainAllahNameData.mapToPresentation(): PresentationAllahNameData {
+    return PresentationAllahNameData(
+        name = name,
+        transliteration = transliteration,
+        number = number,
+        en = en.mapToPresentation()
+    )
+}
+
+fun DomainEn.mapToPresentation(): PresentationEn {
+    return PresentationEn(
+        meaning = meaning
+    )
+}
+
+// ---------------- Hadith Presentation Mappers ----------------
 
 fun DomainHadithResponse.mapToPresentation(): PresentationHadithResponse {
     return PresentationHadithResponse(
@@ -170,7 +197,7 @@ fun DomainHadithResponse.mapToPresentation(): PresentationHadithResponse {
 fun DomainHadiths.mapToPresentation(): PresentationHadiths {
     return PresentationHadiths(
         currentPage = currentPage,
-        data = data.map { it.mapToPresentation() }, // Map each DomainHadith to PresentationHadith
+        data = data.map { it.mapToPresentation() },
         total = total,
         lastPage = lastPage,
         nextPageUrl = nextPageUrl,

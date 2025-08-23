@@ -159,6 +159,31 @@ fun Params.mapToDomain(): DomainParams {
     )
 }
 
+// ---------------- Allah Names Mappers ----------------
+
+fun AsmaAlHusnaResponse.mapToDomain(): DomainAsmaAlHusnaResponse {
+    return DomainAsmaAlHusnaResponse(
+        code = code,
+        status = status,
+        data = data.map { it.mapToDomain() }
+    )
+}
+
+fun AllahNameData.mapToDomain(): DomainAllahNameData {
+    return DomainAllahNameData(
+        name = name,
+        transliteration = transliteration,
+        number = number,
+        en = en.mapToDomain()
+    )
+}
+
+fun En.mapToDomain(): DomainEn {
+    return DomainEn(
+        meaning = meaning
+    )
+}
+
 // ---------------- Hadith Mappers ----------------
 
 fun HadithResponse.mapToDomain(): DomainHadithResponse {
@@ -176,7 +201,7 @@ fun Hadiths.mapToDomain(): DomainHadiths {
         total = total,
         lastPage = last_page,
         nextPageUrl = next_page_url,
-        prevPageUrl = prev_page_url?.toString()
+        prevPageUrl = prev_page_url
     )
 }
 
@@ -208,7 +233,7 @@ fun Book.mapToDomain(): DomainBook {
         bookSlug = bookSlug,
         writerName = writerName,
         writerDeath = writerDeath,
-        aboutWriter = aboutWriter?.toString()
+        aboutWriter = aboutWriter
     )
 }
 

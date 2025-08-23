@@ -10,8 +10,8 @@ interface HadithApiService {
     @GET("api/hadiths/")
     suspend fun getHadiths(
         @Query("apiKey") apiKey: String,
-        @Query("page") page: Int? = 2, // pagination
-        @Query("limit") limit: Int = 20 // default limit for hadiths per page
+        @Query("page") page: Int? = 2,
+        @Query("limit") limit: Int = 20
     ): HadithResponse
 
 }
