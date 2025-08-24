@@ -9,6 +9,7 @@ import com.example.zakrni.clean.data.remote.IRemoteDataSource
 import com.example.zakrni.clean.domain.IRepo
 import com.example.zakrni.clean.domain.models.DomainAllahNameData
 import com.example.zakrni.clean.domain.models.DomainAsmaAlHusnaResponse
+import com.example.zakrni.clean.domain.models.DomainAzkarResponse
 import com.example.zakrni.clean.domain.models.DomainHadithResponse
 import com.example.zakrni.clean.domain.models.DomainPrayerTimesResponse
 import com.example.zakrni.clean.ui.utils.Constant.Companion.APIKEY
@@ -41,6 +42,15 @@ class Repo @Inject constructor(
     override suspend fun getHadiths(page: Int, limit: Int): Result<DomainHadithResponse> {
         return try {
             val data = remoteDataSource.getHadiths(page,limit)
+            Result.success(data.getOrThrow().mapToDomain())
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getAzkar(): Result<DomainAzkarResponse> {
+        return try {
+            val data = remoteDataSource.getAzkar()
             Result.success(data.getOrThrow().mapToDomain())
         } catch (e: Exception) {
             Result.failure(e)

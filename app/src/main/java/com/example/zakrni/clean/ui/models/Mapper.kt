@@ -255,3 +255,137 @@ fun DomainLink.mapToPresentation(): PresentationLink {
         active = active
     )
 }
+
+
+// ---------------- Azkar Presentation Mappers ----------------
+
+fun DomainAzkarResponse.mapToPresentation(): PresentationAzkarResponse {
+    return PresentationAzkarResponse(
+        adhan_azkar = adhan_azkar.map { it.mapToPresentation() },
+        evening_azkar = evening_azkar.map { it.mapToPresentation() },
+        food_azkar = food_azkar.map { it.mapToPresentation() },
+        hajj_and_umrah_azkar = hajj_and_umrah_azkar.map { it.mapToPresentation() },
+        home_azkar = home_azkar.map { it.mapToPresentation() },
+        khala_azkar = khala_azkar.map { it.mapToPresentation() },
+        miscellaneous_azkar = miscellaneous_azkar.map { it.mapToPresentation() },
+        morning_azkar = morning_azkar.map { it.mapToPresentation() },
+        mosque_azkar = mosque_azkar.map { it.mapToPresentation() },
+        prayer_azkar = prayer_azkar.map { it.mapToPresentation() },
+        prayer_later_azkar = prayer_later_azkar.map { it.mapToPresentation() },
+        sleep_azkar = sleep_azkar.map { it.mapToPresentation() },
+        wake_up_azkar = wake_up_azkar.map { it.mapToPresentation() },
+        wudu_azkar = wudu_azkar.map { it.mapToPresentation() }
+    )
+}
+
+fun DomainAdhanAzkar.mapToPresentation(): PresentationAdhanAzkar {
+    return PresentationAdhanAzkar(
+        count = count,
+        id = id,
+        text = text
+    )
+}
+
+fun DomainEveningAzkar.mapToPresentation(): PresentationEveningAzkar {
+    return PresentationEveningAzkar(
+        count = count,
+        id = id,
+        text = text
+    )
+}
+
+fun DomainFoodAzkar.mapToPresentation(): PresentationFoodAzkar {
+    return PresentationFoodAzkar(
+        count = count,
+        id = id,
+        text = text
+    )
+}
+
+fun DomainHajjAndUmrahAzkar.mapToPresentation(): PresentationHajjAndUmrahAzkar {
+    return PresentationHajjAndUmrahAzkar(
+        count = count,
+        id = id,
+        text = text
+    )
+}
+
+fun DomainHomeAzkar.mapToPresentation(): PresentationHomeAzkar {
+    return PresentationHomeAzkar(
+        count = count,
+        id = id,
+        text = text
+    )
+}
+
+fun DomainKhalaAzkar.mapToPresentation(): PresentationKhalaAzkar {
+    return PresentationKhalaAzkar(
+        count = count,
+        id = id,
+        text = text
+    )
+}
+
+fun DomainMiscellaneousAzkar.mapToPresentation(): PresentationMiscellaneousAzkar {
+    return PresentationMiscellaneousAzkar(
+        count = count,
+        id = id,
+        text = text
+    )
+}
+
+fun DomainMorningAzkar.mapToPresentation(): PresentationMorningAzkar {
+    return PresentationMorningAzkar(
+        count = count,
+        id = id,
+        text = text
+    )
+}
+
+fun DomainMosqueAzkar.mapToPresentation(): PresentationMosqueAzkar {
+    return PresentationMosqueAzkar(
+        count = count,
+        id = id,
+        text = text
+    )
+}
+
+fun DomainPrayerAzkar.mapToPresentation(): PresentationPrayerAzkar {
+    return PresentationPrayerAzkar(
+        count = count,
+        id = id,
+        text = text
+    )
+}
+
+fun DomainPrayerLaterAzkar.mapToPresentation(): PresentationPrayerLaterAzkar {
+    return PresentationPrayerLaterAzkar(
+        count = count,
+        id = id,
+        text = text
+    )
+}
+
+fun DomainSleepAzkar.mapToPresentation(): PresentationSleepAzkar {
+    return PresentationSleepAzkar(
+        count = count,
+        id = id,
+        text = text
+    )
+}
+
+fun DomainWakeUpAzkar.mapToPresentation(): PresentationWakeUpAzkar {
+    return PresentationWakeUpAzkar(
+        count = count,
+        id = id,
+        text = text
+    )
+}
+
+fun DomainWuduAzkar.mapToPresentation(): PresentationWuduAzkar {
+    return PresentationWuduAzkar(
+        count = count,
+        id = id,
+        text = text
+    )
+}

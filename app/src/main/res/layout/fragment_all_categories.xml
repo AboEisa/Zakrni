@@ -6,235 +6,260 @@
     android:layout_height="match_parent"
     tools:context=".clean.ui.views.AllCategoriesFragment">
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginHorizontal="@dimen/_15sdp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="@dimen/_10sdp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="3"
-            android:layout_marginBottom="@dimen/_15sdp">
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="24dp">
 
+            <!-- First Row -->
             <LinearLayout
-                android:id="@+id/allahNamesFragment"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:background="@drawable/selected_nav_background"
-                android:padding="@dimen/_12sdp"
-                android:layout_marginEnd="@dimen/_6sdp"
-                android:clickable="true"
-                android:focusable="true"
-                android:minHeight="@dimen/_80sdp">
+                android:orientation="horizontal"
+                android:baselineAligned="false"
+                android:layout_marginBottom="12dp">
 
-                <ImageView
-                    android:layout_width="@dimen/_36sdp"
-                    android:layout_height="@dimen/_36sdp"
-                    android:src="@drawable/ic_allah_names"
-                    android:layout_marginBottom="@dimen/_6sdp"
-                    android:contentDescription="أسماء الله الحسنى" />
-
-                <TextView
-                    android:layout_width="wrap_content"
+                <!-- Allah Names -->
+                <LinearLayout
+                    android:id="@+id/allahNamesFragment"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="أسماء الله الحسنى"
-                    android:textSize="@dimen/_10sdp"
-                    android:textColor="#333333"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
                     android:gravity="center"
-                    android:maxLines="2"
-                    android:ellipsize="end" />
+                    android:background="@drawable/selected_nav_background"
+                    android:padding="12dp"
+                    android:layout_marginEnd="6dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:minHeight="100dp">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/ic_allah_names"
+                        android:layout_marginBottom="8dp"
+                        android:contentDescription="أسماء الله الحسنى"
+                        android:scaleType="centerInside" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="أسماء الله الحسنى"
+                        android:textSize="12sp"
+                        android:textColor="#333333"
+                        android:gravity="center"
+                        android:maxLines="2"
+                        android:ellipsize="end"
+                        android:lineSpacingExtra="2dp" />
+
+                </LinearLayout>
+
+                <!-- Tasbeh -->
+                <LinearLayout
+                    android:id="@+id/tasbehFragment"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:background="@drawable/selected_nav_background"
+                    android:padding="12dp"
+                    android:layout_marginHorizontal="3dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:minHeight="100dp">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/ic_tasbeh"
+                        android:layout_marginBottom="8dp"
+                        android:contentDescription="التسبيح الذكر"
+                        android:scaleType="centerInside" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="التسبيح الذكر"
+                        android:textSize="12sp"
+                        android:textColor="#333333"
+                        android:gravity="center"
+                        android:maxLines="2"
+                        android:ellipsize="end"
+                        android:lineSpacingExtra="2dp" />
+
+                </LinearLayout>
+
+                <!-- Dua -->
+                <LinearLayout
+                    android:id="@+id/duaFragment"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:background="@drawable/selected_nav_background"
+                    android:padding="12dp"
+                    android:layout_marginStart="6dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:minHeight="100dp">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/ic_dua"
+                        android:layout_marginBottom="8dp"
+                        android:contentDescription="الادعية"
+                        android:scaleType="centerInside" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="الادعية"
+                        android:textSize="12sp"
+                        android:textColor="#333333"
+                        android:gravity="center"
+                        android:maxLines="2"
+                        android:ellipsize="end"
+                        android:lineSpacingExtra="2dp" />
+
+                </LinearLayout>
 
             </LinearLayout>
 
+            <!-- Second Row -->
             <LinearLayout
-                android:id="@+id/tasbehFragment"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:background="@drawable/selected_nav_background"
-                android:padding="@dimen/_12sdp"
-                android:layout_marginStart="@dimen/_3sdp"
-                android:layout_marginEnd="@dimen/_3sdp"
-                android:clickable="true"
-                android:focusable="true"
-                android:minHeight="@dimen/_80sdp">
+                android:orientation="horizontal"
+                android:baselineAligned="false">
 
-                <ImageView
-                    android:layout_width="@dimen/_36sdp"
-                    android:layout_height="@dimen/_36sdp"
-                    android:src="@drawable/ic_tasbeh"
-                    android:layout_marginBottom="@dimen/_6sdp"
-                    android:contentDescription="التسبيح الذكر" />
-
-                <TextView
-                    android:layout_width="wrap_content"
+                <!-- Hadith -->
+                <LinearLayout
+                    android:id="@+id/hadithFragment"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="التسبيح الذكر"
-                    android:textSize="@dimen/_10sdp"
-                    android:textColor="#333333"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
                     android:gravity="center"
-                    android:maxLines="2"
-                    android:ellipsize="end" />
+                    android:background="@drawable/selected_nav_background"
+                    android:padding="12dp"
+                    android:layout_marginEnd="6dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:minHeight="100dp">
 
-            </LinearLayout>
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/ic_hadith"
+                        android:layout_marginBottom="8dp"
+                        android:contentDescription="الاحاديث"
+                        android:scaleType="centerInside" />
 
-            <LinearLayout
-                android:id="@+id/duaFragment"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:background="@drawable/selected_nav_background"
-                android:padding="@dimen/_12sdp"
-                android:layout_marginStart="@dimen/_6sdp"
-                android:clickable="true"
-                android:focusable="true"
-                android:minHeight="@dimen/_80sdp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="الاحاديث"
+                        android:textSize="12sp"
+                        android:textColor="#333333"
+                        android:gravity="center"
+                        android:maxLines="2"
+                        android:ellipsize="end"
+                        android:lineSpacingExtra="2dp" />
 
-                <ImageView
-                    android:layout_width="@dimen/_36sdp"
-                    android:layout_height="@dimen/_36sdp"
-                    android:src="@drawable/ic_dua"
-                    android:layout_marginBottom="@dimen/_6sdp"
-                    android:contentDescription="الادعية" />
+                </LinearLayout>
 
-                <TextView
-                    android:layout_width="wrap_content"
+                <!-- Azkar -->
+                <LinearLayout
+                    android:id="@+id/azkarFragment"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="الادعية"
-                    android:textSize="@dimen/_10sdp"
-                    android:textColor="#333333"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
                     android:gravity="center"
-                    android:maxLines="2"
-                    android:ellipsize="end" />
+                    android:background="@drawable/selected_nav_background"
+                    android:padding="12dp"
+                    android:layout_marginHorizontal="3dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:minHeight="100dp">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/ic_azkar"
+                        android:layout_marginBottom="8dp"
+                        android:contentDescription="الاذكار"
+                        android:scaleType="centerInside" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="الاذكار"
+                        android:textSize="12sp"
+                        android:textColor="#333333"
+                        android:gravity="center"
+                        android:maxLines="2"
+                        android:ellipsize="end"
+                        android:lineSpacingExtra="2dp" />
+
+                </LinearLayout>
+
+                <!-- Quran -->
+                <LinearLayout
+                    android:id="@+id/quranFragment"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:background="@drawable/selected_nav_background"
+                    android:padding="12dp"
+                    android:layout_marginStart="6dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:minHeight="100dp">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/ic_quran"
+                        android:layout_marginBottom="8dp"
+                        android:contentDescription="القرآن"
+                        android:scaleType="centerInside" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="القرآن"
+                        android:textSize="12sp"
+                        android:textColor="#333333"
+                        android:gravity="center"
+                        android:maxLines="2"
+                        android:ellipsize="end"
+                        android:lineSpacingExtra="2dp" />
+
+                </LinearLayout>
 
             </LinearLayout>
 
         </LinearLayout>
 
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="3">
-
-            <LinearLayout
-                android:id="@+id/hadithFragment"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:background="@drawable/selected_nav_background"
-                android:padding="@dimen/_12sdp"
-                android:layout_marginEnd="@dimen/_6sdp"
-                android:clickable="true"
-                android:focusable="true"
-                android:minHeight="@dimen/_80sdp">
-
-                <ImageView
-                    android:layout_width="@dimen/_36sdp"
-                    android:layout_height="@dimen/_36sdp"
-                    android:src="@drawable/ic_hadith"
-                    android:layout_marginBottom="@dimen/_6sdp"
-                    android:contentDescription="الاحاديث" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="الاحاديث"
-                    android:textSize="@dimen/_10sdp"
-                    android:textColor="#333333"
-                    android:gravity="center"
-                    android:maxLines="2"
-                    android:ellipsize="end" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/azkarFragment"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:background="@drawable/selected_nav_background"
-                android:padding="@dimen/_12sdp"
-                android:layout_marginStart="@dimen/_3sdp"
-                android:layout_marginEnd="@dimen/_3sdp"
-                android:clickable="true"
-                android:focusable="true"
-                android:minHeight="@dimen/_80sdp">
-
-                <ImageView
-                    android:layout_width="@dimen/_36sdp"
-                    android:layout_height="@dimen/_36sdp"
-                    android:src="@drawable/ic_azkar"
-                    android:layout_marginBottom="@dimen/_6sdp"
-                    android:contentDescription="الاذكار" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="الاذكار"
-                    android:textSize="@dimen/_10sdp"
-                    android:textColor="#333333"
-                    android:gravity="center"
-                    android:maxLines="2"
-                    android:ellipsize="end" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/quranFragment"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:background="@drawable/selected_nav_background"
-                android:padding="@dimen/_12sdp"
-                android:layout_marginStart="@dimen/_6sdp"
-                android:clickable="true"
-                android:focusable="true"
-                android:minHeight="@dimen/_80sdp">
-
-                <ImageView
-                    android:layout_width="@dimen/_36sdp"
-                    android:layout_height="@dimen/_36sdp"
-                    android:src="@drawable/ic_quran"
-                    android:layout_marginBottom="@dimen/_6sdp"
-                    android:contentDescription="القرآن" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="القرآن"
-                    android:textSize="@dimen/_10sdp"
-                    android:textColor="#333333"
-                    android:gravity="center"
-                    android:maxLines="2"
-                    android:ellipsize="end" />
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-    </LinearLayout>
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
