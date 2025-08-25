@@ -389,3 +389,47 @@ fun DomainWuduAzkar.mapToPresentation(): PresentationWuduAzkar {
         text = text
     )
 }
+
+
+// ---------------- Dua Presentation Mappers ----------------
+
+fun DomainDuaResponse.mapToPresentation(): PresentationDuaResponse {
+    return PresentationDuaResponse(
+        prophetic_duas = prophetic_duas.map { it.mapToPresentation() },
+        prophets_duas = prophets_duas.map { it.mapToPresentation() },
+        quran_completion_duas = quran_completion_duas.map { it.mapToPresentation() },
+        quran_duas = quran_duas.map { it.mapToPresentation() }
+    )
+}
+
+fun DomainPropheticDua.mapToPresentation(): PresentationPropheticDua {
+    return PresentationPropheticDua(
+        count = count,
+        id = id,
+        text = text
+    )
+}
+
+fun DomainProphetsDua.mapToPresentation(): PresentationProphetsDua {
+    return PresentationProphetsDua(
+        count = count,
+        id = id,
+        text = text
+    )
+}
+
+fun DomainQuranCompletionDua.mapToPresentation(): PresentationQuranCompletionDua {
+    return PresentationQuranCompletionDua(
+        count = count,
+        id = id,
+        text = text
+    )
+}
+
+fun DomainQuranDua.mapToPresentation(): PresentationQuranDua {
+    return PresentationQuranDua(
+        count = count,
+        id = id,
+        text = text
+    )
+}

@@ -389,3 +389,46 @@ fun WuduAzkar.mapToDomain(): DomainWuduAzkar {
         text = text
     )
 }
+
+// ---------------- Dua Mappers ----------------
+
+fun DuaResponse.mapToDomain(): DomainDuaResponse {
+    return DomainDuaResponse(
+        prophetic_duas = prophetic_duas.map { it.mapToDomain() },
+        prophets_duas = prophets_duas.map { it.mapToDomain() },
+        quran_completion_duas = quran_completion_duas.map { it.mapToDomain() },
+        quran_duas = quran_duas.map { it.mapToDomain() }
+    )
+}
+
+fun PropheticDua.mapToDomain(): DomainPropheticDua {
+    return DomainPropheticDua(
+        count = count,
+        id = id,
+        text = text
+    )
+}
+
+fun ProphetsDua.mapToDomain(): DomainProphetsDua {
+    return DomainProphetsDua(
+        count = count,
+        id = id,
+        text = text
+    )
+}
+
+fun QuranCompletionDua.mapToDomain(): DomainQuranCompletionDua {
+    return DomainQuranCompletionDua(
+        count = count,
+        id = id,
+        text = text
+    )
+}
+
+fun QuranDua.mapToDomain(): DomainQuranDua {
+    return DomainQuranDua(
+        count = count,
+        id = id,
+        text = text
+    )
+}

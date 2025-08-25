@@ -2,6 +2,7 @@ package com.example.zakrni.clean.data.remote
 
 import com.example.zakrni.clean.data.models.AsmaAlHusnaResponse
 import com.example.zakrni.clean.data.models.AzkarResponse
+import com.example.zakrni.clean.data.models.DuaResponse
 import com.example.zakrni.clean.data.models.HadithResponse
 import com.example.zakrni.clean.data.models.PrayerTimesResponse
 import com.example.zakrni.clean.data.models.Location
@@ -20,6 +21,8 @@ interface IRemoteDataSource {
 
 
     suspend fun getAzkar(): Result<AzkarResponse>
+
+    suspend fun getDuas(): Result<DuaResponse>
 
 
 }

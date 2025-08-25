@@ -2,6 +2,7 @@ package com.example.zakrni.clean.data.remote
 
 import com.example.zakrni.clean.data.models.AsmaAlHusnaResponse
 import com.example.zakrni.clean.data.models.AzkarResponse
+import com.example.zakrni.clean.data.models.DuaResponse
 import com.example.zakrni.clean.data.models.HadithResponse
 import com.example.zakrni.clean.data.models.Location
 import com.example.zakrni.clean.data.models.PrayerTimesResponse
@@ -46,6 +47,15 @@ class RemoteDataSource @Inject constructor(private val apiPrayerServices: Prayer
     override suspend fun getAzkar(): Result<AzkarResponse> {
         return try {
             val response = apiAzkarServices.getAzkar()
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getDuas(): Result<DuaResponse> {
+        return try {
+           val response = apiAzkarServices.getDua()
             Result.success(response)
         } catch (e: Exception) {
             Result.failure(e)

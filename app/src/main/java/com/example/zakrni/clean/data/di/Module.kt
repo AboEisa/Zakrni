@@ -77,7 +77,7 @@ object Module {
         return retrofit.create(HadithApiService::class.java)
     }
 
-    // Azkar API - FIXED: Using correct qualifier and working base URL
+
     @Provides
     @Singleton
     @DuaApi
@@ -91,7 +91,7 @@ object Module {
 
     @Provides
     @Singleton
-    fun provideAzkarApiService(@DuaApi retrofit: Retrofit): AzkarApiService { // FIXED: Using @DuaApi instead of @HadithApi
+    fun provideAzkarApiService(@DuaApi retrofit: Retrofit): AzkarApiService {
         return retrofit.create(AzkarApiService::class.java)
     }
 
