@@ -20,11 +20,14 @@ import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import com.example.zakrni.R
 import com.example.zakrni.clean.ui.models.PresentationPrayerTimesResponse
+import com.example.zakrni.clean.ui.utils.NetworkManager
+import com.example.zakrni.clean.ui.utils.NoInternetDialog
 import com.example.zakrni.clean.ui.utils.PrayerTimeUtils
 import com.example.zakrni.clean.ui.viewmodels.PrayerTimesViewModel
 import com.example.zakrni.databinding.ActivityHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class HomeActivity : AppCompatActivity() {
@@ -32,8 +35,12 @@ class HomeActivity : AppCompatActivity() {
     private var _binding: ActivityHomeBinding? = null
     private val binding get() = _binding!!
     private lateinit var navController: NavController
+    private lateinit var noInternetDialog: NoInternetDialog
 
     private val prayerTimeViewModel: PrayerTimesViewModel by viewModels()
+
+    @Inject
+    lateinit var networkManager: NetworkManager
 
     // Define which fragments should be full-screen
     private val fullScreenFragments = mapOf(
@@ -82,10 +89,52 @@ class HomeActivity : AppCompatActivity() {
             insets
         }
 
+        // Initialize network dialog
+        noInternetDialog = NoInternetDialog(this)
+
         setupNavigation()
         setupCustomBottomNavigation()
         setupPrayerTimesObservers()
+        setupNetworkObserver() // إضافة مراقبة الشبكة هنا
         checkLocationPermissions()
+    }
+
+    private fun setupNetworkObserver() {
+        lifecycleScope.launch {
+            networkManager.isConnected.collect { isConnected ->
+                if (!isConnected) {
+                    showNoInternetDialog()
+                } else {
+                    hideNoInternetDialog()
+                }
+            }
+        }
+    }
+
+    private fun showNoInternetDialog() {
+        if (!noInternetDialog.isShowing()) {
+            noInternetDialog.show(
+                onRetry = {
+                    // Retry action
+                    if (networkManager.isNetworkAvailable()) {
+                        hideNoInternetDialog()
+                    } else {
+                        noInternetDialog.showLoading(false) // Hide loading, show retry button again
+                        showNoInternetDialog()
+                    }
+                },
+                onCancel = {
+                    // Close the app when cancel is clicked
+                    finishAffinity()
+                }
+            )
+        }
+    }
+
+    private fun hideNoInternetDialog() {
+        if (noInternetDialog.isShowing()) {
+            noInternetDialog.dismiss()
+        }
     }
 
     private fun checkLocationPermissions() {
@@ -338,6 +387,7 @@ class HomeActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        hideNoInternetDialog()
         _binding = null
     }
 }

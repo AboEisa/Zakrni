@@ -1,114 +1,154 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    app:cardElevation="4dp"
+    android:layout_margin="12dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackground"
+    app:cardBackgroundColor="@color/surface"
     app:cardCornerRadius="12dp"
-    app:cardBackgroundColor="#FFFFFF"
-    app:strokeColor="#E8F4FD"
-    app:strokeWidth="1dp">
+    app:cardElevation="2dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:orientation="vertical">
 
-        <!-- Header with hadith number and book info -->
+        <!-- Simple Header -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/primary_container"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:layout_marginBottom="8dp">
+            android:padding="16dp">
 
+            <!-- Book Name -->
+            <TextView
+                android:id="@+id/bookName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+
+                android:gravity="start"
+                android:text="صحيح البخاري"
+                android:textColor="@color/on_primary_container"
+                android:textSize="16sp"
+                tools:text="صحيح البخاري" />
+
+            <!-- Hadith Number -->
             <TextView
                 android:id="@+id/hadithNumber"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="حديث رقم 1"
-                android:textSize="12sp"
-                android:textColor="#666666"
-                 />
-
-            <TextView
-                android:id="@+id/bookInfo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="صحيح البخاري - المجلد 1"
-                android:textSize="12sp"
-                android:textColor="#666666"
-                />
+                android:background="@drawable/simple_number_background"
+
+                android:gravity="center"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="4dp"
+                android:text="1"
+                android:textColor="@color/primary"
+                android:textSize="14sp"
+                tools:text="1" />
 
         </LinearLayout>
 
-        <!-- Hadith heading -->
-        <TextView
-            android:id="@+id/hadithHeading"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="باب بدء الوحي"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="#2E7D32"
-
-            android:layout_marginBottom="8dp"
-            android:gravity="end"
-            android:visibility="gone" />
-
-        <!-- Narrator -->
+        <!-- Content Container -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="12dp">
+            android:orientation="vertical"
+            android:padding="20dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="عن "
-                android:textSize="14sp"
-                android:textColor="#4A4A4A"
-                />
-
+            <!-- Narrator (Simple) -->
             <TextView
                 android:id="@+id/narrator"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="عمر بن الخطاب رضي الله عنه"
-                android:textSize="14sp"
-                android:textColor="#4A4A4A"
 
-                android:gravity="end" />
+                android:gravity="end"
+                android:text="عن عمر بن الخطاب رضي الله عنه قال:"
+                android:textColor="@color/on_surface_variant"
+                android:textSize="15sp"
+                tools:text="عن عمر بن الخطاب رضي الله عنه قال:" />
+
+            <!-- Hadith Text (Clean & Elegant) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="vertical">
+
+                <!-- Simple Top Line -->
+                <View
+                    android:layout_width="60dp"
+                    android:layout_height="2dp"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@color/primary"
+                    android:layout_marginBottom="16dp" />
+
+                <TextView
+                    android:id="@+id/hadithText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+
+                    android:gravity="center"
+                    android:lineSpacingMultiplier="1.6"
+                    android:text="إِنَّمَا الْأَعْمَالُ بِالنِّيَّاتِ وَإِنَّمَا لِكُلِّ امْرِئٍ مَا نَوَى"
+                    android:textColor="@color/on_surface"
+                    android:textSize="20sp"
+                    tools:text="إِنَّمَا الْأَعْمَالُ بِالنِّيَّاتِ وَإِنَّمَا لِكُلِّ امْرِئٍ مَا نَوَى" />
+
+                <!-- Simple Bottom Line -->
+                <View
+                    android:layout_width="60dp"
+                    android:layout_height="2dp"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@color/primary"
+                    android:layout_marginTop="16dp" />
+
+            </LinearLayout>
+
+            <!-- Chapter Info (Minimal) -->
+            <TextView
+                android:id="@+id/chapterInfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:gravity="center"
+                android:text="باب بدء الوحي"
+                android:textColor="@color/text_secondary"
+                android:textSize="14sp"
+                android:textStyle="italic"
+                tools:text="باب بدء الوحي" />
 
         </LinearLayout>
 
-        <!-- Hadith Arabic text -->
-        <TextView
-            android:id="@+id/hadithArabic"
+        <!-- Simple Footer Actions -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="إنما الأعمال بالنيات وإنما لكل امرئ ما نوى"
-            android:textSize="18sp"
-            android:textColor="#1A1A1A"
-            android:lineSpacingExtra="8dp"
-            android:gravity="end"
-            android:layout_marginBottom="12dp"
+            android:background="@color/surface_variant"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingVertical="12dp">
 
-            android:padding="12dp" />
+            <!-- Share Icon -->
+            <ImageView
+                android:id="@+id/shareIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="4dp"
+                android:src="@drawable/ic_share"
+                app:tint="@color/on_surface_variant" />
 
-        <!-- Chapter info -->
-        <TextView
-            android:id="@+id/chapterInfo"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="الباب 1"
-            android:textSize="12sp"
-            android:textColor="#666666"
-            android:gravity="center" />
+        </LinearLayout>
 
     </LinearLayout>
 

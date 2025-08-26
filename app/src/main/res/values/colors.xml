@@ -13,16 +13,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
     <color name="primary">#2E7D32</color>
     <color name="on_primary">#FFFFFF</color>
     <color name="primary_container">#A8DAB5</color>
@@ -50,4 +40,19 @@
     <!-- Accent Colors -->
     <color name="islamic_gold">#D4AF37</color>
     <color name="islamic_teal">#008B8B</color>
+
+
+
+
+
+
+    <!-- Dark Theme Colors (Optional) -->
+    <color name="primary_dark">#90CAF9</color>
+    <color name="primary_container_dark">#1565C0</color>
+    <color name="on_primary_container_dark">#E3F2FD</color>
+    <color name="secondary_dark">#81C784</color>
+    <color name="surface_dark">#121212</color>
+    <color name="surface_variant_dark">#2C2C2C</color>
+    <color name="on_surface_dark">#E6E1E5</color>
+    <color name="on_surface_variant_dark">#CAC4D0</color>
 </resources>

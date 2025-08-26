@@ -9,6 +9,7 @@ import com.example.zakrni.clean.data.network.PrayerApiService
 import com.example.zakrni.clean.data.remote.IRemoteDataSource
 import com.example.zakrni.clean.data.remote.RemoteDataSource
 import com.example.zakrni.clean.domain.IRepo
+import com.example.zakrni.clean.ui.utils.NetworkManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -127,5 +128,11 @@ object Module {
     @Singleton
     fun provideLocationManager(@ApplicationContext context: Context): LocationManager {
         return LocationManager(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideNetworkManager(@ApplicationContext context: Context): NetworkManager {
+        return NetworkManager(context)
     }
 }
