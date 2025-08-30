@@ -7,30 +7,98 @@
 
     <fragment
         android:id="@+id/allCategoriesFragment"
-        android:name="com.example.zakrni.AllCategoriesFragment"
+        android:name="com.example.zakrni.clean.ui.views.AllCategoriesFragment"
         android:label="fragment_all_categories"
         tools:layout="@layout/fragment_all_categories" >
+
         <action
             android:id="@+id/action_allCategoriesFragment_to_allMediaFragment"
-            app:destination="@id/allMediaFragment" />
+            app:destination="@id/allMediaFragment"
+            app:launchSingleTop="true" />
+
         <action
             android:id="@+id/action_allCategoriesFragment_to_playerTimesFragment"
             app:destination="@id/playerTimesFragment"
-             />
+            app:launchSingleTop="true" />
+
+        <action
+            android:id="@+id/action_allCategoriesFragment_to_hadithFragment"
+            app:destination="@id/hadithFragment"
+            app:launchSingleTop="true" />
+
+        <action
+            android:id="@+id/action_allCategoriesFragment_to_duaFragment"
+            app:destination="@id/duaFragment"
+            app:launchSingleTop="true" />
+
+        <action
+            android:id="@+id/action_allCategoriesFragment_to_azkarFragment"
+            app:destination="@id/azkarFragment"
+            app:launchSingleTop="true" />
+
+        <action
+            android:id="@+id/action_allCategoriesFragment_to_quranFragment"
+            app:destination="@id/quranFragment"
+            app:launchSingleTop="true" />
+
+        <action
+            android:id="@+id/action_allCategoriesFragment_to_allahNamesFragment"
+            app:destination="@id/allahNamesFragment"
+            app:launchSingleTop="true" />
+
+        <action
+            android:id="@+id/action_allCategoriesFragment_to_tasbehFragment"
+            app:destination="@id/tasbehFragment"
+            app:launchSingleTop="true" />
     </fragment>
+
+    <!-- Other fragments remain the same -->
     <fragment
         android:id="@+id/allMediaFragment"
-        android:name="com.example.zakrni.AllMediaFragment"
+        android:name="com.example.zakrni.clean.ui.views.AllMediaFragment"
         android:label="fragment_all_media"
-        tools:layout="@layout/fragment_all_media" >
-        <action
-            android:id="@+id/action_allMediaFragment_to_playerTimesFragment"
-            app:destination="@id/playerTimesFragment"
-            />
-    </fragment>
+        tools:layout="@layout/fragment_all_media" />
+
     <fragment
         android:id="@+id/playerTimesFragment"
-        android:name="com.example.zakrni.PlayerTimesFragment"
+        android:name="com.example.zakrni.clean.ui.views.PrayerTimesFragment"
         android:label="fragment_player_times"
-        tools:layout="@layout/fragment_player_times" />
+        tools:layout="@layout/fragment_prayer_times" />
+
+    <fragment
+        android:id="@+id/hadithFragment"
+        android:name="com.example.zakrni.clean.ui.views.HadithFragment"
+        android:label="الأحاديث"
+        tools:layout="@layout/fragment_hadith" />
+
+    <fragment
+        android:id="@+id/duaFragment"
+        android:name="com.example.zakrni.clean.ui.views.DuaFragment"
+        android:label="الأدعية"
+        tools:layout="@layout/fragment_dua" />
+
+    <fragment
+        android:id="@+id/azkarFragment"
+        android:name="com.example.zakrni.clean.ui.views.AzkarFragment"
+        android:label="الأذكار"
+        tools:layout="@layout/fragment_azkar" />
+
+    <fragment
+        android:id="@+id/quranFragment"
+        android:name="com.example.zakrni.clean.ui.views.QuranFragment"
+        android:label="القرآن"
+        tools:layout="@layout/fragment_quran" />
+
+    <fragment
+        android:id="@+id/allahNamesFragment"
+        android:name="com.example.zakrni.clean.ui.views.AllahNamesFragment"
+        android:label="أسماء الله الحسنى"
+        tools:layout="@layout/fragment_allah_names" />
+
+    <fragment
+        android:id="@+id/tasbehFragment"
+        android:name="com.example.zakrni.clean.ui.views.TasbehFragment"
+        android:label="التسبيح"
+        tools:layout="@layout/fragment_tasbeh" />
+
 </navigation>

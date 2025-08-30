@@ -5,294 +5,305 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".clean.ui.HomeActivity"
-    android:background="#F3E8D5">
+    tools:context=".clean.ui.views.HomeActivity"
+    android:background="#FEFBF4">
 
+    <!-- Main content container that can be hidden for full-screen fragments -->
     <LinearLayout
-        android:id="@+id/searchLayout"
+        android:id="@+id/mainContentContainer"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/_10sdp"
-        android:layout_marginTop="@dimen/_5sdp"
-        android:layout_marginEnd="@dimen/_10sdp"
-        android:orientation="horizontal"
-        android:padding="@dimen/_10sdp"
-        android:gravity="center_vertical"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintEnd_toEndOf="parent">
 
-        <ImageView
-            android:id="@+id/searchIcon"
-            android:layout_width="@dimen/_24sdp"
-            android:layout_height="@dimen/_24sdp"
-            android:src="@drawable/ic_search" />
-
-        <View
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_weight="1" />
-
-        <TextView
-            android:id="@+id/titleText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/quran"
-            android:textColor="#795547"
-            android:textSize="@dimen/_16sdp"
-            android:textStyle="bold"
-            android:layout_marginEnd="@dimen/_8sdp"
-            android:gravity="center" />
-
-        <ImageView
-            android:id="@+id/menuIcon"
-            android:layout_width="@dimen/_24sdp"
-            android:layout_height="@dimen/_24sdp"
-            android:src="@drawable/ic_menu"
-            android:contentDescription="Menu" />
-
-    </LinearLayout>
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/prayerCard"
-        android:layout_width="0dp"
-        android:layout_height="@dimen/_140sdp"
-        android:layout_marginStart="@dimen/_15sdp"
-        android:layout_marginTop="@dimen/_20sdp"
-        android:layout_marginEnd="@dimen/_15sdp"
-        app:cardCornerRadius="@dimen/_12sdp"
-        app:cardElevation="@dimen/_8sdp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/searchLayout">
-
-        <FrameLayout
+        <LinearLayout
+            android:id="@+id/searchLayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:layout_marginEnd="@dimen/_10sdp"
+            android:orientation="horizontal"
+            android:padding="@dimen/_10sdp"
+            android:gravity="center_vertical">
 
             <ImageView
-                android:id="@+id/cardBackgroundImage"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:src="@drawable/quarn_background"
-                android:scaleType="centerCrop"
-                android:alpha="0.8" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:gravity="center_vertical"
-                android:padding="@dimen/_16sdp">
-
-                <TextView
-                    android:id="@+id/prayerName"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/esha"
-                    android:textColor="#795547"
-                    android:textSize="@dimen/_14sdp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/prayerTime"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="19:01"
-                    android:textColor="#795547"
-                    android:textSize="@dimen/_28sdp"
-                    android:textStyle="bold"
-                    android:layout_marginTop="@dimen/_2sdp" />
-
-                <TextView
-                    android:id="@+id/nextPrayerLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/next_player_time"
-                    android:textColor="#795547"
-                    android:textSize="@dimen/_11sdp"
-                    android:layout_marginTop="@dimen/_8sdp" />
-
-                <TextView
-                    android:id="@+id/nextPrayerTime"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="05:30 صباحاً"
-                    android:textColor="#795547"
-                    android:textSize="@dimen/_14sdp"
-                    android:textStyle="bold"
-                    android:layout_marginTop="@dimen/_2sdp" />
-
-            </LinearLayout>
-
-        </FrameLayout>
-
-    </androidx.cardview.widget.CardView>
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/dailyAyahCard"
-        android:layout_width="0dp"
-        android:layout_height="@dimen/_140sdp"
-        android:layout_marginStart="@dimen/_15sdp"
-        android:layout_marginTop="@dimen/_20sdp"
-        android:layout_marginEnd="@dimen/_15sdp"
-        app:cardCornerRadius="@dimen/_12sdp"
-        app:cardElevation="@dimen/_8sdp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/prayerCard">
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+                android:id="@+id/searchIcon"
+                android:layout_width="@dimen/_24sdp"
+                android:layout_height="@dimen/_24sdp"
+                android:src="@drawable/ic_search" />
 
             <View
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="#2E2E2E" />
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
 
-            <LinearLayout
+            <TextView
+                android:id="@+id/titleText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/quran"
+                android:textColor="#795547"
+                android:textSize="@dimen/_16sdp"
+                android:textStyle="bold"
+                android:layout_marginEnd="@dimen/_8sdp"
+                android:gravity="center" />
+
+            <ImageView
+                android:id="@+id/menuIcon"
+                android:layout_width="@dimen/_24sdp"
+                android:layout_height="@dimen/_24sdp"
+                android:src="@drawable/ic_menu"
+                android:contentDescription="Menu" />
+
+        </LinearLayout>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/prayerCard"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_140sdp"
+            android:layout_marginStart="@dimen/_15sdp"
+            android:layout_marginTop="@dimen/_20sdp"
+            android:layout_marginEnd="@dimen/_15sdp"
+            app:cardCornerRadius="@dimen/_12sdp"
+            app:cardElevation="@dimen/_8sdp">
+
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:gravity="center_vertical"
-                android:padding="@dimen/_12sdp">
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:id="@+id/cardBackgroundImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/quarn_background"
+                    android:scaleType="centerCrop"
+                    android:alpha="0.8" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <TextView
-                        android:id="@+id/dailyAyahTitle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="سورة الفاتحة"
-                        android:textColor="#FFFFFF"
-                        android:textSize="@dimen/_14sdp"
-                        android:textStyle="bold" />
-
-                    <View
-                        android:layout_width="0dp"
-                        android:layout_height="1dp"
-                        android:layout_weight="1" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/daily_ayahs"
-                        android:textColor="#FFFFFF"
-                        android:textSize="@dimen/_14sdp"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/ayahArabic"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/ayah"
-                    android:textColor="#FFFFFF"
-                    android:textSize="@dimen/_16sdp"
-                    android:textStyle="bold"
-                    android:layout_marginTop="@dimen/_8sdp" />
-
-                <TextView
-                    android:id="@+id/ayahTranslation"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="All praise and thanks be to the Lord of the worlds."
-                    android:textColor="#B0B0B0"
-                    android:textSize="@dimen/_12sdp"
-                    android:layout_marginTop="@dimen/_4sdp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
                     android:gravity="center_vertical"
-                    android:layout_marginTop="@dimen/_8sdp">
+                    android:padding="@dimen/_16sdp">
 
                     <TextView
+                        android:id="@+id/prayerName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="سورة الفاتحة - الجزء الثلاثون - آية ١"
-                        android:textColor="#B0B0B0"
-                        android:textSize="@dimen/_10sdp" />
+                        android:text="@string/esha"
+                        android:textColor="#795547"
+                        android:textSize="@dimen/_14sdp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/prayerTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="19:01"
+                        android:textColor="#795547"
+                        android:textSize="@dimen/_28sdp"
+                        android:textStyle="bold"
+                        android:layout_marginTop="@dimen/_2sdp" />
+
+                    <TextView
+                        android:id="@+id/nextPrayerLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/next_player_time"
+                        android:textColor="#795547"
+                        android:textSize="@dimen/_11sdp"
+                        android:layout_marginTop="@dimen/_8sdp" />
+
+                    <TextView
+                        android:id="@+id/nextPrayerTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="05:30 صباحاً"
+                        android:textColor="#795547"
+                        android:textSize="@dimen/_14sdp"
+                        android:textStyle="bold"
+                        android:layout_marginTop="@dimen/_2sdp" />
 
                 </LinearLayout>
 
-            </LinearLayout>
+            </FrameLayout>
 
-        </FrameLayout>
+        </androidx.cardview.widget.CardView>
 
-    </androidx.cardview.widget.CardView>
+        <androidx.cardview.widget.CardView
+            android:id="@+id/dailyAyahCard"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_140sdp"
+            android:layout_marginStart="@dimen/_15sdp"
+            android:layout_marginTop="@dimen/_20sdp"
+            android:layout_marginEnd="@dimen/_15sdp"
+            app:cardCornerRadius="@dimen/_12sdp"
+            app:cardElevation="@dimen/_8sdp">
 
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-    <LinearLayout
-        android:id="@+id/custom_bottom_nav"
-        android:layout_width="0dp"
-        android:layout_height="36dp"
-        android:orientation="horizontal"
-        android:background="@drawable/bottom_nav_background"
-        android:gravity="center"
-        android:layout_marginStart="@dimen/_18sdp"
-        android:layout_marginEnd="@dimen/_18sdp"
-        android:layout_marginTop="@dimen/_18sdp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dailyAyahCard">
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#2E2E2E" />
 
-        <TextView
-            android:id="@+id/nav_prayer_times"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="@string/player_times"
-            android:textColor="#FFFFFF"
-            android:textSize="12sp"
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center_vertical"
+                    android:padding="@dimen/_12sdp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:id="@+id/dailyAyahTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="سورة الفاتحة"
+                            android:textColor="#FFFFFF"
+                            android:textSize="@dimen/_14sdp"
+                            android:textStyle="bold" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="1dp"
+                            android:layout_weight="1" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/daily_ayahs"
+                            android:textColor="#FFFFFF"
+                            android:textSize="@dimen/_14sdp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/ayahArabic"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/ayah"
+                        android:textColor="#FFFFFF"
+                        android:textSize="@dimen/_16sdp"
+                        android:textStyle="bold"
+                        android:layout_marginTop="@dimen/_8sdp" />
+
+                    <TextView
+                        android:id="@+id/ayahTranslation"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="All praise and thanks be to the Lord of the worlds."
+                        android:textColor="#B0B0B0"
+                        android:textSize="@dimen/_12sdp"
+                        android:layout_marginTop="@dimen/_4sdp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="@dimen/_8sdp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="سورة الفاتحة - الجزء الثلاثون - آية ١"
+                            android:textColor="#B0B0B0"
+                            android:textSize="@dimen/_10sdp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </FrameLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <LinearLayout
+            android:id="@+id/custom_bottom_nav"
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:orientation="horizontal"
+            android:background="@drawable/bottom_nav_background"
             android:gravity="center"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="?android:attr/selectableItemBackground" />
+            android:layout_marginStart="@dimen/_18sdp"
+            android:layout_marginEnd="@dimen/_18sdp"
+            android:layout_marginTop="@dimen/_18sdp">
 
-        <TextView
-            android:id="@+id/nav_all_media"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="@string/all_media"
-            android:textColor="#FFFFFF"
-            android:textSize="12sp"
-            android:gravity="center"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="?android:attr/selectableItemBackground" />
+            <TextView
+                android:id="@+id/nav_prayer_times"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="@string/player_times"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?android:attr/selectableItemBackground" />
 
-        <TextView
-            android:id="@+id/nav_all_categories"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
+            <TextView
+                android:id="@+id/nav_all_media"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="@string/all_media"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?android:attr/selectableItemBackground" />
+
+            <TextView
+                android:id="@+id/nav_all_categories"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="@string/all_categories"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?android:attr/selectableItemBackground" />
+        </LinearLayout>
+
+        <!-- Regular fragment container for normal fragments -->
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/nav_host_fragment"
+            android:name="androidx.navigation.fragment.NavHostFragment"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
             android:layout_weight="1"
-            android:text="@string/all_categories"
-            android:textColor="#FFFFFF"
-            android:textSize="12sp"
-            android:gravity="center"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="?android:attr/selectableItemBackground" />
+            app:defaultNavHost="true"
+            android:layout_marginTop="@dimen/_8sdp"
+            app:navGraph="@navigation/nav_graph" />
+
     </LinearLayout>
 
+    <!-- Full-screen fragment container that overlays everything -->
     <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/nav_host_fragment"
-        android:name="androidx.navigation.fragment.NavHostFragment"
-        android:layout_width="match_parent"
+        android:id="@+id/fullscreen_fragment_container"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        app:defaultNavHost="true"
-        android:layout_marginTop="@dimen/_10sdp"
-        app:layout_constraintTop_toBottomOf="@+id/custom_bottom_nav"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:navGraph="@navigation/nav_graph" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

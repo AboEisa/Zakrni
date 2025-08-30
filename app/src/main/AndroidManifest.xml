@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:name=".clean.App"
@@ -15,10 +17,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Zakrni">
         <activity
-            android:name=".clean.ui.HomeActivity"
+            android:name=".clean.ui.views.HomeActivity"
             android:exported="false" />
         <activity
-            android:name=".clean.ui.MainActivity"
+            android:name=".clean.ui.views.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
