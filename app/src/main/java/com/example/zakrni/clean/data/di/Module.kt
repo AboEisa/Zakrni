@@ -6,6 +6,7 @@ import com.example.zakrni.clean.data.location.LocationManager
 import com.example.zakrni.clean.data.network.AzkarApiService
 import com.example.zakrni.clean.data.network.HadithApiService
 import com.example.zakrni.clean.data.network.PrayerApiService
+import com.example.zakrni.clean.data.network.QuranApiService
 import com.example.zakrni.clean.data.remote.IRemoteDataSource
 import com.example.zakrni.clean.data.remote.RemoteDataSource
 import com.example.zakrni.clean.domain.IRepo
@@ -20,7 +21,10 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
+import javax.inject.Qualifier
 import javax.inject.Singleton
+
+
 
 @InstallIn(SingletonComponent::class)
 @Module
@@ -78,7 +82,6 @@ object Module {
         return retrofit.create(HadithApiService::class.java)
     }
 
-
     @Provides
     @Singleton
     @DuaApi
@@ -103,9 +106,15 @@ object Module {
     fun provideQuranRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .client(okHttpClient)
-            .baseUrl("https://api.quran.com/v4/")
+            .baseUrl("https://api.alquran.cloud/v1/quran/en.asad")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideQuranApiService(@QuranApi retrofit: Retrofit): QuranApiService {
+        return retrofit.create(QuranApiService::class.java)
     }
 
     @Singleton
@@ -113,9 +122,10 @@ object Module {
     fun getRemoteDataSource(
         prayerApiService: PrayerApiService,
         hadithApiService: HadithApiService,
-        azkarApiService: AzkarApiService
+        azkarApiService: AzkarApiService,
+        quranApiService: QuranApiService
     ): IRemoteDataSource {
-        return RemoteDataSource(prayerApiService, hadithApiService, azkarApiService)
+        return RemoteDataSource(prayerApiService, hadithApiService, azkarApiService, quranApiService)
     }
 
     @Singleton

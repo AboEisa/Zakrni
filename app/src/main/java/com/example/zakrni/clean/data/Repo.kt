@@ -13,6 +13,8 @@ import com.example.zakrni.clean.domain.models.DomainAzkarResponse
 import com.example.zakrni.clean.domain.models.DomainDuaResponse
 import com.example.zakrni.clean.domain.models.DomainHadithResponse
 import com.example.zakrni.clean.domain.models.DomainPrayerTimesResponse
+import com.example.zakrni.clean.domain.models.DomainQuranVerseResponse
+import com.example.zakrni.clean.domain.models.DomainSurah
 import com.example.zakrni.clean.ui.utils.Constant.Companion.APIKEY
 import javax.inject.Inject
 
@@ -65,6 +67,15 @@ class Repo @Inject constructor(
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+
+    override suspend fun getQuranVerses(suraNumber: Int): List<DomainQuranVerseResponse> {
+        return remoteDataSource.getQuranVerses(suraNumber) // Add caching logic if needed
+    }
+
+    override suspend fun getAllSurahs(): List<DomainSurah> {
+        return remoteDataSource.getAllSurahs()
+
     }
 
 

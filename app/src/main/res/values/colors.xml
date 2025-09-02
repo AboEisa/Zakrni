@@ -55,4 +55,10 @@
     <color name="surface_variant_dark">#2C2C2C</color>
     <color name="on_surface_dark">#E6E1E5</color>
     <color name="on_surface_variant_dark">#CAC4D0</color>
+
+
+
+
+<!--    <color name="s.xml">#F5E8C7</color> &lt;!&ndash; Adjust to match Figma design &ndash;&gt;-->
+<!--    <color name="s.xml">#F9F1E0</color> &lt;!&ndash; Slightly lighter shade &ndash;&gt;-->
 </resources>

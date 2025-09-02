@@ -7,6 +7,7 @@ import com.example.zakrni.clean.domain.models.DomainAzkarResponse
 import com.example.zakrni.clean.domain.models.DomainDuaResponse
 import com.example.zakrni.clean.domain.models.DomainHadithResponse
 import com.example.zakrni.clean.domain.models.DomainPrayerTimesResponse
+import com.example.zakrni.clean.domain.models.DomainQuranVerseResponse
 
 interface IRepo {
     suspend fun getPrayerTimes(
@@ -23,5 +24,9 @@ interface IRepo {
 
     suspend fun getDuas(): Result<DomainDuaResponse>
 
+    suspend fun getQuranVerses(suraNumber: Int): List<DomainQuranVerseResponse>
+    
+    suspend fun getAllSurahs(): List<com.example.zakrni.clean.domain.models.DomainSurah>
+    
 
 }
