@@ -1,32 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:padding="16dp">
+    android:layout_margin="4dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="2dp"
+    android:background="@android:color/white">
 
-    <TextView
-        android:id="@+id/verse_text"
-        android:layout_width="0dp"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/verse_number"
-        android:textSize="20sp"
-        android:textDirection="rtl"
-        android:layout_marginEnd="8dp"
-        android:fontFamily="@font/scheherazade" />
+        android:padding="16dp">
 
-    <TextView
-        android:id="@+id/verse_number"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="@id/verse_text"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:background="@drawable/circle_number"
-        android:gravity="center"
-        android:textSize="14sp"
-        android:textColor="@android:color/white"
-        android:padding="4dp"
-        android:layout_marginStart="8dp" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <!-- Verse Text -->
+        <TextView
+            android:id="@+id/verse_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:textColor="@android:color/black"
+            android:textDirection="rtl"
+            android:fontFamily="@font/scheherazade"
+            android:lineSpacingExtra="4dp"
+            android:layout_marginEnd="12dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/verse_number"
+            android:text="بِسۡمِ ٱللَّهِ ٱلرَّحۡمَـٰنِ ٱلرَّحِيمِ" />
+
+        <!-- Verse Number Circle -->
+        <TextView
+            android:id="@+id/verse_number"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/circle_number"
+            android:gravity="center"
+            android:textSize="14sp"
+            android:textColor="@android:color/white"
+            android:fontFamily="@font/scheherazade"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="@id/verse_text"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:text="1" />
+
+        <!-- Translation Text (Hidden by default) -->
+        <TextView
+            android:id="@+id/translation_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="#666666"
+            android:fontFamily="@font/scheherazade"
+            android:layout_marginTop="8dp"
+            android:textDirection="ltr"
+            android:visibility="visible"
+            app:layout_constraintTop_toBottomOf="@id/verse_text"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:text="In the name of Allah, the Entirely Merciful, the Especially Merciful." />
+
+        <!-- Highlight Overlay (for current playing verse) -->
+        <View
+            android:id="@+id/highlight_overlay"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="#1A2E7D32"
+            android:visibility="gone"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>

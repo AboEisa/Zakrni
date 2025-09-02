@@ -99,14 +99,13 @@ object Module {
         return retrofit.create(AzkarApiService::class.java)
     }
 
-    // Quran API
     @Provides
     @Singleton
     @QuranApi
     fun provideQuranRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .client(okHttpClient)
-            .baseUrl("https://api.alquran.cloud/v1/quran/en.asad")
+            .baseUrl("https://api.alquran.cloud/v1/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }

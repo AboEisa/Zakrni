@@ -4,19 +4,22 @@ import com.example.zakrni.clean.data.models.AsmaAlHusnaResponse
 import com.example.zakrni.clean.data.models.AzkarResponse
 import com.example.zakrni.clean.data.models.DuaResponse
 import com.example.zakrni.clean.data.models.HadithResponse
-import com.example.zakrni.clean.data.models.Location
 import com.example.zakrni.clean.data.models.PrayerTimesResponse
 import com.example.zakrni.clean.data.network.AzkarApiService
 import com.example.zakrni.clean.data.network.HadithApiService
 import com.example.zakrni.clean.data.network.PrayerApiService
 import com.example.zakrni.clean.data.network.QuranApiService
-import com.example.zakrni.clean.domain.models.DomainQuranVerseResponse
-import com.example.zakrni.clean.domain.models.DomainSurah
+import com.example.zakrni.clean.domain.models.DomainAyah
 import com.example.zakrni.clean.ui.utils.Constant.Companion.APIKEY
 import javax.inject.Inject
-import kotlin.collections.emptyList
 
-class RemoteDataSource @Inject constructor(private val apiPrayerServices: PrayerApiService ,private val apiHadithsServices: HadithApiService,private val apiAzkarServices: AzkarApiService ,private val quranApiService: QuranApiService): IRemoteDataSource {
+class RemoteDataSource @Inject constructor(
+    private val apiPrayerServices: PrayerApiService,
+    private val apiHadithsServices: HadithApiService,
+    private val apiAzkarServices: AzkarApiService,
+    private val quranApiService: QuranApiService
+): IRemoteDataSource {
+
     override suspend fun getPrayerTimes(
         latitude: Double,
         longitude: Double,
@@ -59,49 +62,59 @@ class RemoteDataSource @Inject constructor(private val apiPrayerServices: Prayer
 
     override suspend fun getDuas(): Result<DuaResponse> {
         return try {
-           val response = apiAzkarServices.getDua()
+            val response = apiAzkarServices.getDua()
             Result.success(response)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
 
-
-
-        override suspend fun getQuranVerses(surahNumber: Int): List<DomainQuranVerseResponse> {
+    override suspend fun getQuranVerses(surahNumber: Int): List<DomainAyah> {
+        return try {
             val response = quranApiService.getSurahDetails(surahNumber)
-            return if (response.code == 200 && response.status == "OK") {
-                response.data.ayahs.map { verse ->
-                    val editionMap = mapOf(
-                        "quran-uthmani" to verse.text,
-                        "en.pickthall" to (response.data.ayahs.find { it.number == verse.number }?.editions?.get("en.pickthall") ?: ""),
-                        "ar.alafasy" to (response.data.ayahs.find { it.number == verse.number }?.editions?.get("ar.alafasy") ?: "")
+            if (response.code == 200 && response.status == "OK") {
+                // Find the specific surah from the response
+                val surah = response.data.surahs.find { it.number == surahNumber }
+                surah?.ayahs?.map { ayah ->
+                    DomainAyah(
+                        hizbQuarter = ayah.hizbQuarter,
+                        juz = ayah.juz,
+                        manzil = ayah.manzil,
+                        number = ayah.number,
+                        numberInSurah = ayah.numberInSurah,
+                        page = ayah.page,
+                        ruku = ayah.ruku,
+                        sajda = ayah.sajda,
+                        text = ayah.text
                     )
-                    DomainQuranVerseResponse(
-                        number = verse.number,
-                        text = verse.text,
-                        numberInSurah = verse.numberInSurah ?: (verse.number % 100), // Fallback logic
-                        juz = verse.juz ?: 1,
-                        manzil = verse.manzil ?: 1,
-                        page = verse.page ?: 1,
-                        ruku = verse.ruku ?: 1,
-                        hizbQuarter = verse.hizbQuarter ?: 1,
-                        sajda = verse.sajda ?: false,
-                        editions = editionMap.filterValues { it.isNotEmpty() },
-                        audioUrl = editionMap["ar.alafasy"] // Audio URL from ar.alafasy
+                } ?: emptyList()
+            } else {
+                emptyList()
+            }
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
+    override suspend fun getSurahList(): List<com.example.zakrni.clean.domain.models.DomainSurah> {
+        return try {
+            val response = quranApiService.getSurahList()
+            if (response.code == 200 && response.status == "OK") {
+                response.data.surahs.map { surah ->
+                    com.example.zakrni.clean.domain.models.DomainSurah(
+                        ayahs = emptyList(), // Will be populated when needed
+                        englishName = surah.englishName,
+                        englishNameTranslation = surah.englishNameTranslation,
+                        name = surah.name,
+                        number = surah.number,
+                        revelationType = surah.revelationType
                     )
                 }
             } else {
                 emptyList()
             }
-        }
-
-        override suspend fun getSurahList(): List<DomainSurah> {
-            val response = quranApiService.getSurahList()
-            return if (response.code == 200 && response.status == "OK") {
-                response.data
-            } else {
-                emptyList()
-            }
+        } catch (e: Exception) {
+            emptyList()
         }
     }
+}

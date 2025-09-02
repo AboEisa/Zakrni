@@ -258,7 +258,6 @@ fun Link.mapToDomain(): DomainLink {
 
 // ---------------- Azkar Mappers ----------------
 
-
 fun AzkarResponse.mapToDomain(): DomainAzkarResponse {
     return DomainAzkarResponse(
         adhan_azkar = adhan_azkar.map { it.mapToDomain() },
@@ -429,6 +428,59 @@ fun QuranDua.mapToDomain(): DomainQuranDua {
     return DomainQuranDua(
         count = count,
         id = id,
+        text = text
+    )
+}
+
+// ---------------- Quran Mappers ----------------
+
+fun QuranResponse.mapToDomain(): DomainQuranResponse {
+    return DomainQuranResponse(
+        code = code,
+        status = status,
+        data = data.mapToDomain()
+    )
+}
+
+fun QuranData.mapToDomain(): DomainQuranData {
+    return DomainQuranData(
+        edition = edition.mapToDomain(),
+        surahs = surahs.map { it.mapToDomain() }
+    )
+}
+
+fun Edition.mapToDomain(): DomainEdition {
+    return DomainEdition(
+        englishName = englishName,
+        format = format,
+        identifier = identifier,
+        language = language,
+        name = name,
+        type = type
+    )
+}
+
+fun Surah.mapToDomain(): DomainSurah {
+    return DomainSurah(
+        ayahs = ayahs.map { it.mapToDomain() },
+        englishName = englishName,
+        englishNameTranslation = englishNameTranslation,
+        name = name,
+        number = number,
+        revelationType = revelationType
+    )
+}
+
+fun Ayah.mapToDomain(): DomainAyah {
+    return DomainAyah(
+        hizbQuarter = hizbQuarter,
+        juz = juz,
+        manzil = manzil,
+        number = number,
+        numberInSurah = numberInSurah,
+        page = page,
+        ruku = ruku,
+        sajda = sajda,
         text = text
     )
 }

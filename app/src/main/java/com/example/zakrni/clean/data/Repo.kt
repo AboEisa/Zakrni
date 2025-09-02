@@ -9,11 +9,11 @@ import com.example.zakrni.clean.data.remote.IRemoteDataSource
 import com.example.zakrni.clean.domain.IRepo
 import com.example.zakrni.clean.domain.models.DomainAllahNameData
 import com.example.zakrni.clean.domain.models.DomainAsmaAlHusnaResponse
+import com.example.zakrni.clean.domain.models.DomainAyah
 import com.example.zakrni.clean.domain.models.DomainAzkarResponse
 import com.example.zakrni.clean.domain.models.DomainDuaResponse
 import com.example.zakrni.clean.domain.models.DomainHadithResponse
 import com.example.zakrni.clean.domain.models.DomainPrayerTimesResponse
-import com.example.zakrni.clean.domain.models.DomainQuranVerseResponse
 import com.example.zakrni.clean.domain.models.DomainSurah
 import com.example.zakrni.clean.ui.utils.Constant.Companion.APIKEY
 import javax.inject.Inject
@@ -69,14 +69,19 @@ class Repo @Inject constructor(
         }
     }
 
-    override suspend fun getQuranVerses(suraNumber: Int): List<DomainQuranVerseResponse> {
-        return remoteDataSource.getQuranVerses(suraNumber) // Add caching logic if needed
+    override suspend fun getQuranVerses(suraNumber: Int): List<DomainAyah> {
+        return try {
+            remoteDataSource.getQuranVerses(suraNumber)
+        } catch (e: Exception) {
+            emptyList()
+        }
     }
 
     override suspend fun getAllSurahs(): List<DomainSurah> {
-        return remoteDataSource.getAllSurahs()
-
+        return try {
+            remoteDataSource.getSurahList()
+        } catch (e: Exception) {
+            emptyList()
+        }
     }
-
-
 }

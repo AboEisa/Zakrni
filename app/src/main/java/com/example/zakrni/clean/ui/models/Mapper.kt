@@ -256,7 +256,6 @@ fun DomainLink.mapToPresentation(): PresentationLink {
     )
 }
 
-
 // ---------------- Azkar Presentation Mappers ----------------
 
 fun DomainAzkarResponse.mapToPresentation(): PresentationAzkarResponse {
@@ -390,7 +389,6 @@ fun DomainWuduAzkar.mapToPresentation(): PresentationWuduAzkar {
     )
 }
 
-
 // ---------------- Dua Presentation Mappers ----------------
 
 fun DomainDuaResponse.mapToPresentation(): PresentationDuaResponse {
@@ -430,6 +428,59 @@ fun DomainQuranDua.mapToPresentation(): PresentationQuranDua {
     return PresentationQuranDua(
         count = count,
         id = id,
+        text = text
+    )
+}
+
+// ---------------- Quran Presentation Mappers ----------------
+
+fun DomainQuranResponse.mapToPresentation(): PresentationQuranResponse {
+    return PresentationQuranResponse(
+        code = code,
+        status = status,
+        data = data.mapToPresentation()
+    )
+}
+
+fun DomainQuranData.mapToPresentation(): PresentationQuranData {
+    return PresentationQuranData(
+        edition = edition.mapToPresentation(),
+        surahs = surahs.map { it.mapToPresentation() }
+    )
+}
+
+fun DomainEdition.mapToPresentation(): PresentationEdition {
+    return PresentationEdition(
+        englishName = englishName,
+        format = format,
+        identifier = identifier,
+        language = language,
+        name = name,
+        type = type
+    )
+}
+
+fun DomainSurah.mapToPresentation(): PresentationSurah {
+    return PresentationSurah(
+        ayahs = ayahs.map { it.mapToPresentation() },
+        englishName = englishName,
+        englishNameTranslation = englishNameTranslation,
+        name = name,
+        number = number,
+        revelationType = revelationType
+    )
+}
+
+fun DomainAyah.mapToPresentation(): PresentationAyah {
+    return PresentationAyah(
+        hizbQuarter = hizbQuarter,
+        juz = juz,
+        manzil = manzil,
+        number = number,
+        numberInSurah = numberInSurah,
+        page = page,
+        ruku = ruku,
+        sajda = sajda,
         text = text
     )
 }

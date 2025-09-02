@@ -1,14 +1,12 @@
-package com.example.zakrni.clean.views
+package com.example.zakrni.clean.ui.views
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.ViewModelProvider
-import androidx.media3.exoplayer.SimpleExoPlayer
-import androidx.media3.common.MediaItem
-import androidx.media3.common.util.UnstableApi
+import android.widget.Toast
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.zakrni.R
 import com.example.zakrni.clean.ui.adapters.QuranAdapter
@@ -16,71 +14,88 @@ import com.example.zakrni.clean.viewmodels.QuranViewModel
 import com.example.zakrni.databinding.FragmentQuranBinding
 import dagger.hilt.android.AndroidEntryPoint
 
-@UnstableApi
 @AndroidEntryPoint
 class QuranFragment : Fragment() {
-    private lateinit var binding: FragmentQuranBinding
-    private lateinit var viewModel: QuranViewModel
+    private var _binding: FragmentQuranBinding? = null
+    private val binding get() = _binding!!
+
+    private val viewModel: QuranViewModel by viewModels()
     private lateinit var adapter: QuranAdapter
-    private var exoPlayer: SimpleExoPlayer? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentQuranBinding.inflate(inflater, container, false)
+        _binding = FragmentQuranBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(this).get(QuranViewModel::class.java)
-        adapter = QuranAdapter()
-        binding.quranVersesRecycler.adapter = adapter
-        binding.quranVersesRecycler.layoutManager = LinearLayoutManager(context)
 
-        // Load Surah 1 (Al-Fatiha) as an example
+        setupRecyclerView()
+        observeViewModel()
+
+        // Load Surah 1 (Al-Fatiha) as default
         viewModel.loadQuranVerses(1)
-
-        viewModel.verses.observe(viewLifecycleOwner) { verses ->
-            binding.surahHeader.text = viewModel.surahName.value ?: "سُورَةُ ٱلْفَاتِحَةِ"
-            adapter.submitList(verses)
-            if (verses.isNotEmpty()) {
-                val audioUrl = verses.first().audioUrl ?: verses.first().editions?.get("ar.alafasy")
-                setupExoPlayer(audioUrl ?: "")
-            }
-        }
-
-        viewModel.isPlaying.observe(viewLifecycleOwner) { isPlaying ->
-            updatePlayButton(isPlaying)
-        }
 
         binding.playButton.setOnClickListener {
             viewModel.togglePlay()
         }
     }
 
-    private fun setupExoPlayer(audioUrl: String) {
-        exoPlayer = SimpleExoPlayer.Builder(requireContext()).build()
-        if (audioUrl.isNotEmpty()) {
-            val mediaItem = MediaItem.fromUri(audioUrl)
-            exoPlayer?.setMediaItem(mediaItem)
-            exoPlayer?.prepare()
+    private fun setupRecyclerView() {
+        adapter = QuranAdapter()
+        binding.quranVersesRecycler.apply {
+            adapter = this@QuranFragment.adapter
+            layoutManager = LinearLayoutManager(context)
         }
+    }
+
+    private fun observeViewModel() {
+        viewModel.verses.observe(viewLifecycleOwner) { verses ->
+            println("DEBUG: Received ${verses.size} verses")
+            if (verses.isNotEmpty()) {
+                adapter.submitList(verses)
+                binding.quranVersesRecycler.visibility = View.VISIBLE
+            } else {
+                println("DEBUG: No verses received")
+                Toast.makeText(context, "No verses found", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        viewModel.surahName.observe(viewLifecycleOwner) { name ->
+            binding.surahHeader.text = name
+            println("DEBUG: Surah name set to: $name")
+        }
+
         viewModel.isPlaying.observe(viewLifecycleOwner) { isPlaying ->
-            if (isPlaying) exoPlayer?.play() else exoPlayer?.pause()
             updatePlayButton(isPlaying)
+        }
+
+        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            println("DEBUG: Loading state: $isLoading")
+            // If you have a progress bar, show/hide it here
+            // binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+        }
+
+        viewModel.error.observe(viewLifecycleOwner) { error ->
+            error?.let {
+                println("DEBUG: Error occurred: $it")
+                Toast.makeText(context, "Error: $it", Toast.LENGTH_LONG).show()
+            }
         }
     }
 
     private fun updatePlayButton(isPlaying: Boolean?) {
-        binding.playButton.setImageResource(if (isPlaying == true) R.drawable.ic_pause else R.drawable.ic_play)
+        binding.playButton.setImageResource(
+            if (isPlaying == true) R.drawable.ic_pause else R.drawable.ic_play
+        )
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        exoPlayer?.release()
-        exoPlayer = null
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
