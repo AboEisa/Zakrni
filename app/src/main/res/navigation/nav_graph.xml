@@ -87,7 +87,11 @@
         android:id="@+id/quranFragment"
         android:name="com.example.zakrni.clean.ui.views.QuranFragment"
         android:label="القرآن"
-        tools:layout="@layout/fragment_quran" />
+        tools:layout="@layout/fragment_quran" >
+        <action
+            android:id="@+id/action_quranFragment_to_quran2Fragment"
+            app:destination="@id/quran2Fragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/allahNamesFragment"
@@ -100,5 +104,10 @@
         android:name="com.example.zakrni.clean.ui.views.TasbehFragment"
         android:label="التسبيح"
         tools:layout="@layout/fragment_tasbeh" />
+    <fragment
+        android:id="@+id/quran2Fragment"
+        android:name="com.example.zakrni.clean.ui.views.Quran2Fragment"
+        android:label="fragment_quran2"
+        tools:layout="@layout/fragment_quran2" />
 
 </navigation>

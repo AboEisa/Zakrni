@@ -69,7 +69,7 @@ class NetworkManager @Inject constructor(
         }
     }
 
-    fun unregisterCallback() {
+    fun unregisterNetworkCallback() {
         connectivityManager.unregisterNetworkCallback(networkCallback)
     }
 }
