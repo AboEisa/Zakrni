@@ -37,11 +37,6 @@
             app:launchSingleTop="true" />
 
         <action
-            android:id="@+id/action_allCategoriesFragment_to_quranFragment"
-            app:destination="@id/quranFragment"
-            app:launchSingleTop="true" />
-
-        <action
             android:id="@+id/action_allCategoriesFragment_to_allahNamesFragment"
             app:destination="@id/allahNamesFragment"
             app:launchSingleTop="true" />
@@ -50,6 +45,9 @@
             android:id="@+id/action_allCategoriesFragment_to_tasbehFragment"
             app:destination="@id/tasbehFragment"
             app:launchSingleTop="true" />
+        <action
+            android:id="@+id/action_allCategoriesFragment_to_quran2Fragment"
+            app:destination="@id/quran2Fragment" />
     </fragment>
 
     <!-- Other fragments remain the same -->
@@ -84,16 +82,6 @@
         tools:layout="@layout/fragment_azkar" />
 
     <fragment
-        android:id="@+id/quranFragment"
-        android:name="com.example.zakrni.clean.ui.views.QuranFragment"
-        android:label="القرآن"
-        tools:layout="@layout/fragment_quran" >
-        <action
-            android:id="@+id/action_quranFragment_to_quran2Fragment"
-            app:destination="@id/quran2Fragment" />
-    </fragment>
-
-    <fragment
         android:id="@+id/allahNamesFragment"
         android:name="com.example.zakrni.clean.ui.views.AllahNamesFragment"
         android:label="أسماء الله الحسنى"
@@ -108,6 +96,14 @@
         android:id="@+id/quran2Fragment"
         android:name="com.example.zakrni.clean.ui.views.Quran2Fragment"
         android:label="fragment_quran2"
-        tools:layout="@layout/fragment_quran2" />
+        tools:layout="@layout/fragment_quran2" >
+        <action
+            android:id="@+id/action_quran2Fragment_to_quranFragment2"
+            app:destination="@id/quranFragment2" />
+    </fragment>
+    <fragment
+        android:id="@+id/quranFragment2"
+        android:name="com.example.zakrni.clean.ui.views.QuranFragment"
+        android:label="QuranFragment" />
 
 </navigation>

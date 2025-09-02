@@ -3,7 +3,7 @@ package com.example.zakrni.clean.viewmodels
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.zakrni.clean.domain.models.DomainAyah
+import com.example.zakrni.clean.domain.models.DomainSurah
 import com.example.zakrni.clean.domain.usecase.GetQuranUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -14,58 +14,85 @@ class QuranViewModel @Inject constructor(
     private val getQuranUseCase: GetQuranUseCase
 ) : ViewModel() {
 
-    private val _verses = MutableLiveData<List<DomainAyah>>()
-    val verses: MutableLiveData<List<DomainAyah>> get() = _verses
-
-    private val _isPlaying = MutableLiveData<Boolean>(false)
-    val isPlaying: MutableLiveData<Boolean> get() = _isPlaying
-
-    private val _surahName = MutableLiveData<String>("سُورَةُ ٱلْفَاتِحَةِ")
-    val surahName: MutableLiveData<String> get() = _surahName
+    private val _surahs = MutableLiveData<List<DomainSurah>>()
+    val surahs: MutableLiveData<List<DomainSurah>> get() = _surahs
 
     private val _isLoading = MutableLiveData<Boolean>(false)
     val isLoading: MutableLiveData<Boolean> get() = _isLoading
 
-    private val _error = MutableLiveData<String>()
-    val error: MutableLiveData<String> get() = _error
+    private val _error = MutableLiveData<String?>()
+    val error: MutableLiveData<String?> get() = _error
 
-    fun loadQuranVerses(surahNumber: Int) {
+    init {
+        loadAllSurahs()
+    }
+
+    fun loadAllSurahs() {
         viewModelScope.launch {
             try {
-                println("DEBUG: Starting to load verses for Surah $surahNumber")
+                println("DEBUG: SurahListViewModel - Starting to load all surahs")
                 _isLoading.value = true
                 _error.value = null
 
-                val surah = getQuranUseCase.getSurahByNumber(surahNumber)
-                println("DEBUG: Got surah info: $surah")
+                val surahs = getQuranUseCase.getAllSurahs()
+                println("DEBUG: SurahListViewModel - Got ${surahs.size} surahs")
 
-                surah?.let {
-                    _surahName.value = "${it.name} (${it.englishName})"
-                }
-
-                // Then get the verses
-                val verses = getQuranUseCase.getQuranVerses(surahNumber)
-                println("DEBUG: Got ${verses.size} verses")
-
-                if (verses.isNotEmpty()) {
-                    verses.forEachIndexed { index, verse ->
-                        println("DEBUG: Verse $index: ${verse.text.take(50)}...")
+                if (surahs.isNotEmpty()) {
+                    surahs.forEachIndexed { index, surah ->
+                        println("DEBUG: SurahListViewModel - Surah ${index + 1}: ${surah.number} - ${surah.englishName}")
                     }
+                    _surahs.value = surahs
+                } else {
+                    println("DEBUG: SurahListViewModel - No surahs received")
+                    _surahs.value = emptyList()
                 }
-
-                _verses.value = verses
 
             } catch (e: Exception) {
-                println("DEBUG: Exception in loadQuranVerses: ${e.message}")
+                println("DEBUG: SurahListViewModel - Exception in loadAllSurahs: ${e.message}")
                 e.printStackTrace()
-                _error.value = "Failed to load Quran verses: ${e.message}"
+                _error.value = "Failed to load Surahs: ${e.message}"
+                _surahs.value = emptyList()
             } finally {
                 _isLoading.value = false
+                println("DEBUG: SurahListViewModel - Finished loading")
             }
         }
     }
 
-    fun togglePlay() {
-        _isPlaying.value = _isPlaying.value?.not()
+    fun clearError() {
+        _error.value = null
+    }
+
+    // Test method with dummy data
+    fun loadTestData() {
+        println("DEBUG: SurahListViewModel - Loading test data")
+        val testSurahs = listOf(
+            DomainSurah(
+                number = 1,
+                name = "سُورَةُ ٱلْفَاتِحَةِ",
+                englishName = "Al-Faatiha",
+                englishNameTranslation = "The Opening",
+                revelationType = "Meccan",
+                ayahs = emptyList()
+            ),
+            DomainSurah(
+                number = 2,
+                name = "سُورَةُ ٱلْبَقَرَةِ",
+                englishName = "Al-Baqarah",
+                englishNameTranslation = "The Cow",
+                revelationType = "Medinan",
+                ayahs = emptyList()
+            ),
+            DomainSurah(
+                number = 3,
+                name = "سُورَةُ آلِ عِمْرَانَ",
+                englishName = "Ali 'Imran",
+                englishNameTranslation = "Family of Imran",
+                revelationType = "Medinan",
+                ayahs = emptyList()
+            )
+        )
+        _surahs.value = testSurahs
+        println("DEBUG: SurahListViewModel - Test data loaded with ${testSurahs.size} surahs")
     }
 }

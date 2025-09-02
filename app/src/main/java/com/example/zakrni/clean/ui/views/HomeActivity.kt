@@ -49,7 +49,8 @@ class HomeActivity : AppCompatActivity() {
         R.id.azkarFragment to { AzkarFragment() },
         R.id.quranFragment to { QuranFragment() },
         R.id.allahNamesFragment to { AllahNamesFragment() },
-        R.id.tasbehFragment to { TasbehFragment() }
+        R.id.tasbehFragment to { TasbehFragment() },
+        R.id.quran2Fragment to { Quran2Fragment() }
     )
 
     private val locationPermissionRequest = registerForActivityResult(
@@ -95,8 +96,9 @@ class HomeActivity : AppCompatActivity() {
         setupNavigation()
         setupCustomBottomNavigation()
         setupPrayerTimesObservers()
-        setupNetworkObserver() // إضافة مراقبة الشبكة هنا
+        setupNetworkObserver()
         checkLocationPermissions()
+
     }
 
     private fun setupNetworkObserver() {

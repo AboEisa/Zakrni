@@ -63,7 +63,7 @@ class AllCategoriesFragment : Fragment() {
 
             quranFragment.setOnClickListener {
                 findNavController().navigate(
-                    AllCategoriesFragmentDirections.actionAllCategoriesFragmentToQuranFragment(),
+                    AllCategoriesFragmentDirections.actionAllCategoriesFragmentToQuran2Fragment(),
                     navOptions
                 )
             }

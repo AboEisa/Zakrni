@@ -5,56 +5,132 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.zakrni.R
+import android.widget.Toast
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.R
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.zakrni.clean.ui.adapters.Quran2Adapter
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
+import com.example.zakrni.clean.viewmodels.QuranViewModel
 
-/**
- * A simple [Fragment] subclass.
- * Use the [Quran2Fragment.newInstance] factory method to
- * create an instance of this fragment.
- */
+import com.example.zakrni.databinding.FragmentQuran2Binding
+import dagger.hilt.android.AndroidEntryPoint
+
+@AndroidEntryPoint
 class Quran2Fragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+    private var _binding: FragmentQuran2Binding? = null
+    private val binding get() = _binding!!
+
+    private val viewModel: QuranViewModel by viewModels()
+    private lateinit var adapter: Quran2Adapter
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentQuran2Binding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        println("DEBUG: Quran2Fragment - onViewCreated called")
+
+        setupRecyclerView()
+        observeViewModel()
+        setupClickListeners()
+    }
+
+    private fun setupRecyclerView() {
+        println("DEBUG: Quran2Fragment - Setting up RecyclerView")
+        adapter = Quran2Adapter { surah ->
+            println("DEBUG: Quran2Fragment - Surah clicked: ${surah.number} - ${surah.englishName}")
+            // Navigate to QuranFragment with surah number
+            navigateToSurahVerses(surah.number)
+        }
+
+        binding.quranVersesRecycler.apply {
+            adapter = this@Quran2Fragment.adapter
+            layoutManager = LinearLayoutManager(context)
+            setHasFixedSize(true)
+        }
+        println("DEBUG: Quran2Fragment - RecyclerView setup complete")
+    }
+
+    private fun observeViewModel() {
+        println("DEBUG: Quran2Fragment - Setting up observers")
+
+        viewModel.surahs.observe(viewLifecycleOwner) { surahs ->
+            println("DEBUG: Quran2Fragment - Surahs observer triggered with ${surahs.size} surahs")
+            if (surahs.isNotEmpty()) {
+                println("DEBUG: Quran2Fragment - Submitting ${surahs.size} surahs to adapter")
+                surahs.forEachIndexed { index, surah ->
+                    println("DEBUG: Quran2Fragment - Surah ${index + 1}: ${surah.number} - ${surah.englishName}")
+                }
+
+                adapter.submitList(surahs) {
+                    println("DEBUG: Quran2Fragment - List submitted to adapter, items count: ${adapter.itemCount}")
+                    binding.quranVersesRecycler.visibility = View.VISIBLE
+                }
+            } else {
+                println("DEBUG: Quran2Fragment - No surahs received, hiding RecyclerView")
+                binding.quranVersesRecycler.visibility = View.GONE
+                Toast.makeText(context, "No surahs found", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            println("DEBUG: Quran2Fragment - Loading state: $isLoading")
+            // You can show/hide a loading indicator here if you have one
+            if (isLoading) {
+                binding.quranVersesRecycler.visibility = View.GONE
+            }
+        }
+
+        viewModel.error.observe(viewLifecycleOwner) { error ->
+            if (error != null) {
+                println("DEBUG: Quran2Fragment - Error occurred: $error")
+                Toast.makeText(context, "Error: $error", Toast.LENGTH_LONG).show()
+                binding.quranVersesRecycler.visibility = View.GONE
+                viewModel.clearError()
+            }
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_quran2, container, false)
+    private fun setupClickListeners() {
+        // Back button
+        binding.backButton.setOnClickListener {
+            findNavController().navigateUp()
+        }
+
+        // Long press on header to load test data
+        binding.headerLayout.setOnLongClickListener {
+            println("DEBUG: Quran2Fragment - Loading test data")
+            viewModel.loadTestData()
+            true
+        }
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment Quran2Fragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            Quran2Fragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
+    private fun navigateToSurahVerses(surahNumber: Int) {
+        // Navigate to QuranFragment with the selected surah number
+        // You'll need to create this navigation action in your nav_graph.xml
+        try {
+            val bundle = Bundle().apply {
+                putInt("surah_number", surahNumber)
             }
+//            findNavController().navigate(Quran2FragmentDirections())// You need to add this action to nav_graph.xml bundle)
+        } catch (e: Exception) {
+            println("DEBUG: Quran2Fragment - Navigation error: ${e.message}")
+            Toast.makeText(context, "Navigation not set up yet. Surah $surahNumber selected.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

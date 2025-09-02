@@ -44,8 +44,8 @@ object PrayerTimeUtils {
 
             val prayerTimeInSeconds = prayerCalendar.timeInMillis / 1000
 
-            // Convert to 12-hour format without AM/PM
-            val formattedTime = formatTimeTo12Hour(hour, minute)
+            // Keep original 24-hour format
+            val formattedTime = String.format("%02d:%02d", hour, minute)
 
             Quadruple(name, nameArabic, prayerTimeInSeconds, formattedTime)
         }
@@ -112,24 +112,6 @@ object PrayerTimeUtils {
         return Pair(currentPrayer, nextPrayer)
     }
 
-    // Convert 24-hour format to 12-hour format without AM/PM
-    private fun formatTimeTo12Hour(hour: Int, minute: Int): String {
-        val hour12 = when {
-            hour == 0 -> 12 // Midnight -> 12
-            hour > 12 -> hour - 12 // PM hours
-            else -> hour // AM hours (1-12)
-        }
-
-        return String.format("%d:%02d", hour12, minute)
-    }
-
-    // DEPRECATED: Keep for backward compatibility
-    private fun formatTime(timeInMinutes: Int): String {
-        val hour = timeInMinutes / 60
-        val minute = timeInMinutes % 60
-        return formatTimeTo12Hour(hour, minute)
-    }
-
     fun formatTimeRemaining(seconds: Long): String {
         val hours = seconds / 3600
         val minutes = (seconds % 3600) / 60
@@ -141,7 +123,7 @@ object PrayerTimeUtils {
         }
     }
 
-    // NEW: Use API data for Hijri date formatting
+    // Use API data for Hijri date formatting
     fun formatHijriDateFromApi(prayerTimesResponse: PresentationPrayerTimesResponse): String {
         return with(prayerTimesResponse.data.date) {
             val dayName = hijri.weekday.ar
@@ -153,10 +135,10 @@ object PrayerTimeUtils {
         }
     }
 
-    // NEW: Use API data for Gregorian date formatting
+    // Use API data for Gregorian date formatting
     fun formatGregorianDateFromApi(prayerTimesResponse: PresentationPrayerTimesResponse): String {
         return with(prayerTimesResponse.data.date) {
-            val dayName = getCurrentDayNameInArabic() // You can also use gregorian.weekday.en and translate
+            val dayName = getCurrentDayNameInArabic()
             val day = gregorian.day
             val monthName = translateMonthToArabic(gregorian.month.en)
             val year = gregorian.year
@@ -165,21 +147,18 @@ object PrayerTimeUtils {
         }
     }
 
-    // DEPRECATED: Keep these for backward compatibility but they should be replaced
+    // DEPRECATED: Keep these for backward compatibility
     fun formatHijriDate(hijriDate: String): String {
-        // This method should be replaced with formatHijriDateFromApi
         val parts = hijriDate.split(" ")
-        if (parts.size < 4) return hijriDate // Invalid format
-        val dayName = parts[0] // e.g., "الأحد"
-        val day = parts[1] // e.g., "1"
-        val monthName = parts[2] // e.g., "محرم"
-        val year = parts[3] // e.g., "1445"
-        val hijriDate = "$dayName $day $monthName $year هـ"
-        return hijriDate
+        if (parts.size < 4) return hijriDate
+        val dayName = parts[0]
+        val day = parts[1]
+        val monthName = parts[2]
+        val year = parts[3]
+        return "$dayName $day $monthName $year هـ"
     }
 
     fun formatGregorianDate(gregorianDate: String): String {
-        // This method should be replaced with formatGregorianDateFromApi
         return gregorianDate
     }
 
@@ -195,7 +174,7 @@ object PrayerTimeUtils {
             Calendar.THURSDAY -> "الخميس"
             Calendar.FRIDAY -> "الجمعة"
             Calendar.SATURDAY -> "السبت"
-            else -> "الأحد" // default case
+            else -> "الأحد"
         }
     }
 
@@ -219,4 +198,17 @@ object PrayerTimeUtils {
 
     // Helper data class for quadruple
     private data class Quadruple<A, B, C, D>(val first: A, val second: B, val third: C, val fourth: D)
+
+    // REMOVED: All the 12-hour conversion functions since you want 24-hour format
+
+    // OPTIONAL: Add this function if you want to test the 24-hour format
+    fun testTimes() {
+        println("=== TESTING 24-HOUR FORMAT ===")
+        val testHours = listOf(0, 5, 12, 13, 19, 23)
+        testHours.forEach { hour ->
+            val formatted = String.format("%02d:%02d", hour, 30)
+            println("Hour $hour:30 displays as: $formatted")
+        }
+        println("=== END TEST ===")
+    }
 }
