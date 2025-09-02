@@ -80,10 +80,13 @@ class QuranFragment : Fragment() {
             // binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
         }
 
+        // Handle nullable error properly
         viewModel.error.observe(viewLifecycleOwner) { error ->
-            error?.let {
-                println("DEBUG: Error occurred: $it")
-                Toast.makeText(context, "Error: $it", Toast.LENGTH_LONG).show()
+            if (error != null) {
+                println("DEBUG: Error occurred: $error")
+                Toast.makeText(context, "Error: $error", Toast.LENGTH_LONG).show()
+                // Clear the error after showing it
+                viewModel.clearError()
             }
         }
     }

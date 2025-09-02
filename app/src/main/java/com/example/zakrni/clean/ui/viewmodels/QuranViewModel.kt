@@ -26,8 +26,8 @@ class QuranViewModel @Inject constructor(
     private val _isLoading = MutableLiveData<Boolean>(false)
     val isLoading: MutableLiveData<Boolean> get() = _isLoading
 
-    private val _error = MutableLiveData<String>()
-    val error: MutableLiveData<String> get() = _error
+    private val _error = MutableLiveData<String?>()
+    val error: MutableLiveData<String?> get() = _error
 
     fun loadQuranVerses(surahNumber: Int) {
         viewModelScope.launch {
@@ -43,7 +43,6 @@ class QuranViewModel @Inject constructor(
                     _surahName.value = "${it.name} (${it.englishName})"
                 }
 
-                // Then get the verses
                 val verses = getQuranUseCase.getQuranVerses(surahNumber)
                 println("DEBUG: Got ${verses.size} verses")
 
@@ -67,5 +66,9 @@ class QuranViewModel @Inject constructor(
 
     fun togglePlay() {
         _isPlaying.value = _isPlaying.value?.not()
+    }
+
+    fun clearError() {
+        _error.value = null
     }
 }
