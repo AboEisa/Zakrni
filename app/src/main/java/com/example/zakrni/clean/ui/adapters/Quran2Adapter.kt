@@ -27,7 +27,9 @@ class Quran2Adapter(
             binding.root.setOnClickListener {
                 val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {
-                    onSurahClick(getItem(position))
+                    val surah = getItem(position)
+                    println("DEBUG: Clicked on Surah ${surah.number}: ${surah.name}")
+                    onSurahClick(surah)
                 }
             }
         }
@@ -48,7 +50,6 @@ class Quran2Adapter(
         }
 
         // Helper function to get ayah count for each surah
-        // You can replace this with actual data from your API or add ayahCount to DomainSurah
         private fun getAyahCount(surahNumber: Int): Int {
             return when (surahNumber) {
                 1 -> 7      // Al-Fatiha
@@ -81,7 +82,90 @@ class Quran2Adapter(
                 28 -> 88    // Al-Qasas
                 29 -> 69    // Al-Ankabut
                 30 -> 60    // Ar-Rum
-                // Add more as needed, or get from API
+                31 -> 34    // Luqman
+                32 -> 30    // As-Sajdah
+                33 -> 73    // Al-Ahzab
+                34 -> 54    // Saba
+                35 -> 45    // Fatir
+                36 -> 83    // Ya-Sin
+                37 -> 182   // As-Saffat
+                38 -> 88    // Sad
+                39 -> 75    // Az-Zumar
+                40 -> 85    // Ghafir
+                41 -> 54    // Fussilat
+                42 -> 53    // Ash-Shuraa
+                43 -> 89    // Az-Zukhruf
+                44 -> 59    // Ad-Dukhan
+                45 -> 37    // Al-Jathiyah
+                46 -> 35    // Al-Ahqaf
+                47 -> 38    // Muhammad
+                48 -> 29    // Al-Fath
+                49 -> 18    // Al-Hujurat
+                50 -> 45    // Qaf
+                51 -> 60    // Adh-Dhariyat
+                52 -> 49    // At-Tur
+                53 -> 62    // An-Najm
+                54 -> 55    // Al-Qamar
+                55 -> 78    // Ar-Rahman
+                56 -> 96    // Al-Waqiah
+                57 -> 29    // Al-Hadid
+                58 -> 22    // Al-Mujadilah
+                59 -> 24    // Al-Hashr
+                60 -> 13    // Al-Mumtahanah
+                61 -> 14    // As-Saff
+                62 -> 11    // Al-Jumuah
+                63 -> 11    // Al-Munafiqun
+                64 -> 18    // At-Taghabun
+                65 -> 12    // At-Talaq
+                66 -> 12    // At-Tahrim
+                67 -> 30    // Al-Mulk
+                68 -> 52    // Al-Qalam
+                69 -> 52    // Al-Haqqah
+                70 -> 44    // Al-Maarij
+                71 -> 28    // Nuh
+                72 -> 28    // Al-Jinn
+                73 -> 20    // Al-Muzzammil
+                74 -> 56    // Al-Muddaththir
+                75 -> 40    // Al-Qiyamah
+                76 -> 31    // Al-Insan
+                77 -> 50    // Al-Mursalat
+                78 -> 40    // An-Naba
+                79 -> 46    // An-Naziat
+                80 -> 42    // Abasa
+                81 -> 29    // At-Takwir
+                82 -> 19    // Al-Infitar
+                83 -> 36    // Al-Mutaffifin
+                84 -> 25    // Al-Inshiqaq
+                85 -> 22    // Al-Buruj
+                86 -> 17    // At-Tariq
+                87 -> 19    // Al-Ala
+                88 -> 26    // Al-Ghashiyah
+                89 -> 30    // Al-Fajr
+                90 -> 20    // Al-Balad
+                91 -> 15    // Ash-Shams
+                92 -> 21    // Al-Layl
+                93 -> 11    // Ad-Duhaa
+                94 -> 8     // Ash-Sharh
+                95 -> 8     // At-Tin
+                96 -> 19    // Al-Alaq
+                97 -> 5     // Al-Qadr
+                98 -> 8     // Al-Bayyinah
+                99 -> 8     // Az-Zalzalah
+                100 -> 11   // Al-Adiyat
+                101 -> 11   // Al-Qariah
+                102 -> 8    // At-Takathur
+                103 -> 3    // Al-Asr
+                104 -> 9    // Al-Humazah
+                105 -> 5    // Al-Fil
+                106 -> 4    // Quraysh
+                107 -> 7    // Al-Maun
+                108 -> 3    // Al-Kawthar
+                109 -> 6    // Al-Kafirun
+                110 -> 3    // An-Nasr
+                111 -> 5    // Al-Masad
+                112 -> 4    // Al-Ikhlas
+                113 -> 5    // Al-Falaq
+                114 -> 6    // An-Nas
                 else -> 0
             }
         }

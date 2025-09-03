@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.R
+
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.zakrni.clean.ui.adapters.Quran2Adapter
@@ -107,12 +107,6 @@ class Quran2Fragment : Fragment() {
             findNavController().navigateUp()
         }
 
-        // Long press on header to load test data
-//        binding.headerLayout.setOnLongClickListener {
-//            println("DEBUG: Quran2Fragment - Loading test data")
-//            viewModel.loadTestData()
-//            true
-//        }
     }
 
     private fun navigateToSurahVerses(surahNumber: Int) {

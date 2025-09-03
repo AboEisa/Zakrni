@@ -8,14 +8,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.viewModels
-import androidx.navigation.Navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.zakrni.R
 import com.example.zakrni.clean.domain.models.DomainSurah
 import com.example.zakrni.clean.ui.adapters.QuranAdapter
 import com.example.zakrni.clean.ui.viewmodels.QuranViewModel
-
 import com.example.zakrni.databinding.FragmentQuranBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -40,10 +38,10 @@ class QuranFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupRecyclerView()
-        observeViewModel()
         setupClickListeners()
+        observeViewModel()
 
-        // Get surah number from arguments
+        // Get surah information from arguments
         val surahNumber = arguments?.getInt("surah_number", 1) ?: 1
         val surahName = arguments?.getString("surah_name", "") ?: ""
 
@@ -53,55 +51,69 @@ class QuranFragment : Fragment() {
         viewModel.loadQuranVerses(surahNumber)
     }
 
+    private fun setupRecyclerView() {
+        adapter = QuranAdapter()
+        binding.quranVersesRecycler.apply {
+            adapter = this@QuranFragment.adapter
+            layoutManager = LinearLayoutManager(context)
+            // Add some spacing between items
+            addItemDecoration(androidx.recyclerview.widget.DividerItemDecoration(
+                context,
+                androidx.recyclerview.widget.DividerItemDecoration.VERTICAL
+            ))
+        }
+    }
+
     private fun setupClickListeners() {
         // Back button
-        binding.backButton?.setOnClickListener {
+        binding.backButton.setOnClickListener {
             findNavController().navigateUp()
         }
 
-        // Play button
+        // Play button (if you implement audio later)
         binding.playButton?.setOnClickListener {
-            // TODO: Implement audio playback
             Toast.makeText(context, "Audio playback coming soon", Toast.LENGTH_SHORT).show()
         }
 
         // Share button
-        binding.shareButton?.setOnClickListener {
-            shareCurrentVerse()
+        binding.shareButton.setOnClickListener {
+            shareCurrentSurah()
         }
 
-        // Bookmark button
-        binding.bookmarkButton?.setOnClickListener {
-            toggleBookmark()
-        }
+
     }
 
     private fun observeViewModel() {
+        // Observe verses
         viewModel.verses.observe(viewLifecycleOwner) { verses ->
             println("DEBUG: QuranFragment - Received ${verses.size} verses")
             if (verses.isNotEmpty()) {
                 adapter.submitList(verses)
                 binding.quranVersesRecycler.visibility = View.VISIBLE
+                binding.progressBar.visibility = View.GONE
             } else {
                 binding.quranVersesRecycler.visibility = View.GONE
                 Toast.makeText(context, "No verses found", Toast.LENGTH_SHORT).show()
             }
         }
 
+        // Observe current surah info
         viewModel.currentSurah.observe(viewLifecycleOwner) { surah ->
             surah?.let {
                 updateSurahHeader(it)
             }
         }
 
+        // Observe loading state
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-            // Show/hide loading indicator
-            binding.audioProgress?.visibility = if (isLoading) View.VISIBLE else View.GONE
+            binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
         }
 
+        // Observe errors
         viewModel.error.observe(viewLifecycleOwner) { error ->
             error?.let {
                 Toast.makeText(context, "Error: $it", Toast.LENGTH_LONG).show()
+                binding.progressBar.visibility = View.GONE
                 viewModel.clearError()
             }
         }
@@ -117,78 +129,27 @@ class QuranFragment : Fragment() {
             }
             versesCount.text = "${surah.ayahs.size} آيات"
 
-            // Hide Bismillah for Surah At-Tawbah (9) and show for others except Al-Fatihah (1)
+            // Hide Bismillah for Surah At-Tawbah (9) and Al-Fatihah (1) since it's already in the first verse
             bismillah.visibility = when(surah.number) {
-                9 -> View.GONE
+                1, 9 -> View.GONE  // Al-Fatihah and At-Tawbah
                 else -> View.VISIBLE
             }
         }
     }
 
-    private fun shareCurrentVerse() {
-        // Get currently visible verse or selected verse
+    private fun shareCurrentSurah() {
+        val surahName = binding.surahHeader.text.toString()
+        val shareText = "Reading $surahName from the Quran"
+
         val shareIntent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
-            putExtra(Intent.EXTRA_TEXT, "Verse text here") // Add actual verse text
+            putExtra(Intent.EXTRA_TEXT, shareText)
         }
-        startActivity(Intent.createChooser(shareIntent, "Share Verse"))
+        startActivity(Intent.createChooser(shareIntent, "Share Surah"))
     }
 
     private fun toggleBookmark() {
-        // TODO: Implement bookmark functionality
         Toast.makeText(context, "Bookmark feature coming soon", Toast.LENGTH_SHORT).show()
-    }
-
-    private fun setupRecyclerView() {
-        adapter = QuranAdapter()
-        binding.quranVersesRecycler.apply {
-            adapter = this@QuranFragment.adapter
-            layoutManager = LinearLayoutManager(context)
-        }
-    }
-
-//    private fun observeViewModel() {
-//        viewModel.verses.observe(viewLifecycleOwner) { verses ->
-//            println("DEBUG: Received ${verses.size} verses")
-//            if (verses.isNotEmpty()) {
-//                adapter.submitList(verses)
-//                binding.quranVersesRecycler.visibility = View.VISIBLE
-//            } else {
-//                println("DEBUG: No verses received")
-//                Toast.makeText(context, "No verses found", Toast.LENGTH_SHORT).show()
-//            }
-//        }
-//
-//        viewModel.surahName.observe(viewLifecycleOwner) { name ->
-//            binding.surahHeader.text = name
-//            println("DEBUG: Surah name set to: $name")
-//        }
-//
-//        viewModel.isPlaying.observe(viewLifecycleOwner) { isPlaying ->
-//            updatePlayButton(isPlaying)
-//        }
-//
-//        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-//            println("DEBUG: Loading state: $isLoading")
-//            // If you have a progress bar, show/hide it here
-//            // binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
-//        }
-//
-//        // Handle nullable error properly
-//        viewModel.error.observe(viewLifecycleOwner) { error ->
-//            if (error != null) {
-//                println("DEBUG: Error occurred: $error")
-//                Toast.makeText(context, "Error: $error", Toast.LENGTH_LONG).show()
-//                // Clear the error after showing it
-//                viewModel.clearError()
-//            }
-//        }
-//    }
-
-    private fun updatePlayButton(isPlaying: Boolean?) {
-        binding.playButton.setImageResource(
-            if (isPlaying == true) R.drawable.ic_pause else R.drawable.ic_play
-        )
     }
 
     override fun onDestroyView() {
