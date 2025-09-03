@@ -29,6 +29,7 @@ data class DomainSurah(
     val revelationType: String
 )
 
+
 data class DomainAyah(
     val hizbQuarter: Int,
     val juz: Int,

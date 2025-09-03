@@ -11,24 +11,25 @@ import javax.inject.Inject
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 
-
 @HiltViewModel
 class QuranViewModel @Inject constructor(
     private val getQuranUseCase: GetQuranUseCase
 ) : ViewModel() {
 
-    // Existing LiveData for surahs list
+    // Surahs list
     private val _surahs = MutableLiveData<List<DomainSurah>>()
     val surahs: LiveData<List<DomainSurah>> get() = _surahs
 
-    // Add these for verse display
+    // Verses for selected surah
     private val _verses = MutableLiveData<List<DomainAyah>>()
     val verses: LiveData<List<DomainAyah>> get() = _verses
 
+    // Current selected surah
     private val _currentSurah = MutableLiveData<DomainSurah?>()
     val currentSurah: LiveData<DomainSurah?> get() = _currentSurah
 
-    private val _isLoading = MutableLiveData<Boolean>(false)
+    // Loading / error states
+    private val _isLoading = MutableLiveData(false)
     val isLoading: LiveData<Boolean> get() = _isLoading
 
     private val _error = MutableLiveData<String?>()
@@ -41,23 +42,20 @@ class QuranViewModel @Inject constructor(
     fun loadQuranVerses(surahNumber: Int) {
         viewModelScope.launch {
             try {
-                println("DEBUG: QuranViewModel - Loading verses for Surah $surahNumber")
                 _isLoading.value = true
                 _error.value = null
 
-                // Load verses
                 val verses = getQuranUseCase.getQuranVerses(surahNumber)
-                println("DEBUG: QuranViewModel - Loaded ${verses.size} verses")
+                println("DEBUG: QuranViewModel - Surah $surahNumber returned ${verses.size} verses")
                 _verses.value = verses
 
-                // Load surah details
                 val surah = getQuranUseCase.getSurahByNumber(surahNumber)
+                println("DEBUG: QuranViewModel - Loaded surah: ${surah?.name}")
                 _currentSurah.value = surah
 
                 if (verses.isEmpty()) {
-                    _error.value = "No verses found for this Surah"
+                    _error.value = "No verses found for surah $surahNumber"
                 }
-
             } catch (e: Exception) {
                 println("DEBUG: QuranViewModel - Error loading verses: ${e.message}")
                 e.printStackTrace()
@@ -83,7 +81,6 @@ class QuranViewModel @Inject constructor(
                 if (surahsList.isEmpty()) {
                     _error.value = "No surahs found"
                 }
-
             } catch (e: Exception) {
                 println("DEBUG: QuranViewModel - Error loading surahs: ${e.message}")
                 e.printStackTrace()
@@ -94,7 +91,6 @@ class QuranViewModel @Inject constructor(
             }
         }
     }
-
 
     fun clearError() {
         _error.value = null
