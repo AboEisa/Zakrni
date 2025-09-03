@@ -1,4 +1,5 @@
 package com.example.zakrni.clean.data
+import com.example.zakrni.clean.domain.models.DomainSurah
 
 import com.example.zakrni.clean.data.local.ILocalDataSource
 import com.example.zakrni.clean.data.models.AsmaAlHusnaResponse
@@ -14,7 +15,6 @@ import com.example.zakrni.clean.domain.models.DomainAzkarResponse
 import com.example.zakrni.clean.domain.models.DomainDuaResponse
 import com.example.zakrni.clean.domain.models.DomainHadithResponse
 import com.example.zakrni.clean.domain.models.DomainPrayerTimesResponse
-import com.example.zakrni.clean.domain.models.DomainSurah
 import com.example.zakrni.clean.ui.utils.Constant.Companion.APIKEY
 import javax.inject.Inject
 
@@ -79,8 +79,12 @@ class Repo @Inject constructor(
 
     override suspend fun getAllSurahs(): List<DomainSurah> {
         return try {
-            remoteDataSource.getSurahList()
+            println("DEBUG: Repo - Getting all surahs")
+            val surahs = remoteDataSource.getSurahList()
+            println("DEBUG: Repo - Got ${surahs.size} surahs from remote source")
+            surahs
         } catch (e: Exception) {
+            println("DEBUG: Repo - Error getting surahs: ${e.message}")
             emptyList()
         }
     }

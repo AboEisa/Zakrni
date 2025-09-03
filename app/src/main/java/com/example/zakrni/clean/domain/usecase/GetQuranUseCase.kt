@@ -1,8 +1,8 @@
 package com.example.zakrni.clean.domain.usecase
+import com.example.zakrni.clean.domain.models.DomainSurah
 
 import com.example.zakrni.clean.domain.IRepo
 import com.example.zakrni.clean.domain.models.DomainAyah
-import com.example.zakrni.clean.domain.models.DomainSurah
 import javax.inject.Inject
 
 class GetQuranUseCase @Inject constructor(

@@ -11,8 +11,8 @@ import androidx.navigation.fragment.R
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.zakrni.clean.ui.adapters.Quran2Adapter
+import com.example.zakrni.clean.ui.viewmodels.QuranViewModel
 
-import com.example.zakrni.clean.viewmodels.QuranViewModel
 
 import com.example.zakrni.databinding.FragmentQuran2Binding
 import dagger.hilt.android.AndroidEntryPoint
@@ -108,24 +108,29 @@ class Quran2Fragment : Fragment() {
         }
 
         // Long press on header to load test data
-        binding.headerLayout.setOnLongClickListener {
-            println("DEBUG: Quran2Fragment - Loading test data")
-            viewModel.loadTestData()
-            true
-        }
+//        binding.headerLayout.setOnLongClickListener {
+//            println("DEBUG: Quran2Fragment - Loading test data")
+//            viewModel.loadTestData()
+//            true
+//        }
     }
 
     private fun navigateToSurahVerses(surahNumber: Int) {
-        // Navigate to QuranFragment with the selected surah number
-        // You'll need to create this navigation action in your nav_graph.xml
         try {
+            val action = Quran2FragmentDirections
+                .actionQuran2FragmentToQuranFragment2()
+
+            // Navigate with bundle since we can't use Safe Args without arguments in action
             val bundle = Bundle().apply {
                 putInt("surah_number", surahNumber)
+               // putString("surah_name", getItem(position).name) // if you have access to the surah
             }
-//            findNavController().navigate(Quran2FragmentDirections())// You need to add this action to nav_graph.xml bundle)
+
+            findNavController().navigate(action.actionId, bundle)
+
         } catch (e: Exception) {
             println("DEBUG: Quran2Fragment - Navigation error: ${e.message}")
-            Toast.makeText(context, "Navigation not set up yet. Surah $surahNumber selected.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Error navigating: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
 

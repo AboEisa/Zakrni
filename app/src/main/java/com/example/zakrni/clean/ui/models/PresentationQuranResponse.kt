@@ -37,6 +37,6 @@ data class PresentationAyah(
     val numberInSurah: Int,
     val page: Int,
     val ruku: Int,
-    val sajda: Boolean,
+    val sajda: Any?,
     val text: String
 )

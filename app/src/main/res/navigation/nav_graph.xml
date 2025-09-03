@@ -9,7 +9,7 @@
         android:id="@+id/allCategoriesFragment"
         android:name="com.example.zakrni.clean.ui.views.AllCategoriesFragment"
         android:label="fragment_all_categories"
-        tools:layout="@layout/fragment_all_categories" >
+        tools:layout="@layout/fragment_all_categories">
 
         <action
             android:id="@+id/action_allCategoriesFragment_to_allMediaFragment"
@@ -96,14 +96,26 @@
         android:id="@+id/quran2Fragment"
         android:name="com.example.zakrni.clean.ui.views.Quran2Fragment"
         android:label="fragment_quran2"
-        tools:layout="@layout/fragment_quran2" >
+        tools:layout="@layout/fragment_quran2">
         <action
             android:id="@+id/action_quran2Fragment_to_quranFragment2"
             app:destination="@id/quranFragment2" />
     </fragment>
+
     <fragment
         android:id="@+id/quranFragment2"
         android:name="com.example.zakrni.clean.ui.views.QuranFragment"
-        android:label="QuranFragment" />
+        android:label="QuranFragment">
+
+        <argument
+            android:name="surah_number"
+            android:defaultValue="1"
+            app:argType="integer" />
+
+        <argument
+            android:name="surah_name"
+            android:defaultValue=""
+            app:argType="string" />
+    </fragment>
 
 </navigation>

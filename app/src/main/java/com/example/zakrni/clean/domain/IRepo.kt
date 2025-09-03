@@ -24,7 +24,9 @@ interface IRepo {
 
     suspend fun getDuas(): Result<DomainDuaResponse>
 
-    suspend fun getQuranVerses(suraNumber: Int): List<DomainAyah>
 
-    suspend fun getAllSurahs(): List<DomainSurah>
-}
+    // IRepo.kt in domain package
+
+        suspend fun getAllSurahs(): List<DomainSurah>
+        suspend fun getQuranVerses(suraNumber: Int): List<DomainAyah>
+    }

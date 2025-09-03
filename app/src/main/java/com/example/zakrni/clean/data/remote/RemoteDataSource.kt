@@ -10,8 +10,10 @@ import com.example.zakrni.clean.data.network.HadithApiService
 import com.example.zakrni.clean.data.network.PrayerApiService
 import com.example.zakrni.clean.data.network.QuranApiService
 import com.example.zakrni.clean.domain.models.DomainAyah
+import com.example.zakrni.clean.domain.models.DomainSurah
 import com.example.zakrni.clean.ui.utils.Constant.Companion.APIKEY
 import javax.inject.Inject
+import kotlin.collections.emptyList
 
 class RemoteDataSource @Inject constructor(
     private val apiPrayerServices: PrayerApiService,
@@ -96,13 +98,17 @@ class RemoteDataSource @Inject constructor(
         }
     }
 
-    override suspend fun getSurahList(): List<com.example.zakrni.clean.domain.models.DomainSurah> {
+    // RemoteDataSource.kt
+    override suspend fun getSurahList(): List<DomainSurah> {
         return try {
-            val response = quranApiService.getSurahList()
+            println("DEBUG: RemoteDataSource - Fetching surah list from API")
+            val response = quranApiService.getSurahList() // This gets the full Quran
+            println("DEBUG: RemoteDataSource - API Response: code=${response.code}, status=${response.status}")
+
             if (response.code == 200 && response.status == "OK") {
-                response.data.surahs.map { surah ->
-                    com.example.zakrni.clean.domain.models.DomainSurah(
-                        ayahs = emptyList(), // Will be populated when needed
+                val surahs = response.data.surahs.map { surah ->
+                    DomainSurah(
+                        ayahs = emptyList(), // Don't load verses yet
                         englishName = surah.englishName,
                         englishNameTranslation = surah.englishNameTranslation,
                         name = surah.name,
@@ -110,10 +116,15 @@ class RemoteDataSource @Inject constructor(
                         revelationType = surah.revelationType
                     )
                 }
+                println("DEBUG: RemoteDataSource - Mapped ${surahs.size} surahs")
+                surahs
             } else {
+                println("DEBUG: RemoteDataSource - Invalid response: ${response.status}")
                 emptyList()
             }
         } catch (e: Exception) {
+            println("DEBUG: RemoteDataSource - Exception fetching surahs: ${e.message}")
+            e.printStackTrace()
             emptyList()
         }
     }
