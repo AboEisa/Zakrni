@@ -47,7 +47,7 @@ class HomeActivity : AppCompatActivity() {
         R.id.hadithFragment to { HadithFragment() },
         R.id.duaFragment to { DuaFragment() },
         R.id.azkarFragment to { AzkarFragment() },
-        R.id.quranFragment to { QuranFragment() }, // Changed from quranFragment to quranFragment2
+        R.id.quranFragment to { QuranFragment() },
         R.id.allahNamesFragment to { AllahNamesFragment() },
         R.id.tasbehFragment to { TasbehFragment() },
         R.id.quran2Fragment to { Quran2Fragment() },
@@ -304,26 +304,17 @@ class HomeActivity : AppCompatActivity() {
             }
         }
 
-        // Updated destination listener - only handle non-fullscreen fragments
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            // Only update navigation selection for non-fullscreen fragments
-            if (!fullScreenFragments.containsKey(destination.id)) {
-                when (destination.id) {
-                    R.id.playerTimesFragment -> selectNavItem(R.id.nav_prayer_times)
-                    R.id.allMediaFragment -> selectNavItem(R.id.nav_all_media)
-                    R.id.allCategoriesFragment -> selectNavItem(R.id.nav_all_categories)
-                }
+            when (destination.id) {
+                R.id.playerTimesFragment -> selectNavItem(R.id.nav_prayer_times)
+                R.id.allMediaFragment -> selectNavItem(R.id.nav_all_media)
+                R.id.allCategoriesFragment -> selectNavItem(R.id.nav_all_categories)
             }
         }
     }
 
     // Enhanced method to show full-screen fragment with transition
     private fun showFullScreenFragment(destinationId: Int) {
-        // Hide bottom navigation container
-        binding.navPrayerTimes.visibility = android.view.View.GONE
-        binding.navAllMedia.visibility = android.view.View.GONE
-        binding.navAllCategories.visibility = android.view.View.GONE
-
         // First hide main content with animation
         binding.mainContentContainer.animate()
             .alpha(0f)
@@ -364,11 +355,6 @@ class HomeActivity : AppCompatActivity() {
     // Enhanced method to hide full-screen fragment with transition
     private fun hideFullScreenFragment() {
         if (binding.fullscreenFragmentContainer.visibility == android.view.View.VISIBLE) {
-            // Show bottom navigation again
-            binding.navPrayerTimes.visibility = android.view.View.VISIBLE
-            binding.navAllMedia.visibility = android.view.View.VISIBLE
-            binding.navAllCategories.visibility = android.view.View.VISIBLE
-
             // Animate fullscreen container out
             binding.fullscreenFragmentContainer.animate()
                 .alpha(0f)

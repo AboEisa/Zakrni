@@ -5,14 +5,15 @@
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
     app:cardCornerRadius="12dp"
-    app:cardElevation="3dp"
-    android:background="@android:color/white">
+    app:cardElevation="4dp"
+    app:cardBackgroundColor="@android:color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:background="@android:color/white">
 
         <!-- Verse Number -->
         <LinearLayout
@@ -28,11 +29,11 @@
                 android:layout_height="wrap_content"
                 android:text="1"
                 android:textSize="14sp"
-                android:textColor="#666666"
+                android:textColor="#66666666"
                 android:background="@drawable/circle_background"
                 android:gravity="center"
-                android:minWidth="24dp"
-                android:minHeight="24dp"
+                android:minWidth="28dp"
+                android:minHeight="28dp"
                 android:textStyle="bold" />
 
         </LinearLayout>
@@ -43,23 +44,25 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ"
-            android:textSize="20sp"
-            android:textColor="#1A1A1A"
+            android:textSize="22sp"
+            android:textColor="#212121"
             android:gravity="end"
             android:layoutDirection="rtl"
             android:fontFamily="serif"
+            android:lineSpacingExtra="4dp"
             android:layout_marginBottom="8dp" />
 
-        <!-- Optional Translation (if you want to add it later) -->
+        <!-- Optional Translation -->
         <TextView
             android:id="@+id/verse_translation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text=""
             android:textSize="14sp"
-            android:textColor="#666666"
+            android:textColor="#757575"
             android:visibility="gone"
-            android:layout_marginTop="8dp" />
+            android:layout_marginTop="8dp"
+            android:fontFamily="sans-serif" />
 
     </LinearLayout>
 

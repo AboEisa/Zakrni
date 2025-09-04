@@ -63,6 +63,27 @@
 
 
 
+
+
+
+
+
+    <!-- Traditional Mushaf Colors -->
+    <color name="mushaf_page_color">#F8F6F0</color>
+    <color name="mushaf_text_color">#2C2C2C</color>
+    <color name="traditional_gold">#D4AF37</color>
+    <color name="traditional_text">#3E2723</color>
+    <color name="verse_number_color">#FFFFFF</color>
+    <color name="bismillah_color">#1B5E20</color>
+    <color name="translation_color">#5D4037</color>
+    <color name="traditional_separator">#8D6E63</color>
+    <color name="traditional_progress_track">#EFEBE9</color>
+
+    <!-- Background Colors -->
+    <color name="mushaf_main_background">#F5F5DC</color>
+    <color name="page_border_color">#D7CCC8</color>
+
+
 <!--    <color name="s.xml">#F5E8C7</color> &lt;!&ndash; Adjust to match Figma design &ndash;&gt;-->
 <!--    <color name="s.xml">#F9F1E0</color> &lt;!&ndash; Slightly lighter shade &ndash;&gt;-->
 </resources>
