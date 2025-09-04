@@ -17,4 +17,19 @@
     <string name="player_times">أوقات الصلاة</string>
     <string name="all_media">كل الوسائط</string>
     <string name="all_categories">جميع التصنيفات</string>
+    <string name="audio_playback_coming_soon">Audio playback coming soon</string>
+    <string name="share_surah_title">Share Surah</string>
+    <string name="share_surah_text">Reading %s from the Quran</string>
+    <string name="meccan">مكية</string>
+    <string name="medinan">مدنية</string>
+    <string name="verses_count">%d آيات</string>
+    <string name="no_surahs_found">No surahs found</string>
+    <string name="error_navigating">Error navigating</string>
+    <string name="no_surah_selected">No Surah selected</string>
+    <string name="no_verses_found">No verses found</string>
+    <string name="operation_cancelled">Operation cancelled</string>
+    <string name="request_timed_out">Request timed out</string>
+    <string name="unknown_error">Unknown error occurred</string>
+    <string name="failed_to_load_verses">Failed to load verses</string>
+    <string name="failed_to_load_surahs">Failed to load surahs</string>
 </resources>

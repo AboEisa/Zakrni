@@ -73,11 +73,17 @@ class RemoteDataSource @Inject constructor(
 
     override suspend fun getQuranVerses(surahNumber: Int): List<DomainAyah> {
         return try {
+            println("DEBUG: RemoteDataSource - Fetching verses for surah $surahNumber")
+
+            // Use the getSurahDetails endpoint which returns verses for a specific surah
             val response = quranApiService.getSurahDetails(surahNumber)
+
+            println("DEBUG: RemoteDataSource - Response code: ${response.code}, status: ${response.status}")
+
             if (response.code == 200 && response.status == "OK") {
-                // Find the specific surah from the response
+                // The API returns the full Quran, so we need to find the specific surah
                 val surah = response.data.surahs.find { it.number == surahNumber }
-                surah?.ayahs?.map { ayah ->
+                val verses = surah?.ayahs?.map { ayah ->
                     DomainAyah(
                         hizbQuarter = ayah.hizbQuarter,
                         juz = ayah.juz,
@@ -90,10 +96,16 @@ class RemoteDataSource @Inject constructor(
                         text = ayah.text
                     )
                 } ?: emptyList()
+
+                println("DEBUG: RemoteDataSource - Mapped ${verses.size} verses")
+                verses
             } else {
+                println("DEBUG: RemoteDataSource - Invalid response")
                 emptyList()
             }
         } catch (e: Exception) {
+            println("DEBUG: RemoteDataSource - Error fetching verses: ${e.message}")
+            e.printStackTrace()
             emptyList()
         }
     }

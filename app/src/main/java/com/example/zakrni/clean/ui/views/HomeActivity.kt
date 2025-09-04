@@ -47,7 +47,7 @@ class HomeActivity : AppCompatActivity() {
         R.id.hadithFragment to { HadithFragment() },
         R.id.duaFragment to { DuaFragment() },
         R.id.azkarFragment to { AzkarFragment() },
-        R.id.quranFragment2 to { QuranFragment() }, // Changed from quranFragment to quranFragment2
+        R.id.quranFragment to { QuranFragment() }, // Changed from quranFragment to quranFragment2
         R.id.allahNamesFragment to { AllahNamesFragment() },
         R.id.tasbehFragment to { TasbehFragment() },
         R.id.quran2Fragment to { Quran2Fragment() },

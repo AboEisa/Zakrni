@@ -1,34 +1,33 @@
 package com.example.zakrni.clean.ui.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.zakrni.R
 import com.example.zakrni.clean.domain.models.DomainAyah
 import com.example.zakrni.clean.domain.models.DomainSurah
 import com.example.zakrni.clean.domain.usecase.GetQuranUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 
 @HiltViewModel
 class QuranViewModel @Inject constructor(
     private val getQuranUseCase: GetQuranUseCase
 ) : ViewModel() {
-
-    // Surahs list
     private val _surahs = MutableLiveData<List<DomainSurah>>()
     val surahs: LiveData<List<DomainSurah>> get() = _surahs
 
-    // Verses for selected surah
     private val _verses = MutableLiveData<List<DomainAyah>>()
     val verses: LiveData<List<DomainAyah>> get() = _verses
 
-    // Current selected surah
     private val _currentSurah = MutableLiveData<DomainSurah?>()
     val currentSurah: LiveData<DomainSurah?> get() = _currentSurah
 
-    // Loading / error states
     private val _isLoading = MutableLiveData(false)
     val isLoading: LiveData<Boolean> get() = _isLoading
 
@@ -42,24 +41,26 @@ class QuranViewModel @Inject constructor(
     fun loadQuranVerses(surahNumber: Int) {
         viewModelScope.launch {
             try {
+                Log.d("QuranViewModel", "Loading verses for surah $surahNumber")
                 _isLoading.value = true
                 _error.value = null
 
-                val verses = getQuranUseCase.getQuranVerses(surahNumber)
-                println("DEBUG: QuranViewModel - Surah $surahNumber returned ${verses.size} verses")
+                val verses = withTimeoutOrNull(10_000L) {
+                    getQuranUseCase.getQuranVerses(surahNumber)
+                } ?: throw Exception("Request timed out")
+                Log.d("QuranViewModel", "Got ${verses.size} verses")
                 _verses.value = verses
 
-                val surah = getQuranUseCase.getSurahByNumber(surahNumber)
-                println("DEBUG: QuranViewModel - Loaded surah: ${surah?.name}")
+                val surah = withTimeoutOrNull(10_000L) {
+                    getQuranUseCase.getSurahByNumber(surahNumber)
+                } ?: throw Exception("Request timed out")
                 _currentSurah.value = surah
-
-                if (verses.isEmpty()) {
-                    _error.value = "No verses found for surah $surahNumber"
-                }
+            } catch (e: CancellationException) {
+                Log.e("QuranViewModel", "Coroutine cancelled for surah $surahNumber", e)
+                _error.value = "Operation cancelled"
             } catch (e: Exception) {
-                println("DEBUG: QuranViewModel - Error loading verses: ${e.message}")
-                e.printStackTrace()
-                _error.value = "Failed to load verses: ${e.message}"
+                Log.e("QuranViewModel", "Error loading verses for surah $surahNumber", e)
+                _error.value = e.message ?: "Unknown error occurred"
                 _verses.value = emptyList()
             } finally {
                 _isLoading.value = false
@@ -70,21 +71,25 @@ class QuranViewModel @Inject constructor(
     fun loadAllSurahs() {
         viewModelScope.launch {
             try {
-                println("DEBUG: QuranViewModel - Loading all surahs")
+                Log.d("QuranViewModel", "Loading all surahs")
                 _isLoading.value = true
                 _error.value = null
 
-                val surahsList = getQuranUseCase.getAllSurahs()
-                println("DEBUG: QuranViewModel - Loaded ${surahsList.size} surahs")
+                val surahsList = withTimeoutOrNull(10_000L) {
+                    getQuranUseCase.getAllSurahs()
+                } ?: throw Exception("Request timed out")
+                Log.d("QuranViewModel", "Loaded ${surahsList.size} surahs")
                 _surahs.value = surahsList
 
                 if (surahsList.isEmpty()) {
                     _error.value = "No surahs found"
                 }
+            } catch (e: CancellationException) {
+                Log.e("QuranViewModel", "Coroutine cancelled for surah list", e)
+                _error.value = "Operation cancelled"
             } catch (e: Exception) {
-                println("DEBUG: QuranViewModel - Error loading surahs: ${e.message}")
-                e.printStackTrace()
-                _error.value = "Failed to load surahs: ${e.message}"
+                Log.e("QuranViewModel", "Error loading surahs", e)
+                _error.value = e.message ?: "Unknown error occurred"
                 _surahs.value = emptyList()
             } finally {
                 _isLoading.value = false

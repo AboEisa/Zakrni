@@ -2,11 +2,13 @@ package com.example.zakrni.clean.ui.views
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,7 +24,8 @@ class QuranFragment : Fragment() {
     private var _binding: FragmentQuranBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: QuranViewModel by viewModels()
+//    private val viewModel: QuranViewModel by viewModels()
+    private val viewModel: QuranViewModel by activityViewModels()
     private lateinit var adapter: QuranAdapter
 
     override fun onCreateView(
@@ -36,102 +39,90 @@ class QuranFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        setupRecyclerView()
-        setupClickListeners()
-        observeViewModel()
-
-        // Get surah information from arguments
-        val surahNumber = arguments?.getInt("surah_number", 1) ?: 1
-        val surahName = arguments?.getString("surah_name", "") ?: ""
-
-        println("DEBUG: QuranFragment - Loading Surah $surahNumber: $surahName")
-
-        // Load the verses for this surah
-        viewModel.loadQuranVerses(surahNumber)
+        try {
+            val args = QuranFragmentArgs.fromBundle(requireArguments())
+            val surahNumber = args.surahNumber
+            Log.d("QuranFragment", "Received surah number: $surahNumber")
+            setupRecyclerView()
+            setupClickListeners()
+            observeViewModel()
+            viewModel.loadQuranVerses(surahNumber)
+        } catch (e: Exception) {
+            Log.e("QuranFragment", "Error: No Surah selected - ${e.message}")
+            Toast.makeText(requireContext(), R.string.no_surah_selected, Toast.LENGTH_SHORT).show()
+            findNavController().navigateUp()
+        }
     }
 
     private fun setupRecyclerView() {
         adapter = QuranAdapter()
         binding.quranVersesRecycler.apply {
             adapter = this@QuranFragment.adapter
-            layoutManager = LinearLayoutManager(context)
-            // Add some spacing between items
-            addItemDecoration(androidx.recyclerview.widget.DividerItemDecoration(
-                context,
-                androidx.recyclerview.widget.DividerItemDecoration.VERTICAL
-            ))
+            layoutManager = LinearLayoutManager(requireContext())
+            addItemDecoration(
+                androidx.recyclerview.widget.DividerItemDecoration(
+                    requireContext(),
+                    androidx.recyclerview.widget.DividerItemDecoration.VERTICAL
+                )
+            )
         }
     }
 
     private fun setupClickListeners() {
-        // Back button
         binding.backButton.setOnClickListener {
             findNavController().navigateUp()
         }
 
-        // Play button (if you implement audio later)
-        binding.playButton?.setOnClickListener {
-            Toast.makeText(context, "Audio playback coming soon", Toast.LENGTH_SHORT).show()
+        binding.playButton.setOnClickListener {
+            Toast.makeText(requireContext(), R.string.audio_playback_coming_soon, Toast.LENGTH_SHORT).show()
         }
 
-        // Share button
         binding.shareButton.setOnClickListener {
             shareCurrentSurah()
         }
-
-
     }
 
     private fun observeViewModel() {
-        // Observe verses
         viewModel.verses.observe(viewLifecycleOwner) { verses ->
-            println("DEBUG: QuranFragment - Received ${verses.size} verses")
-            if (verses.isNotEmpty()) {
+            Log.d("QuranFragment", "Received ${verses.size} verses")
+            binding.quranVersesRecycler.visibility = if (verses.isNotEmpty()) {
                 adapter.submitList(verses)
-                binding.quranVersesRecycler.visibility = View.VISIBLE
-                binding.progressBar.visibility = View.GONE
+                View.VISIBLE
             } else {
-                binding.quranVersesRecycler.visibility = View.GONE
-                Toast.makeText(context, "No verses found", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), R.string.no_verses_found, Toast.LENGTH_SHORT).show()
+                View.GONE
             }
         }
 
-        // Observe current surah info
         viewModel.currentSurah.observe(viewLifecycleOwner) { surah ->
             surah?.let {
                 updateSurahHeader(it)
             }
         }
 
-        // Observe loading state
-        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-            binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
-        }
-
-        // Observe errors
         viewModel.error.observe(viewLifecycleOwner) { error ->
             error?.let {
-                Toast.makeText(context, "Error: $it", Toast.LENGTH_LONG).show()
-                binding.progressBar.visibility = View.GONE
-                viewModel.clearError()
+                Log.e("QuranFragment", "Error: $it")
+                Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
             }
+        }
+
+        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
         }
     }
 
     private fun updateSurahHeader(surah: DomainSurah) {
         binding.apply {
             surahHeader.text = surah.name
-            surahType.text = when(surah.revelationType.lowercase()) {
-                "meccan" -> "مكية"
-                "medinan" -> "مدنية"
+            surahType.text = when (surah.revelationType.lowercase()) {
+                "meccan" -> getString(R.string.meccan)
+                "medinan" -> getString(R.string.medinan)
                 else -> surah.revelationType
             }
-            versesCount.text = "${surah.ayahs.size} آيات"
-
-            // Hide Bismillah for Surah At-Tawbah (9) and Al-Fatihah (1) since it's already in the first verse
-            bismillah.visibility = when(surah.number) {
-                1, 9 -> View.GONE  // Al-Fatihah and At-Tawbah
+            versesCount.text = getString(R.string.verses_count, surah.ayahs.size)
+            bismillah.visibility = when (surah.number) {
+                1, 9 -> View.GONE
                 else -> View.VISIBLE
             }
         }
@@ -139,17 +130,12 @@ class QuranFragment : Fragment() {
 
     private fun shareCurrentSurah() {
         val surahName = binding.surahHeader.text.toString()
-        val shareText = "Reading $surahName from the Quran"
-
+        val shareText = getString(R.string.share_surah_text, surahName)
         val shareIntent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
             putExtra(Intent.EXTRA_TEXT, shareText)
         }
-        startActivity(Intent.createChooser(shareIntent, "Share Surah"))
-    }
-
-    private fun toggleBookmark() {
-        Toast.makeText(context, "Bookmark feature coming soon", Toast.LENGTH_SHORT).show()
+        startActivity(Intent.createChooser(shareIntent, getString(R.string.share_surah_title)))
     }
 
     override fun onDestroyView() {

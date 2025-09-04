@@ -1,4 +1,7 @@
 package com.example.zakrni.clean.data
+import androidx.annotation.OptIn
+import androidx.media3.common.util.Log
+import androidx.media3.common.util.UnstableApi
 import com.example.zakrni.clean.domain.models.DomainSurah
 
 import com.example.zakrni.clean.data.local.ILocalDataSource
@@ -69,13 +72,18 @@ class Repo @Inject constructor(
         }
     }
 
+    @OptIn(UnstableApi::class)
     override suspend fun getQuranVerses(suraNumber: Int): List<DomainAyah> {
         return try {
-            remoteDataSource.getQuranVerses(suraNumber)
+            val ayahs = remoteDataSource.getQuranVerses(suraNumber) // <-- get from remote
+            Log.d("QURAN_API", "Repo - Surah $suraNumber has ${ayahs.size} ayahs")
+            ayahs
         } catch (e: Exception) {
+            Log.e("QURAN_API", "Repo - Error fetching verses: ${e.message}", e)
             emptyList()
         }
     }
+
 
     override suspend fun getAllSurahs(): List<DomainSurah> {
         return try {
