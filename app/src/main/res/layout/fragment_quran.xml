@@ -34,13 +34,7 @@
 
 
 
-                <ImageButton
-                    android:id="@+id/share_button"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:background="?android:attr/selectableItemBackgroundBorderless"
-                    android:src="@drawable/ic_share"
-                    android:contentDescription="Share" />
+
 
             </LinearLayout>
 
@@ -57,6 +51,7 @@
                 android:textSize="20sp"
                 android:textColor="@android:color/white"
                 android:textStyle="bold"
+                android:layout_marginStart="@dimen/_35sdp"
                 android:gravity="center" />
 
             <View

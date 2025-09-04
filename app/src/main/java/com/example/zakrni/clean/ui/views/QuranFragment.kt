@@ -6,10 +6,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.zakrni.R
@@ -24,7 +22,6 @@ class QuranFragment : Fragment() {
     private var _binding: FragmentQuranBinding? = null
     private val binding get() = _binding!!
 
-//    private val viewModel: QuranViewModel by viewModels()
     private val viewModel: QuranViewModel by activityViewModels()
     private lateinit var adapter: QuranAdapter
 
@@ -39,18 +36,64 @@ class QuranFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        try {
-            val args = QuranFragmentArgs.fromBundle(requireArguments())
-            val surahNumber = args.surahNumber
-            Log.d("QuranFragment", "Received surah number: $surahNumber")
-            setupRecyclerView()
-            setupClickListeners()
-            observeViewModel()
+        Log.d("QuranFragment", "onViewCreated started")
+
+        Log.d("QuranFragment", "Arguments bundle: $arguments")
+        arguments?.keySet()?.forEach { key ->
+            Log.d("QuranFragment", "Argument $key = ${arguments?.get(key)}")
+        }
+
+        setupRecyclerView()
+        setupClickListeners()
+        observeViewModel()
+
+        val surahNumber = getSurahNumber()
+        Log.d("QuranFragment", "Final surah number: $surahNumber")
+
+        if (surahNumber in 1..114) {
+            Log.d("QuranFragment", "Loading verses for surah: $surahNumber")
             viewModel.loadQuranVerses(surahNumber)
+        } else {
+            Log.e("QuranFragment", "Invalid surah number: $surahNumber")
+        }
+    }
+
+    private fun getSurahNumber(): Int {
+        return try {
+            // Method 1: Try Safe Args first
+            Log.d("QuranFragment", "Trying Safe Args...")
+            val args = QuranFragmentArgs.fromBundle(requireArguments())
+            val safeArgsSurah = args.surahNumber
+            Log.d("QuranFragment", "Safe Args surah number: $safeArgsSurah")
+            if (safeArgsSurah > 0) {
+                return safeArgsSurah
+            } else {
+                throw Exception("Safe Args returned invalid number: $safeArgsSurah")
+            }
         } catch (e: Exception) {
-            Log.e("QuranFragment", "Error: No Surah selected - ${e.message}")
-            Toast.makeText(requireContext(), R.string.no_surah_selected, Toast.LENGTH_SHORT).show()
-            findNavController().navigateUp()
+            Log.w("QuranFragment", "Safe Args failed: ${e.message}")
+
+            // Method 2: Try regular Bundle
+            try {
+                Log.d("QuranFragment", "Trying Bundle method...")
+                val bundleSurah = arguments?.getInt("surahNumber", -1) ?: -1
+                Log.d("QuranFragment", "Bundle surah number: $bundleSurah")
+                if (bundleSurah > 0) {
+                    return bundleSurah
+                } else {
+                    throw Exception("Bundle returned invalid number: $bundleSurah")
+                }
+            } catch (e2: Exception) {
+                Log.w("QuranFragment", "Bundle method failed: ${e2.message}")
+
+                // Method 3: Check if arguments exist at all
+                if (arguments == null) {
+                    Log.e("QuranFragment", "No arguments bundle found!")
+                } else {
+                    Log.e("QuranFragment", "Arguments exist but surahNumber not found")
+                }
+                return -1
+            }
         }
     }
 
@@ -73,29 +116,30 @@ class QuranFragment : Fragment() {
             findNavController().navigateUp()
         }
 
-        binding.playButton.setOnClickListener {
-            Toast.makeText(requireContext(), R.string.audio_playback_coming_soon, Toast.LENGTH_SHORT).show()
-        }
 
-        binding.shareButton.setOnClickListener {
-            shareCurrentSurah()
-        }
+
+
     }
 
     private fun observeViewModel() {
         viewModel.verses.observe(viewLifecycleOwner) { verses ->
             Log.d("QuranFragment", "Received ${verses.size} verses")
-            binding.quranVersesRecycler.visibility = if (verses.isNotEmpty()) {
+            if (verses.isNotEmpty()) {
                 adapter.submitList(verses)
-                View.VISIBLE
+                binding.quranVersesRecycler.visibility = View.VISIBLE
+                binding.progressBar.visibility = View.GONE
+                Log.d("QuranFragment", "Displayed ${verses.size} verses successfully")
             } else {
-                Toast.makeText(requireContext(), R.string.no_verses_found, Toast.LENGTH_SHORT).show()
-                View.GONE
+                binding.quranVersesRecycler.visibility = View.GONE
+                if (viewModel.isLoading.value != true) {
+                    Log.d("QuranFragment", "No verses found for this surah")
+                }
             }
         }
 
         viewModel.currentSurah.observe(viewLifecycleOwner) { surah ->
             surah?.let {
+                Log.d("QuranFragment", "Updating surah info: ${it.name}")
                 updateSurahHeader(it)
             }
         }
@@ -103,11 +147,13 @@ class QuranFragment : Fragment() {
         viewModel.error.observe(viewLifecycleOwner) { error ->
             error?.let {
                 Log.e("QuranFragment", "Error: $it")
-                Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
+                binding.progressBar.visibility = View.GONE
+                viewModel.clearError()
             }
         }
 
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            Log.d("QuranFragment", "Loading state: $isLoading")
             binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
         }
     }
@@ -116,27 +162,20 @@ class QuranFragment : Fragment() {
         binding.apply {
             surahHeader.text = surah.name
             surahType.text = when (surah.revelationType.lowercase()) {
-                "meccan" -> getString(R.string.meccan)
-                "medinan" -> getString(R.string.medinan)
+                "meccan" -> "مكية"
+                "medinan" -> "مدنية"
                 else -> surah.revelationType
             }
-            versesCount.text = getString(R.string.verses_count, surah.ayahs.size)
+            versesCount.text = "${surah.ayahs.size} آية"
             bismillah.visibility = when (surah.number) {
-                1, 9 -> View.GONE
+                1, 9 -> View.GONE // الفاتحة والتوبة
                 else -> View.VISIBLE
             }
         }
+        Log.d("QuranFragment", "Updated surah header: ${surah.name} - ${surah.ayahs.size} verses")
     }
 
-    private fun shareCurrentSurah() {
-        val surahName = binding.surahHeader.text.toString()
-        val shareText = getString(R.string.share_surah_text, surahName)
-        val shareIntent = Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"
-            putExtra(Intent.EXTRA_TEXT, shareText)
-        }
-        startActivity(Intent.createChooser(shareIntent, getString(R.string.share_surah_title)))
-    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

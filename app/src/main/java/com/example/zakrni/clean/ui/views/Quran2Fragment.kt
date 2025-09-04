@@ -5,7 +5,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -42,9 +41,8 @@ class Quran2Fragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        Log.d("Quran2Fragment", "Setting up RecyclerView")
         adapter = Quran2Adapter { surah ->
-            Log.d("Quran2Fragment", "Surah clicked: ${surah.number} - ${surah.englishName}")
+            Log.d("Quran2Fragment", "Surah clicked: ${surah.number} - ${surah.name}")
             navigateToSurahVerses(surah.number)
         }
         binding.quranVersesRecycler.apply {
@@ -52,38 +50,26 @@ class Quran2Fragment : Fragment() {
             layoutManager = LinearLayoutManager(requireContext())
             setHasFixedSize(true)
         }
-        Log.d("Quran2Fragment", "RecyclerView setup complete")
     }
 
     private fun observeViewModel() {
-        Log.d("Quran2Fragment", "Setting up observers")
         viewModel.surahs.observe(viewLifecycleOwner) { surahs ->
-            Log.d("Quran2Fragment", "Surahs observer triggered with ${surahs.size} surahs")
+            Log.d("Quran2Fragment", "Received ${surahs.size} surahs")
             if (surahs.isNotEmpty()) {
-                Log.d("Quran2Fragment", "Submitting ${surahs.size} surahs to adapter")
-                surahs.forEachIndexed { index, surah ->
-                    Log.d("Quran2Fragment", "Surah ${index + 1}: ${surah.number} - ${surah.englishName}")
-                }
-                adapter.submitList(surahs) {
-                    Log.d("Quran2Fragment", "List submitted to adapter, items count: ${adapter.itemCount}")
-                    binding.quranVersesRecycler.visibility = View.VISIBLE
-                }
+                adapter.submitList(surahs)
+                binding.quranVersesRecycler.visibility = View.VISIBLE
             } else {
-                Log.d("Quran2Fragment", "No surahs received, hiding RecyclerView")
                 binding.quranVersesRecycler.visibility = View.GONE
-                 Toast.makeText(requireContext(), R.string.no_surahs_found, Toast.LENGTH_SHORT).show()
             }
         }
+
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-            Log.d("Quran2Fragment", "Loading state: $isLoading")
             binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
-            binding.quranVersesRecycler.visibility = if (isLoading || viewModel.surahs.value.isNullOrEmpty()) View.GONE else View.VISIBLE
         }
+
         viewModel.error.observe(viewLifecycleOwner) { error ->
             error?.let {
-                Log.e("Quran2Fragment", "Error occurred: $it")
-                Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
-                binding.quranVersesRecycler.visibility = View.GONE
+                Log.e("Quran2Fragment", "Error: $it")
                 viewModel.clearError()
             }
         }
@@ -97,12 +83,34 @@ class Quran2Fragment : Fragment() {
 
     private fun navigateToSurahVerses(surahNumber: Int) {
         try {
-            val action = Quran2FragmentDirections.actionQuran2FragmentToQuranFragment(surahNumber)
-            findNavController().navigate(action)
-            Log.d("Quran2Fragment", "Navigated to QuranFragment with surahNumber: $surahNumber")
+            Log.d("Quran2Fragment", "Navigating to surah: $surahNumber")
+
+            if (surahNumber !in 1..114) {
+                Log.e("Quran2Fragment", "Invalid surah number: $surahNumber")
+                return
+            }
+
+            try {
+                Log.d("Quran2Fragment", "Trying Safe Args navigation...")
+                val action = Quran2FragmentDirections.actionQuran2FragmentToQuranFragment(surahNumber)
+                findNavController().navigate(action)
+                Log.d("Quran2Fragment", "Safe Args navigation successful")
+            } catch (e: Exception) {
+                Log.w("Quran2Fragment", "Safe Args failed, trying Bundle method: ${e.message}")
+
+                val bundle = Bundle().apply {
+                    putInt("surahNumber", surahNumber)
+                }
+
+                findNavController().navigate(
+                    R.id.action_quran2Fragment_to_quranFragment,
+                    bundle
+                )
+                Log.d("Quran2Fragment", "Bundle navigation successful")
+            }
+
         } catch (e: Exception) {
-            Log.e("Quran2Fragment", "Navigation error: ${e.message}")
-            Toast.makeText(requireContext(), R.string.error_navigating, Toast.LENGTH_SHORT).show()
+            Log.e("Quran2Fragment", "Navigation error: ${e.message}", e)
         }
     }
 

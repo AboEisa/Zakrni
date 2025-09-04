@@ -13,7 +13,6 @@ import com.example.zakrni.clean.domain.models.DomainAyah
 import com.example.zakrni.clean.domain.models.DomainSurah
 import com.example.zakrni.clean.ui.utils.Constant.Companion.APIKEY
 import javax.inject.Inject
-import kotlin.collections.emptyList
 
 class RemoteDataSource @Inject constructor(
     private val apiPrayerServices: PrayerApiService,
@@ -75,52 +74,63 @@ class RemoteDataSource @Inject constructor(
         return try {
             println("DEBUG: RemoteDataSource - Fetching verses for surah $surahNumber")
 
-            // Use the getSurahDetails endpoint which returns verses for a specific surah
-            val response = quranApiService.getSurahDetails(surahNumber)
+            // First try to get the full Quran data, then filter for the specific surah
+            val response = quranApiService.getSurahList()
 
             println("DEBUG: RemoteDataSource - Response code: ${response.code}, status: ${response.status}")
+            println("DEBUG: RemoteDataSource - Number of surahs in response: ${response.data.surahs.size}")
 
             if (response.code == 200 && response.status == "OK") {
-                // The API returns the full Quran, so we need to find the specific surah
-                val surah = response.data.surahs.find { it.number == surahNumber }
-                val verses = surah?.ayahs?.map { ayah ->
-                    DomainAyah(
-                        hizbQuarter = ayah.hizbQuarter,
-                        juz = ayah.juz,
-                        manzil = ayah.manzil,
-                        number = ayah.number,
-                        numberInSurah = ayah.numberInSurah,
-                        page = ayah.page,
-                        ruku = ayah.ruku,
-                        sajda = ayah.sajda,
-                        text = ayah.text
-                    )
-                } ?: emptyList()
+                // Find the specific surah by number
+                val targetSurah = response.data.surahs.find { it.number == surahNumber }
 
-                println("DEBUG: RemoteDataSource - Mapped ${verses.size} verses")
-                verses
+                if (targetSurah != null) {
+                    println("DEBUG: RemoteDataSource - Found surah ${targetSurah.number} with ${targetSurah.ayahs.size} ayahs")
+
+                    val verses = targetSurah.ayahs.map { ayah ->
+                        DomainAyah(
+                            hizbQuarter = ayah.hizbQuarter,
+                            juz = ayah.juz,
+                            manzil = ayah.manzil,
+                            number = ayah.number,
+                            numberInSurah = ayah.numberInSurah,
+                            page = ayah.page,
+                            ruku = ayah.ruku,
+                            sajda = ayah.sajda,
+                            text = ayah.text
+                        )
+                    }
+
+                    println("DEBUG: RemoteDataSource - Successfully mapped ${verses.size} verses for surah $surahNumber")
+                    verses
+                } else {
+                    println("DEBUG: RemoteDataSource - Surah $surahNumber not found in response")
+
+                    // Log available surah numbers for debugging
+                    println("DEBUG: Available surahs: ${response.data.surahs.map { it.number }.joinToString(", ")}")
+                    emptyList()
+                }
             } else {
-                println("DEBUG: RemoteDataSource - Invalid response")
+                println("DEBUG: RemoteDataSource - Invalid response: code=${response.code}, status=${response.status}")
                 emptyList()
             }
         } catch (e: Exception) {
-            println("DEBUG: RemoteDataSource - Error fetching verses: ${e.message}")
+            println("DEBUG: RemoteDataSource - Error fetching verses for surah $surahNumber: ${e.message}")
             e.printStackTrace()
             emptyList()
         }
     }
 
-    // RemoteDataSource.kt
     override suspend fun getSurahList(): List<DomainSurah> {
         return try {
             println("DEBUG: RemoteDataSource - Fetching surah list from API")
-            val response = quranApiService.getSurahList() // This gets the full Quran
+            val response = quranApiService.getSurahList()
             println("DEBUG: RemoteDataSource - API Response: code=${response.code}, status=${response.status}")
 
             if (response.code == 200 && response.status == "OK") {
                 val surahs = response.data.surahs.map { surah ->
                     DomainSurah(
-                        ayahs = emptyList(), // Don't load verses yet
+                        ayahs = emptyList(), // Don't load verses in the list view
                         englishName = surah.englishName,
                         englishNameTranslation = surah.englishNameTranslation,
                         name = surah.name,
