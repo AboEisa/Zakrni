@@ -103,7 +103,7 @@ class QuranViewModel @Inject constructor(
                     val updatedSurah = surah.copy(ayahs = verses)
                     _currentSurah.value = updatedSurah
                 } else {
-                    val directSurah = withTimeoutOrNull(5_000L) {
+                       val directSurah = withTimeoutOrNull(5_000L) {
                         getQuranUseCase.getSurahByNumber(surahNumber)
                     }
                     if (directSurah != null) {

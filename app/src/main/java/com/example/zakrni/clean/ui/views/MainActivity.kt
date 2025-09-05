@@ -23,6 +23,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var noInternetDialog: NoInternetDialog
 
+
+
     @Inject
     lateinit var networkManager: NetworkManager
 

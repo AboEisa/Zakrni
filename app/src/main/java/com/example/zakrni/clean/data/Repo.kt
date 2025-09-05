@@ -24,10 +24,13 @@ import com.example.zakrni.clean.domain.models.DomainHadithResponse
 import com.example.zakrni.clean.domain.models.DomainPrayerTimesResponse
 import com.example.zakrni.clean.domain.models.DomainQuranAudioResponse
 import com.example.zakrni.clean.ui.utils.Constant.Companion.APIKEY
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class Repo @Inject constructor(
     private val remoteDataSource: IRemoteDataSource,
+    private val localDataSource: ILocalDataSource
 ) : IRepo {
     override suspend fun getPrayerTimes(
         latitude: Double,
@@ -78,26 +81,88 @@ class Repo @Inject constructor(
     }
 
     @OptIn(UnstableApi::class)
-    override suspend fun getQuranVerses(suraNumber: Int): List<DomainAyah> {
-        return try {
-            val ayahs = remoteDataSource.getQuranVerses(suraNumber)
-            Log.d("QURAN_API", "Repo - Surah $suraNumber has ${ayahs.size} ayahs")
-            ayahs
+    override suspend fun getQuranVerses(suraNumber: Int): List<DomainAyah> = withContext(Dispatchers.IO) {
+        try {
+            // Check local cache first
+            val cachedAyahs = localDataSource.getAyahsBySurah(suraNumber)
+            if (cachedAyahs.isNotEmpty()) {
+                println("DEBUG: Repo - Returning ${cachedAyahs.size} ayahs from cache for surah $suraNumber")
+                return@withContext cachedAyahs
+            }
+
+            // If no cache, fetch from API
+            println("DEBUG: Repo - Fetching ayahs from API for surah $suraNumber")
+            val remoteAyahs = remoteDataSource.getQuranVerses(suraNumber)
+
+            // Save to cache if successful
+            if (remoteAyahs.isNotEmpty()) {
+                localDataSource.saveAyahs(suraNumber, remoteAyahs)
+            }
+
+            remoteAyahs
         } catch (e: Exception) {
-            Log.e("QURAN_API", "Repo - Error fetching verses: ${e.message}", e)
-            emptyList()
+            println("DEBUG: Repo - Error fetching ayahs: ${e.message}")
+            // Try to return cached data on error
+            localDataSource.getAyahsBySurah(suraNumber)
         }
     }
 
-    override suspend fun getAllSurahs(): List<DomainSurah> {
-        return try {
-            println("DEBUG: Repo - Getting all surahs")
-            val surahs = remoteDataSource.getSurahList()
-            println("DEBUG: Repo - Got ${surahs.size} surahs from remote source")
-            surahs
+    suspend fun preloadAllQuranData(onProgress: (Int, Int) -> Unit = { _, _ -> }) {
+        withContext(Dispatchers.IO) {
+            try {
+                if (localDataSource.isQuranDataCached()) {
+                    println("DEBUG: Repo - Quran data already cached")
+                    return@withContext
+                }
+
+                println("DEBUG: Repo - Starting Quran data preload")
+
+                // Load and cache all surahs
+                val surahs = remoteDataSource.getSurahList()
+                localDataSource.saveSurahs(surahs)
+                // Load verses for each surah
+                surahs.forEachIndexed { index, surah ->
+                    onProgress(index + 1, 114)
+
+                    val verses = remoteDataSource.getQuranVerses(surah.number)
+                    if (verses.isNotEmpty()) {
+                        localDataSource.saveAyahs(surah.number, verses)
+                    }
+
+                    // Small delay to avoid overwhelming the API
+                    kotlinx.coroutines.delay(100)
+                }
+
+                println("DEBUG: Repo - Quran data preload complete")
+            } catch (e: Exception) {
+                println("DEBUG: Repo - Error preloading data: ${e.message}")
+            }
+        }
+    }
+
+    override suspend fun getAllSurahs(): List<DomainSurah> = withContext(Dispatchers.IO) {
+        try {
+            // Check local cache first
+            val cachedSurahs = localDataSource.getAllSurahs()
+            if (cachedSurahs.isNotEmpty()) {
+                println("DEBUG: Repo - Returning ${cachedSurahs.size} surahs from cache")
+                return@withContext cachedSurahs
+            }
+
+            // If no cache, fetch from API
+            println("DEBUG: Repo - Fetching surahs from API")
+            val remoteSurahs = remoteDataSource.getSurahList()
+
+            // Save to cache if successful
+            if (remoteSurahs.isNotEmpty()) {
+                localDataSource.saveSurahs(remoteSurahs)
+            }
+
+            remoteSurahs
         } catch (e: Exception) {
-            println("DEBUG: Repo - Error getting surahs: ${e.message}")
-            emptyList()
+            println("DEBUG: Repo - Error fetching surahs: ${e.message}")
+            // Try to return cached data on error
+            localDataSource.getAllSurahs()
         }
     }
 

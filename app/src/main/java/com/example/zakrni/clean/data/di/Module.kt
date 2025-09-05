@@ -1,7 +1,12 @@
 package com.example.zakrni.clean.data.di
 
 import android.content.Context
+import androidx.room.Room
 import com.example.zakrni.clean.data.Repo
+import com.example.zakrni.clean.data.local.ILocalDataSource
+import com.example.zakrni.clean.data.local.LocalDataSource
+import com.example.zakrni.clean.data.local.QuranDatabase
+import com.example.zakrni.clean.data.local.dao.QuranDao
 import com.example.zakrni.clean.data.location.LocationManager
 import com.example.zakrni.clean.data.network.AzkarApiService
 import com.example.zakrni.clean.data.network.HadithApiService
@@ -127,11 +132,11 @@ object Module {
         return RemoteDataSource(prayerApiService, hadithApiService, azkarApiService, quranApiService)
     }
 
-    @Singleton
-    @Provides
-    fun getRepository(remoteDataSource: IRemoteDataSource): IRepo {
-        return Repo(remoteDataSource)
-    }
+//    @Singleton
+//    @Provides
+//    fun getRepository(remoteDataSource: IRemoteDataSource): IRepo {
+//        return Repo(remoteDataSource)
+//    }
 
     @Provides
     @Singleton
@@ -143,5 +148,41 @@ object Module {
     @Singleton
     fun provideNetworkManager(@ApplicationContext context: Context): NetworkManager {
         return NetworkManager(context)
+    }
+
+
+
+    @Provides
+    @Singleton
+    fun provideQuranDatabase(@ApplicationContext context: Context): QuranDatabase {
+        return Room.databaseBuilder(
+            context,
+            QuranDatabase::class.java,
+            "zakrni_quran_db"
+        ).fallbackToDestructiveMigration()
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideQuranDao(database: QuranDatabase): QuranDao {
+        return database.quranDao()
+    }
+
+    @Singleton
+    @Provides
+    fun getLocalDataSource(
+        quranDao: QuranDao
+    ): ILocalDataSource {
+        return LocalDataSource(quranDao)
+    }
+
+    @Singleton
+    @Provides
+    fun getRepository(
+        remoteDataSource: IRemoteDataSource,
+        localDataSource: ILocalDataSource
+    ): IRepo {
+        return Repo(remoteDataSource, localDataSource)
     }
 }
