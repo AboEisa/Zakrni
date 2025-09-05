@@ -1,10 +1,12 @@
 package com.example.zakrni.clean.data.remote
 
 import com.example.zakrni.clean.data.models.AsmaAlHusnaResponse
+import com.example.zakrni.clean.data.models.AudioEdition
 import com.example.zakrni.clean.data.models.AzkarResponse
 import com.example.zakrni.clean.data.models.DuaResponse
 import com.example.zakrni.clean.data.models.HadithResponse
 import com.example.zakrni.clean.data.models.PrayerTimesResponse
+import com.example.zakrni.clean.data.models.QuranResponse
 import com.example.zakrni.clean.data.network.AzkarApiService
 import com.example.zakrni.clean.data.network.HadithApiService
 import com.example.zakrni.clean.data.network.PrayerApiService
@@ -150,4 +152,20 @@ class RemoteDataSource @Inject constructor(
             emptyList()
         }
     }
+    override suspend fun getSurahAudio(
+        surahNumber: Int,
+        reciter: String
+    ): Result<QuranResponse> {
+        return try {
+            val response = quranApiService.getSurahAudio(surahNumber, reciter)
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getAudioEditions(language: String): Result<List<AudioEdition>> {
+        TODO("Not yet implemented")
+    }
+
 }

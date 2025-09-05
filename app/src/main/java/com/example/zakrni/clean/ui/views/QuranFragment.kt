@@ -1,6 +1,5 @@
 package com.example.zakrni.clean.ui.views
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -8,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.zakrni.R
@@ -16,6 +16,7 @@ import com.example.zakrni.clean.ui.adapters.QuranAdapter
 import com.example.zakrni.clean.ui.viewmodels.QuranViewModel
 import com.example.zakrni.databinding.FragmentQuranBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class QuranFragment : Fragment() {
@@ -24,6 +25,7 @@ class QuranFragment : Fragment() {
 
     private val viewModel: QuranViewModel by activityViewModels()
     private lateinit var adapter: QuranAdapter
+    private var currentSurahNumber: Int = -1
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,62 +40,36 @@ class QuranFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         Log.d("QuranFragment", "onViewCreated started")
 
-        Log.d("QuranFragment", "Arguments bundle: $arguments")
-        arguments?.keySet()?.forEach { key ->
-            Log.d("QuranFragment", "Argument $key = ${arguments?.get(key)}")
-        }
+        currentSurahNumber = getSurahNumber()
+        Log.d("QuranFragment", "Final surah number: $currentSurahNumber")
 
         setupRecyclerView()
         setupClickListeners()
         observeViewModel()
 
-        val surahNumber = getSurahNumber()
-        Log.d("QuranFragment", "Final surah number: $surahNumber")
-
-        if (surahNumber in 1..114) {
-            Log.d("QuranFragment", "Loading verses for surah: $surahNumber")
-            viewModel.loadQuranVerses(surahNumber)
+        if (currentSurahNumber in 1..114) {
+            Log.d("QuranFragment", "Loading verses for surah: $currentSurahNumber")
+            viewModel.loadQuranVerses(currentSurahNumber)
         } else {
-            Log.e("QuranFragment", "Invalid surah number: $surahNumber")
+            Log.e("QuranFragment", "Invalid surah number: $currentSurahNumber")
         }
     }
 
     private fun getSurahNumber(): Int {
         return try {
-            // Method 1: Try Safe Args first
-            Log.d("QuranFragment", "Trying Safe Args...")
+            // Try Safe Args first
             val args = QuranFragmentArgs.fromBundle(requireArguments())
             val safeArgsSurah = args.surahNumber
             Log.d("QuranFragment", "Safe Args surah number: $safeArgsSurah")
             if (safeArgsSurah > 0) {
-                return safeArgsSurah
+                safeArgsSurah
             } else {
-                throw Exception("Safe Args returned invalid number: $safeArgsSurah")
+                throw Exception("Invalid number: $safeArgsSurah")
             }
         } catch (e: Exception) {
             Log.w("QuranFragment", "Safe Args failed: ${e.message}")
-
-            // Method 2: Try regular Bundle
-            try {
-                Log.d("QuranFragment", "Trying Bundle method...")
-                val bundleSurah = arguments?.getInt("surahNumber", -1) ?: -1
-                Log.d("QuranFragment", "Bundle surah number: $bundleSurah")
-                if (bundleSurah > 0) {
-                    return bundleSurah
-                } else {
-                    throw Exception("Bundle returned invalid number: $bundleSurah")
-                }
-            } catch (e2: Exception) {
-                Log.w("QuranFragment", "Bundle method failed: ${e2.message}")
-
-                // Method 3: Check if arguments exist at all
-                if (arguments == null) {
-                    Log.e("QuranFragment", "No arguments bundle found!")
-                } else {
-                    Log.e("QuranFragment", "Arguments exist but surahNumber not found")
-                }
-                return -1
-            }
+            // Try regular Bundle
+            arguments?.getInt("surahNumber", -1) ?: -1
         }
     }
 
@@ -116,9 +92,21 @@ class QuranFragment : Fragment() {
             findNavController().navigateUp()
         }
 
+        // Show audio controls
+        binding.audioControls.visibility = View.VISIBLE
 
-
-
+        binding.playButton.setOnClickListener {
+            // Use lifecycleScope to collect the StateFlow value
+            lifecycleScope.launch {
+                viewModel.isPlaying.collect { isPlaying ->
+                    if (isPlaying) {
+                        viewModel.pauseAudio()
+                    } else {
+                        viewModel.playSurahAudio(currentSurahNumber)
+                    }
+                }
+            }
+        }
     }
 
     private fun observeViewModel() {
@@ -128,7 +116,6 @@ class QuranFragment : Fragment() {
                 adapter.submitList(verses)
                 binding.quranVersesRecycler.visibility = View.VISIBLE
                 binding.progressBar.visibility = View.GONE
-                Log.d("QuranFragment", "Displayed ${verses.size} verses successfully")
             } else {
                 binding.quranVersesRecycler.visibility = View.GONE
                 if (viewModel.isLoading.value != true) {
@@ -156,6 +143,25 @@ class QuranFragment : Fragment() {
             Log.d("QuranFragment", "Loading state: $isLoading")
             binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
         }
+
+        // Observe audio state using lifecycleScope for StateFlow
+        lifecycleScope.launch {
+            viewModel.isPlaying.collect { isPlaying ->
+                updatePlayPauseButton(isPlaying)
+            }
+        }
+
+        lifecycleScope.launch {
+            viewModel.audioProgress.collect { progress ->
+                binding.audioProgress.progress = progress.toInt()
+            }
+        }
+    }
+
+    private fun updatePlayPauseButton(isPlaying: Boolean) {
+        binding.playButton.setImageResource(
+            if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play
+        )
     }
 
     private fun updateSurahHeader(surah: DomainSurah) {
@@ -168,17 +174,15 @@ class QuranFragment : Fragment() {
             }
             versesCount.text = "${surah.ayahs.size} آية"
             bismillah.visibility = when (surah.number) {
-                1, 9 -> View.GONE // الفاتحة والتوبة
+                1, 9 -> View.GONE
                 else -> View.VISIBLE
             }
         }
-        Log.d("QuranFragment", "Updated surah header: ${surah.name} - ${surah.ayahs.size} verses")
     }
-
-
 
     override fun onDestroyView() {
         super.onDestroyView()
+        viewModel.pauseAudio()
         _binding = null
     }
 }

@@ -1,4 +1,5 @@
 package com.example.zakrni.clean.data
+
 import androidx.annotation.OptIn
 import androidx.media3.common.util.Log
 import androidx.media3.common.util.UnstableApi
@@ -6,7 +7,10 @@ import com.example.zakrni.clean.domain.models.DomainSurah
 
 import com.example.zakrni.clean.data.local.ILocalDataSource
 import com.example.zakrni.clean.data.models.AsmaAlHusnaResponse
+import com.example.zakrni.clean.data.models.AudioEdition
+import com.example.zakrni.clean.data.models.AudioEditionsResponse
 import com.example.zakrni.clean.data.models.PrayerTimesResponse
+import com.example.zakrni.clean.data.models.QuranResponse
 import com.example.zakrni.clean.data.models.mapToDomain
 import com.example.zakrni.clean.data.network.PrayerApiService
 import com.example.zakrni.clean.data.remote.IRemoteDataSource
@@ -23,7 +27,7 @@ import javax.inject.Inject
 
 class Repo @Inject constructor(
     private val remoteDataSource: IRemoteDataSource,
-) : IRepo{
+) : IRepo {
     override suspend fun getPrayerTimes(
         latitude: Double,
         longitude: Double
@@ -47,7 +51,7 @@ class Repo @Inject constructor(
 
     override suspend fun getHadiths(page: Int, limit: Int): Result<DomainHadithResponse> {
         return try {
-            val data = remoteDataSource.getHadiths(page,limit)
+            val data = remoteDataSource.getHadiths(page, limit)
             Result.success(data.getOrThrow().mapToDomain())
         } catch (e: Exception) {
             Result.failure(e)
@@ -96,4 +100,31 @@ class Repo @Inject constructor(
             emptyList()
         }
     }
+
+
+    override suspend fun getSurahAudio(
+        surahNumber: Int,
+        reciter: String
+    ): Result<QuranResponse> {
+        return remoteDataSource.getSurahAudio(surahNumber, reciter)
+    }
+
+    override suspend fun getAudioEditions(language: String): Result<List<AudioEdition>> {
+        return try {
+            val response = remoteDataSource.getAudioEditions(language)
+            if (response.isSuccess) {
+                val editions = response.getOrThrow()
+                Result.success(editions)
+            } else {
+                Result.failure(response.exceptionOrNull() ?: Exception("Unknown error"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
 }
+
+
+
+

@@ -26,18 +26,6 @@
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
-            <!-- Action Buttons (Now on the left/end in RTL) -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-
-
-
-
-            </LinearLayout>
-
             <View
                 android:layout_width="0dp"
                 android:layout_height="1dp"
@@ -51,7 +39,6 @@
                 android:textSize="20sp"
                 android:textColor="@android:color/white"
                 android:textStyle="bold"
-                android:layout_marginStart="@dimen/_35sdp"
                 android:gravity="center" />
 
             <View
@@ -59,14 +46,15 @@
                 android:layout_height="1dp"
                 android:layout_weight="1" />
 
-            <!-- Back Button (Now on the right/start in RTL) -->
+            <!-- Back Button -->
             <ImageButton
                 android:id="@+id/back_button"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:background="?android:attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_back"
-                android:contentDescription="Back" />
+                android:contentDescription="Back"
+                app:tint="@android:color/white" />
 
         </LinearLayout>
 
@@ -126,51 +114,128 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Verses RecyclerView -->
+    <!-- Verses RecyclerView - Updated bottom constraint -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/quran_verses_recycler"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:padding="8dp"
+        android:paddingBottom="16dp"
         android:clipToPadding="false"
         tools:listitem="@layout/item_quran"
         app:layout_constraintTop_toBottomOf="@id/bismillah"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/audio_controls"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Audio Controls (Optional - for future use) -->
+    <!-- Audio Controls - Updated design and always visible -->
     <LinearLayout
         android:id="@+id/audio_controls"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:padding="16dp"
-        android:background="#FFFFFF"
-        android:elevation="4dp"
-        android:visibility="gone"
+        android:orientation="vertical"
+        android:background="@drawable/audio_controls_background"
+        android:elevation="8dp"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <ImageButton
-            android:id="@+id/play_button"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:background="@drawable/circle_background"
-            android:src="@drawable/ic_play"
-            android:contentDescription="Play"/>
-
-        <ProgressBar
-            android:id="@+id/audio_progress"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="0dp"
+        <!-- Reciter Selection Spinner -->
+        <Spinner
+            android:id="@+id/reciter_spinner"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:progressTint="#4CAF50" />
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="8dp"
+            android:padding="12dp"
+            android:background="@drawable/spinner_background"
+            android:popupBackground="@android:color/white"
+            android:visibility="gone" />
+
+        <!-- Audio Player Controls -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="16dp">
+
+            <!-- Play/Pause Button -->
+            <ImageButton
+                android:id="@+id/play_button"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:background="@drawable/play_button_background"
+                android:src="@drawable/ic_play"
+                android:contentDescription="Play"
+                android:scaleType="centerInside"
+                app:tint="@android:color/white" />
+
+            <!-- Progress and Time Layout -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp">
+
+                <!-- Progress Bar -->
+                <ProgressBar
+                    android:id="@+id/audio_progress"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:progressTint="#4CAF50"
+                    android:progressBackgroundTint="#E0E0E0"
+                    android:max="100"
+                    android:progress="0" />
+
+                <!-- Time Display -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="4dp">
+
+                    <TextView
+                        android:id="@+id/current_time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0:00"
+                        android:textSize="12sp"
+                        android:textColor="#666666" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_weight="1" />
+
+                    <TextView
+                        android:id="@+id/total_time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0:00"
+                        android:textSize="12sp"
+                        android:textColor="#666666" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Additional Controls -->
+            <ImageButton
+                android:id="@+id/settings_button"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_settings"
+                android:contentDescription="Settings"
+                android:visibility="gone"
+                app:tint="#666666" />
+
+        </LinearLayout>
 
     </LinearLayout>
 

@@ -1,11 +1,13 @@
 package com.example.zakrni.clean.data.remote
 
 import com.example.zakrni.clean.data.models.AsmaAlHusnaResponse
+import com.example.zakrni.clean.data.models.AudioEdition
 import com.example.zakrni.clean.data.models.AzkarResponse
 import com.example.zakrni.clean.data.models.DuaResponse
 import com.example.zakrni.clean.data.models.HadithResponse
 import com.example.zakrni.clean.data.models.PrayerTimesResponse
 import com.example.zakrni.clean.data.models.Location
+import com.example.zakrni.clean.data.models.QuranResponse
 import com.example.zakrni.clean.domain.models.DomainAyah
 import com.example.zakrni.clean.domain.models.DomainSurah
 
@@ -28,4 +30,6 @@ interface IRemoteDataSource {
     suspend fun getQuranVerses(surahNumber: Int): List<DomainAyah>
 
     suspend fun getSurahList(): List<DomainSurah>
-}
+
+    suspend fun getSurahAudio(surahNumber: Int, reciter: String): Result<QuranResponse>
+    suspend fun getAudioEditions(language: String): Result<List<AudioEdition>>}

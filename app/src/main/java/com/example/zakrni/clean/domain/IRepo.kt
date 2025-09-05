@@ -1,7 +1,9 @@
 package com.example.zakrni.clean.domain
 
 import com.example.zakrni.clean.data.models.AsmaAlHusnaResponse
+import com.example.zakrni.clean.data.models.AudioEdition
 import com.example.zakrni.clean.data.models.PrayerTimesResponse
+import com.example.zakrni.clean.data.models.QuranResponse
 import com.example.zakrni.clean.domain.models.DomainAsmaAlHusnaResponse
 import com.example.zakrni.clean.domain.models.DomainAzkarResponse
 import com.example.zakrni.clean.domain.models.DomainDuaResponse
@@ -27,6 +29,8 @@ interface IRepo {
 
     // IRepo.kt in domain package
 
-        suspend fun getAllSurahs(): List<DomainSurah>
-        suspend fun getQuranVerses(suraNumber: Int): List<DomainAyah>
-    }
+    suspend fun getAllSurahs(): List<DomainSurah>
+    suspend fun getQuranVerses(suraNumber: Int): List<DomainAyah>
+    suspend fun getSurahAudio(surahNumber: Int, reciter: String): Result<QuranResponse>
+    suspend fun getAudioEditions(language: String): Result<List<AudioEdition>>
+}
