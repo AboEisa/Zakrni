@@ -20,37 +20,20 @@ import kotlinx.coroutines.time.debounce
 class Quran2Adapter(
     private val onSurahClick: (DomainSurah) -> Unit
 ) : ListAdapter<DomainSurah, Quran2Adapter.SurahViewHolder>(DiffCallback()) {
-    private val clickFlow = MutableSharedFlow<DomainSurah>(extraBufferCapacity = 1)
-    private var job: Job? = null
-
-    init {
-        job = CoroutineScope(Dispatchers.Main).launch {
-            clickFlow
-                .debounce(500)
-                .collect { surah -> onSurahClick(surah) }
-        }
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SurahViewHolder {
         val binding = ItemQuran2Binding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return SurahViewHolder(binding)
+        return SurahViewHolder(binding, onSurahClick)
     }
 
     override fun onBindViewHolder(holder: SurahViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
 
-    inner class SurahViewHolder(private val binding: ItemQuran2Binding) : RecyclerView.ViewHolder(binding.root) {
-        init {
-            binding.root.setOnClickListener {
-                val position = adapterPosition
-                if (position != RecyclerView.NO_POSITION) {
-                    val surah = getItem(position)
-                    Log.d("Quran2Adapter", "Clicked on Surah ${surah.number}: ${surah.name}")
-                    clickFlow.tryEmit(surah)
-                }
-            }
-        }
+    inner class SurahViewHolder(
+        private val binding: ItemQuran2Binding,
+        private val onSurahClick: (DomainSurah) -> Unit
+    ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(surah: DomainSurah) {
             binding.apply {
@@ -60,22 +43,19 @@ class Quran2Adapter(
                 surahTranslation.text = surah.englishNameTranslation
                 revelationType.text = QuranUtils.getRevelationTypeArabic(surah.number)
                 ayahsCount.text = "${QuranUtils.getAyahCount(surah.number)} آية"
+
+                root.setOnClickListener {
+                    onSurahClick(surah)
+                }
             }
         }
     }
 
-    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
-        super.onDetachedFromRecyclerView(recyclerView)
-        job?.cancel()
-    }
-
     private class DiffCallback : DiffUtil.ItemCallback<DomainSurah>() {
-        override fun areItemsTheSame(oldItem: DomainSurah, newItem: DomainSurah): Boolean {
-            return oldItem.number == newItem.number
-        }
+        override fun areItemsTheSame(oldItem: DomainSurah, newItem: DomainSurah) =
+            oldItem.number == newItem.number
 
-        override fun areContentsTheSame(oldItem: DomainSurah, newItem: DomainSurah): Boolean {
-            return oldItem == newItem
-        }
+        override fun areContentsTheSame(oldItem: DomainSurah, newItem: DomainSurah) =
+            oldItem == newItem
     }
 }

@@ -109,11 +109,13 @@
         tools:layout="@layout/fragment_quran2">
         <action
             android:id="@+id/action_quran2Fragment_to_quranFragment"
-            app:destination="@id/quranFragment"
-            app:popUpTo="@id/quran2Fragment"
-            app:popUpToInclusive="false"
-            app:launchSingleTop="true" />
+            app:destination="@id/quranFragment">
+            <argument
+                android:name="surahNumber"
+                app:argType="integer" />
+        </action>
     </fragment>
+
 
 
 </navigation>

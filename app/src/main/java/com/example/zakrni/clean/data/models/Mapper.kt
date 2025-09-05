@@ -484,3 +484,55 @@ fun Ayah.mapToDomain(): DomainAyah {
         text = text
     )
 }
+
+
+// ---------------- Quran Audio Mappers ----------------
+
+fun QuranAudioResponse.mapToDomain(): DomainQuranAudioResponse {
+    return DomainQuranAudioResponse(
+        code = code,
+        status = status,
+        data = data.mapToDomain()
+    )
+}
+
+fun QuranAudioData.mapToDomain(): DomainQuranAudioData {
+    return DomainQuranAudioData(
+        number = number,
+        audio = audio,
+        audioSecondary = audioSecondary,
+        text = text,
+        edition = edition.mapToDomain(),
+        surah = surah.mapToDomain(),
+        numberInSurah = numberInSurah
+    )
+}
+
+fun AudioEdition.mapToDomain(): DomainAudioEdition {
+    return DomainAudioEdition(
+        identifier = identifier,
+        language = language,
+        name = name,
+        englishName = englishName,
+        type = type
+    )
+}
+
+fun SurahInfo.mapToDomain(): DomainSurahInfo {
+    return DomainSurahInfo(
+        number = number,
+        name = name,
+        englishName = englishName,
+        englishNameTranslation = englishNameTranslation,
+        numberOfAyahs = numberOfAyahs,
+        revelationType = revelationType
+    )
+}
+
+fun AudioEditionsResponse.mapToDomain(): DomainAudioEditionsResponse {
+    return DomainAudioEditionsResponse(
+        code = code,
+        status = status,
+        data = data.map { it.mapToDomain() }
+    )
+}

@@ -484,3 +484,56 @@ fun DomainAyah.mapToPresentation(): PresentationAyah {
         text = text
     )
 }
+
+
+
+// ---------------- Quran Audio Presentation Mappers ----------------
+
+fun DomainQuranAudioResponse.mapToPresentation(): PresentationQuranAudioResponse {
+    return PresentationQuranAudioResponse(
+        code = code,
+        status = status,
+        data = data.mapToPresentation()
+    )
+}
+
+fun DomainQuranAudioData.mapToPresentation(): PresentationQuranAudioData {
+    return PresentationQuranAudioData(
+        number = number,
+        audio = audio,
+        audioSecondary = audioSecondary,
+        text = text,
+        edition = edition.mapToPresentation(),
+        surah = surah.mapToPresentation(),
+        numberInSurah = numberInSurah
+    )
+}
+
+fun DomainAudioEdition.mapToPresentation(): PresentationAudioEdition {
+    return PresentationAudioEdition(
+        identifier = identifier,
+        language = language,
+        name = name,
+        englishName = englishName,
+        type = type
+    )
+}
+
+fun DomainSurahInfo.mapToPresentation(): PresentationSurahInfo {
+    return PresentationSurahInfo(
+        number = number,
+        name = name,
+        englishName = englishName,
+        englishNameTranslation = englishNameTranslation,
+        numberOfAyahs = numberOfAyahs,
+        revelationType = revelationType
+    )
+}
+
+fun DomainAudioEditionsResponse.mapToPresentation(): PresentationAudioEditionsResponse {
+    return PresentationAudioEditionsResponse(
+        code = code,
+        status = status,
+        data = data.map { it.mapToPresentation() }
+    )
+}

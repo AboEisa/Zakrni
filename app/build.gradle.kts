@@ -44,7 +44,6 @@ android {
         viewBinding = true
     }
 
-    // ✅ Added packaging block to fix META-INF conflicts
     packaging {
         resources {
             excludes += "META-INF/INDEX.LIST"

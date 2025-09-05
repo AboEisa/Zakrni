@@ -1,29 +1,34 @@
 package com.example.zakrni.clean.data
+
 import androidx.annotation.OptIn
 import androidx.media3.common.util.Log
 import androidx.media3.common.util.UnstableApi
 import com.example.zakrni.clean.domain.models.DomainSurah
-
 import com.example.zakrni.clean.data.local.ILocalDataSource
 import com.example.zakrni.clean.data.models.AsmaAlHusnaResponse
+import com.example.zakrni.clean.data.models.AudioEdition
+import com.example.zakrni.clean.data.models.AudioEditionsResponse
 import com.example.zakrni.clean.data.models.PrayerTimesResponse
+import com.example.zakrni.clean.data.models.QuranResponse
 import com.example.zakrni.clean.data.models.mapToDomain
 import com.example.zakrni.clean.data.network.PrayerApiService
 import com.example.zakrni.clean.data.remote.IRemoteDataSource
 import com.example.zakrni.clean.domain.IRepo
 import com.example.zakrni.clean.domain.models.DomainAllahNameData
 import com.example.zakrni.clean.domain.models.DomainAsmaAlHusnaResponse
+import com.example.zakrni.clean.domain.models.DomainAudioEditionsResponse
 import com.example.zakrni.clean.domain.models.DomainAyah
 import com.example.zakrni.clean.domain.models.DomainAzkarResponse
 import com.example.zakrni.clean.domain.models.DomainDuaResponse
 import com.example.zakrni.clean.domain.models.DomainHadithResponse
 import com.example.zakrni.clean.domain.models.DomainPrayerTimesResponse
+import com.example.zakrni.clean.domain.models.DomainQuranAudioResponse
 import com.example.zakrni.clean.ui.utils.Constant.Companion.APIKEY
 import javax.inject.Inject
 
 class Repo @Inject constructor(
     private val remoteDataSource: IRemoteDataSource,
-) : IRepo{
+) : IRepo {
     override suspend fun getPrayerTimes(
         latitude: Double,
         longitude: Double
@@ -47,7 +52,7 @@ class Repo @Inject constructor(
 
     override suspend fun getHadiths(page: Int, limit: Int): Result<DomainHadithResponse> {
         return try {
-            val data = remoteDataSource.getHadiths(page,limit)
+            val data = remoteDataSource.getHadiths(page, limit)
             Result.success(data.getOrThrow().mapToDomain())
         } catch (e: Exception) {
             Result.failure(e)
@@ -75,7 +80,7 @@ class Repo @Inject constructor(
     @OptIn(UnstableApi::class)
     override suspend fun getQuranVerses(suraNumber: Int): List<DomainAyah> {
         return try {
-            val ayahs = remoteDataSource.getQuranVerses(suraNumber) // <-- get from remote
+            val ayahs = remoteDataSource.getQuranVerses(suraNumber)
             Log.d("QURAN_API", "Repo - Surah $suraNumber has ${ayahs.size} ayahs")
             ayahs
         } catch (e: Exception) {
@@ -83,7 +88,6 @@ class Repo @Inject constructor(
             emptyList()
         }
     }
-
 
     override suspend fun getAllSurahs(): List<DomainSurah> {
         return try {
@@ -94,6 +98,41 @@ class Repo @Inject constructor(
         } catch (e: Exception) {
             println("DEBUG: Repo - Error getting surahs: ${e.message}")
             emptyList()
+        }
+    }
+
+    override suspend fun getSurahAudio(
+        surahNumber: Int,
+        reciter: String
+    ): Result<QuranResponse> {
+        return remoteDataSource.getSurahAudio(surahNumber, reciter)
+    }
+
+    override suspend fun getAudioEditions(language: String): Result<DomainAudioEditionsResponse> {
+        return try {
+            val response = remoteDataSource.getAudioEditions(language)
+            if (response.isSuccess) {
+                val audioEditionsResponse = response.getOrThrow()
+                Result.success(audioEditionsResponse.mapToDomain())
+            } else {
+                Result.failure(response.exceptionOrNull() ?: Exception("Unknown error"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getAyahAudio(reference: String, edition: String): Result<DomainQuranAudioResponse> {
+        return try {
+            val response = remoteDataSource.getAyahAudio(reference, edition)
+            if (response.isSuccess) {
+                val quranAudioResponse = response.getOrThrow()
+                Result.success(quranAudioResponse.mapToDomain())
+            } else {
+                Result.failure(response.exceptionOrNull() ?: Exception("Unknown error"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
         }
     }
 }
