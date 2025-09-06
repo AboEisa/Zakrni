@@ -6,7 +6,7 @@ import com.example.zakrni.clean.data.Repo
 import com.example.zakrni.clean.data.local.ILocalDataSource
 import com.example.zakrni.clean.data.local.LocalDataSource
 import com.example.zakrni.clean.data.local.QuranDatabase
-import com.example.zakrni.clean.data.local.dao.QuranDao
+import com.example.zakrni.clean.data.local.QuranDao
 import com.example.zakrni.clean.data.location.LocationManager
 import com.example.zakrni.clean.data.network.AzkarApiService
 import com.example.zakrni.clean.data.network.HadithApiService
@@ -155,11 +155,8 @@ object Module {
     @Provides
     @Singleton
     fun provideQuranDatabase(@ApplicationContext context: Context): QuranDatabase {
-        return Room.databaseBuilder(
-            context,
-            QuranDatabase::class.java,
-            "zakrni_quran_db"
-        ).fallbackToDestructiveMigration()
+        return Room.databaseBuilder(context, QuranDatabase::class.java, "QuranDatabase")
+            .fallbackToDestructiveMigration()
             .build()
     }
 
