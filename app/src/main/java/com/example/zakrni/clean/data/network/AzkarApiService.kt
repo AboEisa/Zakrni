@@ -1,18 +1,39 @@
 package com.example.zakrni.clean.data.network
 
 import com.example.zakrni.clean.data.models.AzkarResponse
-import com.example.zakrni.clean.data.models.DuaResponse
 import retrofit2.http.GET
 
 interface AzkarApiService {
 
+    // أذكار الصباح
+    @GET("azkar_sabah.json")
+    suspend fun getMorningAzkar(): AzkarResponse
 
+    // أذكار المساء
+    @GET("azkar_massa.json")
+    suspend fun getEveningAzkar(): AzkarResponse
 
-    @GET("azkar")
-    suspend fun getAzkar(): AzkarResponse
+    // بعد الصلاة
+    @GET("PostPrayer_azkar.json")
+    suspend fun getAfterPrayerAzkar(): AzkarResponse
 
+    // النوم
+    @GET("azkar_noom.json")
+    suspend fun getSleepAzkar(): AzkarResponse
 
-    @GET("duas")
-    suspend fun getDua(): DuaResponse
+    // الاستيقاظ
+    @GET("azkar_wake.json")
+    suspend fun getWakeAzkar(): AzkarResponse
 
+    // المسجد
+    @GET("azkar_mosque.json")
+    suspend fun getMosqueAzkar(): AzkarResponse
+
+    // الطعام
+    @GET("azkar_eating.json")
+    suspend fun getEatingAzkar(): AzkarResponse
+
+    // متفرقة
+    @GET("azkar_misc.json")
+    suspend fun getMiscAzkar(): AzkarResponse
 }

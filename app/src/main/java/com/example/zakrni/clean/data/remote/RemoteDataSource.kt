@@ -56,39 +56,86 @@ class RemoteDataSource @Inject constructor(
         }
     }
 
-    override suspend fun getAzkar(): Result<AzkarResponse> {
+    override suspend fun getAzkarSabah(): Result<AzkarResponse> {
         return try {
-            val response = apiAzkarServices.getAzkar()
+            val response = apiAzkarServices.getMorningAzkar()
             Result.success(response)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
 
-    override suspend fun getDuas(): Result<DuaResponse> {
+    override suspend fun getAzkarMasaa(): Result<AzkarResponse> {
         return try {
-            val response = apiAzkarServices.getDua()
+            val response = apiAzkarServices.getEveningAzkar()
             Result.success(response)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
+
+    override suspend fun getAzkarPostPlayer(): Result<AzkarResponse> {
+        return try {
+            val response = apiAzkarServices.getAfterPrayerAzkar()
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getAzkarNoom(): Result<AzkarResponse> {
+        return try {
+            val response = apiAzkarServices.getSleepAzkar()
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getAzkarWake(): Result<AzkarResponse> {
+        return try {
+            val response = apiAzkarServices.getWakeAzkar()
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getAzkarMosque(): Result<AzkarResponse> {
+        return try {
+            val response = apiAzkarServices.getMosqueAzkar()
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getAzkarEating(): Result<AzkarResponse> {
+        return try {
+            val response = apiAzkarServices.getEatingAzkar()
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getAzkarMisc(): Result<AzkarResponse> {
+        return try {
+            val response = apiAzkarServices.getMiscAzkar()
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
 
     override suspend fun getQuranVerses(surahNumber: Int): List<DomainAyah> {
         return try {
-            println("DEBUG: RemoteDataSource - Fetching verses for surah $surahNumber")
-
             val response = quranApiService.getSurahList()
-
-            println("DEBUG: RemoteDataSource - Response code: ${response.code}, status: ${response.status}")
-            println("DEBUG: RemoteDataSource - Number of surahs in response: ${response.data.surahs.size}")
-
             if (response.code == 200 && response.status == "OK") {
                 val targetSurah = response.data.surahs.find { it.number == surahNumber }
 
                 if (targetSurah != null) {
-                    println("DEBUG: RemoteDataSource - Found surah ${targetSurah.number} with ${targetSurah.ayahs.size} ayahs")
-
                     val verses = targetSurah.ayahs.map { ayah ->
                         DomainAyah(
                             hizbQuarter = ayah.hizbQuarter,
@@ -102,20 +149,15 @@ class RemoteDataSource @Inject constructor(
                             text = ayah.text
                         )
                     }
-
-                    println("DEBUG: RemoteDataSource - Successfully mapped ${verses.size} verses for surah $surahNumber")
                     verses
                 } else {
-                    println("DEBUG: RemoteDataSource - Surah $surahNumber not found in response")
-                    println("DEBUG: Available surahs: ${response.data.surahs.map { it.number }.joinToString(", ")}")
                     emptyList()
                 }
             } else {
-                println("DEBUG: RemoteDataSource - Invalid response: code=${response.code}, status=${response.status}")
+
                 emptyList()
             }
         } catch (e: Exception) {
-            println("DEBUG: RemoteDataSource - Error fetching verses for surah $surahNumber: ${e.message}")
             e.printStackTrace()
             emptyList()
         }
@@ -123,10 +165,7 @@ class RemoteDataSource @Inject constructor(
 
     override suspend fun getSurahList(): List<DomainSurah> {
         return try {
-            println("DEBUG: RemoteDataSource - Fetching surah list from API")
             val response = quranApiService.getSurahList()
-            println("DEBUG: RemoteDataSource - API Response: code=${response.code}, status=${response.status}")
-
             if (response.code == 200 && response.status == "OK") {
                 val surahs = response.data.surahs.map { surah ->
                     DomainSurah(
@@ -138,59 +177,46 @@ class RemoteDataSource @Inject constructor(
                         revelationType = surah.revelationType
                     )
                 }
-                println("DEBUG: RemoteDataSource - Mapped ${surahs.size} surahs")
                 surahs
             } else {
-                println("DEBUG: RemoteDataSource - Invalid response: ${response.status}")
                 emptyList()
             }
         } catch (e: Exception) {
-            println("DEBUG: RemoteDataSource - Exception fetching surahs: ${e.message}")
             e.printStackTrace()
             emptyList()
         }
     }
 
-    // FIXED: Proper implementation of getSurahAudio
     override suspend fun getSurahAudio(
         surahNumber: Int,
         reciter: String
     ): Result<QuranResponse> {
         return try {
-            println("DEBUG: RemoteDataSource - Fetching audio for surah $surahNumber with reciter $reciter")
             val response = quranApiService.getSurahAudio(surahNumber, reciter)
-            println("DEBUG: RemoteDataSource - Audio response: code=${response.code}, status=${response.status}")
             Result.success(response)
         } catch (e: Exception) {
-            println("DEBUG: RemoteDataSource - Error fetching audio: ${e.message}")
             Result.failure(e)
         }
     }
 
     override suspend fun getAudioEditions(language: String): Result<AudioEditionsResponse> {
         return try {
-            println("DEBUG: RemoteDataSource - Fetching audio editions for language: $language")
             val response = quranApiService.getAudioEditions(
                 format = "audio",
                 language = language,
                 type = "versebyverse"
             )
-            println("DEBUG: RemoteDataSource - Audio editions response: code=${response.code}, data size=${response.data.size}")
             Result.success(response)
         } catch (e: Exception) {
-            println("DEBUG: RemoteDataSource - Error fetching audio editions: ${e.message}")
             Result.failure(e)
         }
     }
 
     override suspend fun getAyahAudio(reference: String, edition: String): Result<QuranAudioResponse> {
         return try {
-            println("DEBUG: RemoteDataSource - Fetching ayah audio: $reference with edition $edition")
             val response = quranApiService.getAyahAudio(reference, edition)
-            println("DEBUG: RemoteDataSource - Ayah audio response: code=${response.code}, status=${response.status}")
             Result.success(response)
         } catch (e: Exception) {
-            println("DEBUG: RemoteDataSource - Error fetching ayah audio: ${e.message}")
             Result.failure(e)
         }
     }

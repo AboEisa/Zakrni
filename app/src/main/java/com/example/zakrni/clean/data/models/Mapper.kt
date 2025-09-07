@@ -258,136 +258,24 @@ fun Link.mapToDomain(): DomainLink {
 
 // ---------------- Azkar Mappers ----------------
 
+
 fun AzkarResponse.mapToDomain(): DomainAzkarResponse {
     return DomainAzkarResponse(
-        adhan_azkar = adhan_azkar.map { it.mapToDomain() },
-        evening_azkar = evening_azkar.map { it.mapToDomain() },
-        food_azkar = food_azkar.map { it.mapToDomain() },
-        hajj_and_umrah_azkar = hajj_and_umrah_azkar.map { it.mapToDomain() },
-        home_azkar = home_azkar.map { it.mapToDomain() },
-        khala_azkar = khala_azkar.map { it.mapToDomain() },
-        miscellaneous_azkar = miscellaneous_azkar.map { it.mapToDomain() },
-        morning_azkar = morning_azkar.map { it.mapToDomain() },
-        mosque_azkar = mosque_azkar.map { it.mapToDomain() },
-        prayer_azkar = prayer_azkar.map { it.mapToDomain() },
-        prayer_later_azkar = prayer_later_azkar.map { it.mapToDomain() },
-        sleep_azkar = sleep_azkar.map { it.mapToDomain() },
-        wake_up_azkar = wake_up_azkar.map { it.mapToDomain() },
-        wudu_azkar = wudu_azkar.map { it.mapToDomain() }
+       content = content.map { it.mapToDomain() },
+         title = title
+
+    )
+}
+fun Content.mapToDomain(): DomainContent {
+    return DomainContent(
+        bless = bless,
+        repeat = repeat,
+        zekr = zekr
     )
 }
 
-fun AdhanAzkar.mapToDomain(): DomainAdhanAzkar {
-    return DomainAdhanAzkar(
-        count = count,
-        id = id,
-        text = text
-    )
-}
 
-fun EveningAzkar.mapToDomain(): DomainEveningAzkar {
-    return DomainEveningAzkar(
-        count = count,
-        id = id,
-        text = text
-    )
-}
 
-fun FoodAzkar.mapToDomain(): DomainFoodAzkar {
-    return DomainFoodAzkar(
-        count = count,
-        id = id,
-        text = text
-    )
-}
-
-fun HajjAndUmrahAzkar.mapToDomain(): DomainHajjAndUmrahAzkar {
-    return DomainHajjAndUmrahAzkar(
-        count = count,
-        id = id,
-        text = text
-    )
-}
-
-fun HomeAzkar.mapToDomain(): DomainHomeAzkar {
-    return DomainHomeAzkar(
-        count = count,
-        id = id,
-        text = text
-    )
-}
-
-fun KhalaAzkar.mapToDomain(): DomainKhalaAzkar {
-    return DomainKhalaAzkar(
-        count = count,
-        id = id,
-        text = text
-    )
-}
-
-fun MiscellaneousAzkar.mapToDomain(): DomainMiscellaneousAzkar {
-    return DomainMiscellaneousAzkar(
-        count = count,
-        id = id,
-        text = text
-    )
-}
-
-fun MorningAzkar.mapToDomain(): DomainMorningAzkar {
-    return DomainMorningAzkar(
-        count = count,
-        id = id,
-        text = text
-    )
-}
-
-fun MosqueAzkar.mapToDomain(): DomainMosqueAzkar {
-    return DomainMosqueAzkar(
-        count = count,
-        id = id,
-        text = text
-    )
-}
-
-fun PrayerAzkar.mapToDomain(): DomainPrayerAzkar {
-    return DomainPrayerAzkar(
-        count = count,
-        id = id,
-        text = text
-    )
-}
-
-fun PrayerLaterAzkar.mapToDomain(): DomainPrayerLaterAzkar {
-    return DomainPrayerLaterAzkar(
-        count = count,
-        id = id,
-        text = text
-    )
-}
-
-fun SleepAzkar.mapToDomain(): DomainSleepAzkar {
-    return DomainSleepAzkar(
-        count = count,
-        id = id,
-        text = text
-    )
-}
-
-fun WakeUpAzkar.mapToDomain(): DomainWakeUpAzkar {
-    return DomainWakeUpAzkar(
-        count = count,
-        id = id,
-        text = text
-    )
-}
-
-fun WuduAzkar.mapToDomain(): DomainWuduAzkar {
-    return DomainWuduAzkar(
-        count = count,
-        id = id,
-        text = text
-    )
-}
 
 // ---------------- Dua Mappers ----------------
 

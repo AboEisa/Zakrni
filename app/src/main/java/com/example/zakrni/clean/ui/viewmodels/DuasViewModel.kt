@@ -34,33 +34,33 @@ class DuasViewModel @Inject constructor(
     private val _expandedSections = MutableStateFlow<Set<DuaType>>(emptySet())
     val expandedSections: StateFlow<Set<DuaType>> = _expandedSections.asStateFlow()
 
-    init {
-        loadDuas()
-    }
+//    init {
+//        loadDuas()
+//    }
 
     /**
      * Loads Dua data from the use case
      */
-    fun loadDuas() {
-        viewModelScope.launch {
-            _isLoading.value = true
-            _error.value = null
-
-            try {
-                val result = getDuasUseCase()
-                result.onSuccess { domainResponse ->
-                    // Map domain response to presentation
-                    _duaData.value = domainResponse.mapToPresentation()
-                }.onFailure { exception ->
-                    _error.value = exception.message ?: "Unknown error occurred"
-                }
-            } catch (e: Exception) {
-                _error.value = e.message ?: "Failed to load Duas"
-            } finally {
-                _isLoading.value = false
-            }
-        }
-    }
+//    fun loadDuas() {
+//        viewModelScope.launch {
+//            _isLoading.value = true
+//            _error.value = null
+//
+//            try {
+//                val result = getDuasUseCase()
+//                result.onSuccess { domainResponse ->
+//                    // Map domain response to presentation
+//                    _duaData.value = domainResponse.mapToPresentation()
+//                }.onFailure { exception ->
+//                    _error.value = exception.message ?: "Unknown error occurred"
+//                }
+//            } catch (e: Exception) {
+//                _error.value = e.message ?: "Failed to load Duas"
+//            } finally {
+//                _isLoading.value = false
+//            }
+//        }
+//    }
 
     /**
      * Toggles the expansion state of a specific dua section
@@ -85,7 +85,7 @@ class DuasViewModel @Inject constructor(
     /**
      * Refreshes the dua data
      */
-    fun refresh() {
-        loadDuas()
-    }
+//    fun refresh() {
+//        loadDuas()
+//    }
 }

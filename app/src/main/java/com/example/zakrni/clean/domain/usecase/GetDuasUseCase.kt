@@ -7,5 +7,5 @@ class GetDuasUseCase @Inject constructor(
      private val repo: IRepo
 ) {
 
-    suspend operator fun invoke() = repo.getDuas()
+
 }

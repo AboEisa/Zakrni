@@ -62,23 +62,78 @@ class Repo @Inject constructor(
         }
     }
 
-    override suspend fun getAzkar(): Result<DomainAzkarResponse> {
+    override suspend fun getAzkarSabah(): Result<DomainAzkarResponse> {
         return try {
-            val data = remoteDataSource.getAzkar()
+            val data = remoteDataSource.getAzkarSabah()
             Result.success(data.getOrThrow().mapToDomain())
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
 
-    override suspend fun getDuas(): Result<DomainDuaResponse> {
+    override suspend fun getAzkarMasaa(): Result<DomainAzkarResponse> {
         return try {
-            val data = remoteDataSource.getDuas()
+            val data = remoteDataSource.getAzkarMasaa()
             Result.success(data.getOrThrow().mapToDomain())
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
+
+    override suspend fun getAzkarPostPlayer(): Result<DomainAzkarResponse> {
+       return try {
+           val data = remoteDataSource.getAzkarPostPlayer()
+              Result.success(data.getOrThrow().mapToDomain())
+         } catch (e: Exception) {
+              Result.failure(e)
+       }
+    }
+
+    override suspend fun getAzkarNoom(): Result<DomainAzkarResponse> {
+        return try {
+            val data = remoteDataSource.getAzkarNoom()
+            Result.success(data.getOrThrow().mapToDomain())
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getAzkarWake(): Result<DomainAzkarResponse> {
+        return try {
+            val data = remoteDataSource.getAzkarWake()
+            Result.success(data.getOrThrow().mapToDomain())
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getAzkarMosque(): Result<DomainAzkarResponse> {
+        return try {
+            val data = remoteDataSource.getAzkarMosque()
+            Result.success(data.getOrThrow().mapToDomain())
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getAzkarEating(): Result<DomainAzkarResponse> {
+        return try {
+            val data = remoteDataSource.getAzkarEating()
+            Result.success(data.getOrThrow().mapToDomain())
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getAzkarMisc(): Result<DomainAzkarResponse> {
+        return try {
+            val data = remoteDataSource.getAzkarMisc()
+            Result.success(data.getOrThrow().mapToDomain())
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
 
     @OptIn(UnstableApi::class)
     override suspend fun getQuranVerses(suraNumber: Int): List<DomainAyah> = withContext(Dispatchers.IO) {
@@ -86,15 +141,9 @@ class Repo @Inject constructor(
             // Check local cache first
             val cachedAyahs = localDataSource.getAyahsBySurah(suraNumber)
             if (cachedAyahs.isNotEmpty()) {
-                println("DEBUG: Repo - Returning ${cachedAyahs.size} ayahs from cache for surah $suraNumber")
                 return@withContext cachedAyahs
             }
-
-            // If no cache, fetch from API
-            println("DEBUG: Repo - Fetching ayahs from API for surah $suraNumber")
             val remoteAyahs = remoteDataSource.getQuranVerses(suraNumber)
-
-            // Save to cache if successful
             if (remoteAyahs.isNotEmpty()) {
                 localDataSource.saveAyahs(suraNumber, remoteAyahs)
             }
@@ -102,7 +151,6 @@ class Repo @Inject constructor(
             remoteAyahs
         } catch (e: Exception) {
             println("DEBUG: Repo - Error fetching ayahs: ${e.message}")
-            // Try to return cached data on error
             localDataSource.getAyahsBySurah(suraNumber)
         }
     }
@@ -130,10 +178,8 @@ class Repo @Inject constructor(
                     }
 
                     // Small delay to avoid overwhelming the API
-                    kotlinx.coroutines.delay(100)
+                    kotlinx.coroutines.delay(2000)
                 }
-
-                println("DEBUG: Repo - Quran data preload complete")
             } catch (e: Exception) {
                 println("DEBUG: Repo - Error preloading data: ${e.message}")
             }
@@ -145,12 +191,10 @@ class Repo @Inject constructor(
             // Check local cache first
             val cachedSurahs = localDataSource.getAllSurahs()
             if (cachedSurahs.isNotEmpty()) {
-                println("DEBUG: Repo - Returning ${cachedSurahs.size} surahs from cache")
                 return@withContext cachedSurahs
             }
 
             // If no cache, fetch from API
-            println("DEBUG: Repo - Fetching surahs from API")
             val remoteSurahs = remoteDataSource.getSurahList()
 
             // Save to cache if successful

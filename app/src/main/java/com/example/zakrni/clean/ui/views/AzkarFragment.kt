@@ -1,3 +1,4 @@
+// 5. Updated AzkarFragment.kt - Fixed to work with the new ViewModel
 package com.example.zakrni.clean.ui.views
 
 import android.os.Bundle
@@ -10,6 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.zakrni.databinding.FragmentAzkarBinding
 import com.example.zakrni.clean.ui.adapters.AzkarAdapter
+import com.example.zakrni.clean.ui.models.PresentationAzkarResponse
 import com.example.zakrni.clean.ui.utils.AzkarType
 import com.example.zakrni.clean.ui.viewmodels.AzkarViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -23,9 +25,6 @@ class AzkarFragment : Fragment() {
 
     private val viewModel: AzkarViewModel by viewModels()
     private lateinit var azkarAdapter: AzkarAdapter
-
-
-    private val expandedSections = mutableSetOf<AzkarType>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -51,11 +50,10 @@ class AzkarFragment : Fragment() {
             layoutManager = LinearLayoutManager(context)
             adapter = azkarAdapter
             setHasFixedSize(true)
-
         }
 
         azkarAdapter.setOnHeaderClickListener { type ->
-            toggleSection(type)
+            viewModel.toggleSection(type)
         }
     }
 
@@ -72,14 +70,25 @@ class AzkarFragment : Fragment() {
 
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.azkarData.collect { azkarResponse ->
-                azkarResponse?.let {
-                    azkarAdapter.submitList(it, expandedSections.toSet())
-                    hideError()
+            launch {
+                viewModel.azkarData.collect { azkarResponse ->
+                    azkarResponse?.let {
+                        updateAdapterData(it)
+                        if (viewModel.error.value == null) {
+                            hideError()
+                        }
+                    }
+                }
+            }
+
+            launch {
+                viewModel.expandedSections.collect { expandedSections ->
+                    viewModel.azkarData.value?.let { azkarResponse ->
+                        azkarAdapter.submitList(azkarResponse, expandedSections)
+                    }
                 }
             }
         }
-
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.isLoading.collect { isLoading ->
                 binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
@@ -89,11 +98,14 @@ class AzkarFragment : Fragment() {
                 }
             }
         }
-
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.error.collect { error ->
                 if (error != null) {
-                    showError(error)
+                    if (viewModel.azkarData.value == null) {
+                        showError(error)
+                    } else {
+                        showPartialError(error)
+                    }
                 } else {
                     hideError()
                 }
@@ -101,16 +113,8 @@ class AzkarFragment : Fragment() {
         }
     }
 
-    private fun toggleSection(type: AzkarType) {
-        if (expandedSections.contains(type)) {
-            expandedSections.remove(type)
-        } else {
-            expandedSections.add(type)
-        }
-
-        viewModel.azkarData.value?.let { azkarResponse ->
-            azkarAdapter.submitList(azkarResponse, expandedSections.toSet())
-        }
+    private fun updateAdapterData(azkarResponse: PresentationAzkarResponse) {
+        azkarAdapter.submitList(azkarResponse, viewModel.expandedSections.value)
     }
 
     private fun showError(errorMessage: String) {
@@ -118,6 +122,15 @@ class AzkarFragment : Fragment() {
             errorLayout.visibility = View.VISIBLE
             recyclerView.visibility = View.GONE
             progressBar.visibility = View.GONE
+            tvError.text = errorMessage
+        }
+    }
+
+    private fun showPartialError(errorMessage: String) {
+        binding.apply {
+            errorLayout.visibility = View.GONE
+            recyclerView.visibility = View.GONE
+            progressBar.visibility = View.VISIBLE
             tvError.text = errorMessage
         }
     }

@@ -93,7 +93,7 @@ object Module {
     fun provideDuaRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .client(okHttpClient)
-            .baseUrl("https://alquran.vip/APIs/") // Working API base URL
+            .baseUrl("https://ahegazy.github.io/muslimKit/json/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
@@ -103,6 +103,7 @@ object Module {
     fun provideAzkarApiService(@DuaApi retrofit: Retrofit): AzkarApiService {
         return retrofit.create(AzkarApiService::class.java)
     }
+
 
     @Provides
     @Singleton
@@ -132,11 +133,7 @@ object Module {
         return RemoteDataSource(prayerApiService, hadithApiService, azkarApiService, quranApiService)
     }
 
-//    @Singleton
-//    @Provides
-//    fun getRepository(remoteDataSource: IRemoteDataSource): IRepo {
-//        return Repo(remoteDataSource)
-//    }
+
 
     @Provides
     @Singleton

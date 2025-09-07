@@ -24,9 +24,16 @@ interface IRemoteDataSource {
 
     suspend fun getHadiths(page: Int, limit: Int = 20): Result<HadithResponse>
 
-    suspend fun getAzkar(): Result<AzkarResponse>
+    suspend fun getAzkarSabah(): Result<AzkarResponse>
+    suspend fun getAzkarMasaa(): Result<AzkarResponse>
+    suspend fun getAzkarPostPlayer(): Result<AzkarResponse>
+    suspend fun getAzkarNoom(): Result<AzkarResponse>
+    suspend fun getAzkarWake(): Result<AzkarResponse>
+    suspend fun getAzkarMosque(): Result<AzkarResponse>
+    suspend fun getAzkarEating(): Result<AzkarResponse>
+    suspend fun getAzkarMisc(): Result<AzkarResponse>
 
-    suspend fun getDuas(): Result<DuaResponse>
+//    suspend fun getDuas(): Result<DuaResponse>
 
     suspend fun getQuranVerses(surahNumber: Int): List<DomainAyah>
 

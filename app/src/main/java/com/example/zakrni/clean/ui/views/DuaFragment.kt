@@ -59,9 +59,9 @@ class DuaFragment : Fragment() {
             findNavController().navigateUp()
         }
 
-        binding.btnRetry.setOnClickListener {
-            viewModel.refresh()
-        }
+//        binding.btnRetry.setOnClickListener {
+//            viewModel.refresh()
+//        }
     }
 
     private fun observeViewModel() {

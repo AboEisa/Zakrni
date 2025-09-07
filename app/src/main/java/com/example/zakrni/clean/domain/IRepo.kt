@@ -1,6 +1,7 @@
 package com.example.zakrni.clean.domain
 
 import com.example.zakrni.clean.data.models.AudioEditionsResponse
+import com.example.zakrni.clean.data.models.AzkarResponse
 import com.example.zakrni.clean.data.models.QuranAudioResponse
 import com.example.zakrni.clean.data.models.QuranResponse
 import com.example.zakrni.clean.domain.models.DomainAsmaAlHusnaResponse
@@ -24,9 +25,16 @@ interface IRepo {
 
     suspend fun getHadiths(page: Int, limit: Int = 10): Result<DomainHadithResponse>
 
-    suspend fun getAzkar(): Result<DomainAzkarResponse>
+    suspend fun getAzkarSabah(): Result<DomainAzkarResponse>
+    suspend fun getAzkarMasaa(): Result<DomainAzkarResponse>
+    suspend fun getAzkarPostPlayer(): Result<DomainAzkarResponse>
+    suspend fun getAzkarNoom(): Result<DomainAzkarResponse>
+    suspend fun getAzkarWake(): Result<DomainAzkarResponse>
+    suspend fun getAzkarMosque(): Result<DomainAzkarResponse>
+    suspend fun getAzkarEating(): Result<DomainAzkarResponse>
+    suspend fun getAzkarMisc(): Result<DomainAzkarResponse>
 
-    suspend fun getDuas(): Result<DomainDuaResponse>
+//    suspend fun getDuas(): Result<DomainDuaResponse>
 
     suspend fun getAllSurahs(): List<DomainSurah>
     suspend fun getQuranVerses(suraNumber: Int): List<DomainAyah>
