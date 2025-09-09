@@ -98,7 +98,6 @@ class HomeActivity : AppCompatActivity() {
         setupPrayerTimesObservers()
         setupNetworkObserver()
         checkLocationPermissions()
-
     }
 
     private fun setupNetworkObserver() {
@@ -221,7 +220,7 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun updatePrayerTimesUI(prayerTimes: PresentationPrayerTimesResponse) {
-
+        // Update any additional UI elements with prayer times data
     }
 
     private fun showError(error: String) {
@@ -390,6 +389,8 @@ class HomeActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         hideNoInternetDialog()
+        // Stop the notification service when the app is destroyed
+        prayerTimeViewModel.stopNotificationService()
         _binding = null
     }
 }

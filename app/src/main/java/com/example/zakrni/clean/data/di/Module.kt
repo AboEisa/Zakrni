@@ -26,10 +26,8 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
-import javax.inject.Qualifier
+import javax.inject.Named
 import javax.inject.Singleton
-
-
 
 @InstallIn(SingletonComponent::class)
 @Module
@@ -54,7 +52,7 @@ object Module {
     // Prayer API
     @Provides
     @Singleton
-    @PrayerApi
+    @Named("PrayerApi")
     fun providePrayerRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .client(okHttpClient)
@@ -65,14 +63,14 @@ object Module {
 
     @Provides
     @Singleton
-    fun providePrayerApiService(@PrayerApi retrofit: Retrofit): PrayerApiService {
+    fun providePrayerApiService(@Named("PrayerApi") retrofit: Retrofit): PrayerApiService {
         return retrofit.create(PrayerApiService::class.java)
     }
 
     // Hadith API
     @Provides
     @Singleton
-    @HadithApi
+    @Named("HadithApi")
     fun provideHadithRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .client(okHttpClient)
@@ -83,13 +81,13 @@ object Module {
 
     @Provides
     @Singleton
-    fun provideHadithApiService(@HadithApi retrofit: Retrofit): HadithApiService {
+    fun provideHadithApiService(@Named("HadithApi") retrofit: Retrofit): HadithApiService {
         return retrofit.create(HadithApiService::class.java)
     }
 
     @Provides
     @Singleton
-    @DuaApi
+    @Named("DuaApi")
     fun provideDuaRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .client(okHttpClient)
@@ -100,14 +98,13 @@ object Module {
 
     @Provides
     @Singleton
-    fun provideAzkarApiService(@DuaApi retrofit: Retrofit): AzkarApiService {
+    fun provideAzkarApiService(@Named("DuaApi") retrofit: Retrofit): AzkarApiService {
         return retrofit.create(AzkarApiService::class.java)
     }
 
-
     @Provides
     @Singleton
-    @QuranApi
+    @Named("QuranApi")
     fun provideQuranRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .client(okHttpClient)
@@ -118,7 +115,7 @@ object Module {
 
     @Provides
     @Singleton
-    fun provideQuranApiService(@QuranApi retrofit: Retrofit): QuranApiService {
+    fun provideQuranApiService(@Named("QuranApi") retrofit: Retrofit): QuranApiService {
         return retrofit.create(QuranApiService::class.java)
     }
 
@@ -133,8 +130,6 @@ object Module {
         return RemoteDataSource(prayerApiService, hadithApiService, azkarApiService, quranApiService)
     }
 
-
-
     @Provides
     @Singleton
     fun provideLocationManager(@ApplicationContext context: Context): LocationManager {
@@ -146,8 +141,6 @@ object Module {
     fun provideNetworkManager(@ApplicationContext context: Context): NetworkManager {
         return NetworkManager(context)
     }
-
-
 
     @Provides
     @Singleton

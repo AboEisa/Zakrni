@@ -1,13 +1,20 @@
 package com.example.zakrni.clean.ui.viewmodels
 
+import android.app.NotificationManager
+import android.content.Context
+import androidx.core.app.NotificationCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.zakrni.R
+import com.example.zakrni.clean.App
 import com.example.zakrni.clean.data.location.LocationManager
 import com.example.zakrni.clean.domain.usecases.GetPrayerTimesUseCase
+import com.example.zakrni.clean.service.PrayerNotificationService
 import com.example.zakrni.clean.ui.models.PresentationPrayerTimesResponse
 import com.example.zakrni.clean.ui.models.mapToPresentation
 import com.example.zakrni.clean.ui.utils.PrayerTimeUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +25,8 @@ import javax.inject.Inject
 @HiltViewModel
 class PrayerTimesViewModel @Inject constructor(
     private val prayerTimesUseCase: GetPrayerTimesUseCase,
-    private val locationManager: LocationManager
+    private val locationManager: LocationManager,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
 
     private val _prayerTimes = MutableStateFlow<PresentationPrayerTimesResponse?>(null)
@@ -116,8 +124,23 @@ class PrayerTimesViewModel @Inject constructor(
         // Start countdown timer for next prayer
         next?.let { nextPrayerInfo ->
             nextPrayerTimeInSeconds = nextPrayerInfo.timeRemainingInSeconds
+
+            // Start notification service
+            startNotificationService(nextPrayerInfo)
+
+            // Start local countdown timer
             startCountdownTimer()
         }
+    }
+
+    private fun startNotificationService(nextPrayerInfo: PrayerTimeUtils.PrayerInfo) {
+        PrayerNotificationService.startService(
+            context = context,
+            prayerName = nextPrayerInfo.name,
+            prayerNameArabic = nextPrayerInfo.nameArabic,
+            prayerTime = nextPrayerInfo.time,
+            remainingSeconds = nextPrayerInfo.timeRemainingInSeconds
+        )
     }
 
     private fun startCountdownTimer() {
@@ -133,16 +156,51 @@ class PrayerTimesViewModel @Inject constructor(
                 nextPrayerTimeInSeconds--
             }
 
-            // When countdown reaches 0, refresh prayer times to get the new current/next prayer
+            // 🔔 لما العد التنازلي يخلص
             if (nextPrayerTimeInSeconds <= 0) {
                 _remainingTime.value = "00:00"
+
+                // أرسل إشعار جديد للصلاة الحالية
+                _nextPrayer.value?.let { next ->
+                    PrayerNotificationService.showPrayerAlert(
+                        context,
+                        next.name,
+                        next.nameArabic
+                    )
+                }
+
+                // بعدها حدث المواقيت عشان ينتقل للصلاة التالية
                 _prayerTimes.value?.let { updatePrayerInfo(it) }
             }
         }
     }
 
+
+
+    fun showPrayerTimeNotification(context: Context, prayerName: String, prayerNameArabic: String) {
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        val notification = NotificationCompat.Builder(context, App.PRAYER_CHANNEL_ID)
+            .setContentTitle("حان الآن وقت $prayerName ($prayerNameArabic)")
+            .setContentText("أدِ الصلاة في وقتها")
+            .setSmallIcon(R.drawable.ic_dua)
+            .setAutoCancel(true)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .build()
+
+        // خلي ID مختلف عشان يظهر إشعار جديد مش يستبدل القديم
+        val uniqueId = System.currentTimeMillis().toInt()
+        notificationManager.notify(uniqueId, notification)
+    }
+
+
     fun retry() {
         loadPrayerTimes()
+    }
+
+    fun stopNotificationService() {
+        PrayerNotificationService.stopService(context)
     }
 
     override fun onCleared() {

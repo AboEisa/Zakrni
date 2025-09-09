@@ -29,12 +29,11 @@ object PrayerTimeUtils {
         )
 
         val prayerTimes = prayers.map { (name, nameArabic, time) ->
-            val cleanTime = time.split(" ")[0] // Remove timezone
+            val cleanTime = time.split(" ")[0]
             val timeParts = cleanTime.split(":")
             val hour = timeParts[0].toInt()
             val minute = timeParts[1].toInt()
 
-            // Create Calendar for today with prayer time
             val prayerCalendar = Calendar.getInstance().apply {
                 set(Calendar.HOUR_OF_DAY, hour)
                 set(Calendar.MINUTE, minute)
@@ -44,8 +43,8 @@ object PrayerTimeUtils {
 
             val prayerTimeInSeconds = prayerCalendar.timeInMillis / 1000
 
-            // Keep original 24-hour format
-            val formattedTime = String.format("%02d:%02d", hour, minute)
+            // ✅ صيغة 12 ساعة + AM/PM
+            val formattedTime = SimpleDateFormat("hh:mm a", Locale.ENGLISH).format(prayerCalendar.time)
 
             Quadruple(name, nameArabic, prayerTimeInSeconds, formattedTime)
         }
@@ -53,40 +52,28 @@ object PrayerTimeUtils {
         var currentPrayer: PrayerInfo? = null
         var nextPrayer: PrayerInfo? = null
 
-        // Find current and next prayer
         for (i in prayerTimes.indices) {
             val (name, nameArabic, prayerTimeInSeconds, formattedTime) = prayerTimes[i]
 
             if (currentTimeInSeconds >= prayerTimeInSeconds) {
                 currentPrayer = PrayerInfo(
-                    name = name,
-                    nameArabic = nameArabic,
-                    time = formattedTime,
-                    timeRemaining = "",
-                    timeRemainingInSeconds = 0,
-                    isNext = false
+                    name, nameArabic, formattedTime, "", 0, false
                 )
             }
 
             if (currentTimeInSeconds < prayerTimeInSeconds) {
                 val remainingSeconds = prayerTimeInSeconds - currentTimeInSeconds
                 nextPrayer = PrayerInfo(
-                    name = name,
-                    nameArabic = nameArabic,
-                    time = formattedTime,
-                    timeRemaining = formatTimeRemaining(remainingSeconds),
-                    timeRemainingInSeconds = remainingSeconds,
-                    isNext = true
+                    name, nameArabic, formattedTime,
+                    formatTimeRemaining(remainingSeconds),
+                    remainingSeconds, true
                 )
                 break
             }
         }
 
-        // If no next prayer found (past Isha), next prayer is Fajr tomorrow
         if (nextPrayer == null && prayerTimes.isNotEmpty()) {
             val fajr = prayerTimes[0]
-
-            // Calculate Fajr for tomorrow
             val tomorrowFajr = Calendar.getInstance().apply {
                 add(Calendar.DAY_OF_MONTH, 1)
                 val cleanTime = timings.Fajr.split(" ")[0]
@@ -96,16 +83,13 @@ object PrayerTimeUtils {
                 set(Calendar.SECOND, 0)
                 set(Calendar.MILLISECOND, 0)
             }
-
             val remainingSeconds = (tomorrowFajr.timeInMillis / 1000) - currentTimeInSeconds
+            val formattedFajrTime = SimpleDateFormat("hh:mm a", Locale.ENGLISH).format(tomorrowFajr.time)
 
             nextPrayer = PrayerInfo(
-                name = fajr.first,
-                nameArabic = fajr.second,
-                time = fajr.fourth,
-                timeRemaining = formatTimeRemaining(remainingSeconds),
-                timeRemainingInSeconds = remainingSeconds,
-                isNext = true
+                fajr.first, fajr.second, formattedFajrTime,
+                formatTimeRemaining(remainingSeconds),
+                remainingSeconds, true
             )
         }
 
@@ -117,56 +101,29 @@ object PrayerTimeUtils {
         val minutes = (seconds % 3600) / 60
         val secs = seconds % 60
 
-        return when {
-            hours > 0 -> String.format("%02d:%02d:%02d", hours, minutes, secs)
-            else -> String.format("%02d:%02d", minutes, secs)
+        return if (hours > 0) {
+            String.format("%d:%02d:%02d", hours, minutes, secs)
+        } else {
+            String.format("%02d:%02d", minutes, secs)
         }
     }
 
-    // Use API data for Hijri date formatting
+
+
     fun formatHijriDateFromApi(prayerTimesResponse: PresentationPrayerTimesResponse): String {
         return with(prayerTimesResponse.data.date) {
-            val dayName = hijri.weekday.ar
-            val day = hijri.day
-            val monthName = hijri.month.ar
-            val year = hijri.year
-
-            "$dayName $day $monthName $year هـ"
+            "${hijri.weekday.ar} ${hijri.day} ${hijri.month.ar} ${hijri.year} هـ"
         }
     }
 
-    // Use API data for Gregorian date formatting
     fun formatGregorianDateFromApi(prayerTimesResponse: PresentationPrayerTimesResponse): String {
         return with(prayerTimesResponse.data.date) {
-            val dayName = getCurrentDayNameInArabic()
-            val day = gregorian.day
-            val monthName = translateMonthToArabic(gregorian.month.en)
-            val year = gregorian.year
-
-            "$dayName $day $monthName $year م"
+            "${getCurrentDayNameInArabic()} ${gregorian.day} ${translateMonthToArabic(gregorian.month.en)} ${gregorian.year} م"
         }
-    }
-
-    // DEPRECATED: Keep these for backward compatibility
-    fun formatHijriDate(hijriDate: String): String {
-        val parts = hijriDate.split(" ")
-        if (parts.size < 4) return hijriDate
-        val dayName = parts[0]
-        val day = parts[1]
-        val monthName = parts[2]
-        val year = parts[3]
-        return "$dayName $day $monthName $year هـ"
-    }
-
-    fun formatGregorianDate(gregorianDate: String): String {
-        return gregorianDate
     }
 
     private fun getCurrentDayNameInArabic(): String {
-        val calendar = Calendar.getInstance()
-        val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
-
-        return when (dayOfWeek) {
+        return when (Calendar.getInstance().get(Calendar.DAY_OF_WEEK)) {
             Calendar.SUNDAY -> "الأحد"
             Calendar.MONDAY -> "الاثنين"
             Calendar.TUESDAY -> "الثلاثاء"
@@ -196,19 +153,5 @@ object PrayerTimeUtils {
         }
     }
 
-    // Helper data class for quadruple
     private data class Quadruple<A, B, C, D>(val first: A, val second: B, val third: C, val fourth: D)
-
-    // REMOVED: All the 12-hour conversion functions since you want 24-hour format
-
-    // OPTIONAL: Add this function if you want to test the 24-hour format
-    fun testTimes() {
-        println("=== TESTING 24-HOUR FORMAT ===")
-        val testHours = listOf(0, 5, 12, 13, 19, 23)
-        testHours.forEach { hour ->
-            val formatted = String.format("%02d:%02d", hour, 30)
-            println("Hour $hour:30 displays as: $formatted")
-        }
-        println("=== END TEST ===")
-    }
 }
