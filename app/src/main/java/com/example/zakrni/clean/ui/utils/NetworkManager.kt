@@ -1,11 +1,18 @@
 package com.example.zakrni.clean.ui.utils
 
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.os.Build
+import androidx.core.app.NotificationCompat
+import com.example.zakrni.R
+import com.example.zakrni.clean.App
+import com.example.zakrni.clean.ui.views.HomeActivity
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
@@ -16,26 +23,56 @@ class NetworkManager @Inject constructor(
     private val context: Context
 ) {
     private val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    private val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
     private val _isConnected = MutableStateFlow(false)
     val isConnected: StateFlow<Boolean> = _isConnected
 
+    private var wasOffline = false
+
+    companion object {
+        private const val OFFLINE_NOTIFICATION_ID = 9001
+        private const val BACK_ONLINE_NOTIFICATION_ID = 9002
+    }
+
     private val networkCallback = object : ConnectivityManager.NetworkCallback() {
         override fun onAvailable(network: Network) {
             super.onAvailable(network)
+            val wasOfflineBefore = !_isConnected.value
             _isConnected.value = true
+
+            if (wasOfflineBefore) {
+                // Device is back online
+                dismissOfflineNotification()
+                showBackOnlineNotification()
+            }
         }
 
         override fun onLost(network: Network) {
             super.onLost(network)
             _isConnected.value = false
+            wasOffline = true
+            showOfflineNotification()
         }
 
         override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) {
             super.onCapabilitiesChanged(network, networkCapabilities)
             val hasInternet = networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
                     networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+
+            val wasConnected = _isConnected.value
             _isConnected.value = hasInternet
+
+            if (!hasInternet && wasConnected) {
+                // Just went offline
+                wasOffline = true
+                showOfflineNotification()
+            } else if (hasInternet && !wasConnected && wasOffline) {
+                // Back online after being offline
+                dismissOfflineNotification()
+                showBackOnlineNotification()
+                wasOffline = false
+            }
         }
     }
 
@@ -46,6 +83,9 @@ class NetworkManager @Inject constructor(
 
     private fun checkInitialConnection() {
         _isConnected.value = isNetworkAvailable()
+        if (!_isConnected.value) {
+            showOfflineNotification()
+        }
     }
 
     private fun registerNetworkCallback() {
@@ -69,7 +109,74 @@ class NetworkManager @Inject constructor(
         }
     }
 
+    // 🚀 Show offline notification
+    private fun showOfflineNotification() {
+        val intent = Intent(context, HomeActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+
+        val pendingIntent = PendingIntent.getActivity(
+            context,
+            0,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val notification = NotificationCompat.Builder(context, App.PRAYER_CHANNEL_ID)
+            .setContentTitle("📵 لا يوجد اتصال بالإنترنت - No Internet Connection")
+            .setContentText("أوقات الصلاة قد لا تكون محدثة - Prayer times may not be updated")
+            .setSmallIcon(R.drawable.ic_dua)
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(false)
+            .setOngoing(true) // Make it persistent
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_ERROR)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setColor(0xFFFF5722.toInt()) // Orange color for warning
+            .setStyle(
+                NotificationCompat.BigTextStyle()
+                    .bigText("الجهاز غير متصل بالإنترنت. أوقات الصلاة والتنبيهات قد لا تعمل بشكل صحيح حتى يعود الاتصال.")
+            )
+            .build()
+
+        notificationManager.notify(OFFLINE_NOTIFICATION_ID, notification)
+    }
+
+    // 🚀 Show back online notification
+    private fun showBackOnlineNotification() {
+        val intent = Intent(context, HomeActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+
+        val pendingIntent = PendingIntent.getActivity(
+            context,
+            0,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val notification = NotificationCompat.Builder(context, App.PRAYER_CHANNEL_ID)
+            .setContentTitle("✅ تم استعادة الاتصال - Connection Restored")
+            .setContentText("أوقات الصلاة ستعمل بشكل طبيعي الآن - Prayer times will work normally now")
+            .setSmallIcon(R.drawable.ic_dua)
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setColor(0xFF4CAF50.toInt()) // Green color for success
+            .setTimeoutAfter(5000) // Auto-dismiss after 5 seconds
+            .build()
+
+        notificationManager.notify(BACK_ONLINE_NOTIFICATION_ID, notification)
+    }
+
+    // 🚀 Dismiss offline notification
+    private fun dismissOfflineNotification() {
+        notificationManager.cancel(OFFLINE_NOTIFICATION_ID)
+    }
+
     fun unregisterNetworkCallback() {
         connectivityManager.unregisterNetworkCallback(networkCallback)
+        dismissOfflineNotification()
     }
 }

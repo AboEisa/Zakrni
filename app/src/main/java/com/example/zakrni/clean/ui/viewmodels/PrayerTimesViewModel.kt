@@ -1,18 +1,15 @@
 package com.example.zakrni.clean.ui.viewmodels
 
-import android.app.NotificationManager
 import android.content.Context
-import androidx.core.app.NotificationCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.zakrni.R
-import com.example.zakrni.clean.App
 import com.example.zakrni.clean.data.location.LocationManager
 import com.example.zakrni.clean.domain.usecases.GetPrayerTimesUseCase
 import com.example.zakrni.clean.service.PrayerAlarmManager
 import com.example.zakrni.clean.service.PrayerNotificationService
 import com.example.zakrni.clean.ui.models.PresentationPrayerTimesResponse
 import com.example.zakrni.clean.ui.models.mapToPresentation
+import com.example.zakrni.clean.ui.utils.NetworkManager
 import com.example.zakrni.clean.ui.utils.PrayerTimeUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -27,7 +24,8 @@ import javax.inject.Inject
 class PrayerTimesViewModel @Inject constructor(
     private val prayerTimesUseCase: GetPrayerTimesUseCase,
     private val locationManager: LocationManager,
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+   private val networkManager: NetworkManager
 ) : ViewModel() {
 
     private val _prayerTimes = MutableStateFlow<PresentationPrayerTimesResponse?>(null)
@@ -61,7 +59,7 @@ class PrayerTimesViewModel @Inject constructor(
     private var nextPrayerTimeInSeconds: Long = 0
 
     // Initialize AlarmManager
-    private val prayerAlarmManager = PrayerAlarmManager(context)
+    private val prayerAlarmManager = PrayerAlarmManager(context,networkManager)
 
     init {
         checkLocationPermission()

@@ -134,102 +134,125 @@
 
         </androidx.cardview.widget.CardView>
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/dailyAyahCard"
+        <!-- 🆕 Daily Ayah Container with Card and Dots -->
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="@dimen/_140sdp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
             android:layout_marginStart="@dimen/_15sdp"
             android:layout_marginTop="@dimen/_20sdp"
-            android:layout_marginEnd="@dimen/_15sdp"
-            app:cardCornerRadius="@dimen/_12sdp"
-            app:cardElevation="@dimen/_8sdp">
+            android:layout_marginEnd="@dimen/_15sdp">
 
-            <FrameLayout
+            <androidx.cardview.widget.CardView
+                android:id="@+id/dailyAyahCard"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="@dimen/_140sdp"
+                app:cardCornerRadius="@dimen/_12sdp"
+                app:cardElevation="@dimen/_8sdp">
 
-                <View
+                <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="#2E2E2E" />
+                    android:layout_height="match_parent">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:gravity="center_vertical"
-                    android:padding="@dimen/_12sdp">
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="#2E2E2E" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical">
-
-                        <TextView
-                            android:id="@+id/dailyAyahTitle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="سورة الفاتحة"
-                            android:textColor="#FFFFFF"
-                            android:textSize="@dimen/_14sdp"
-                            android:textStyle="bold" />
-
-                        <View
-                            android:layout_width="0dp"
-                            android:layout_height="1dp"
-                            android:layout_weight="1" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/daily_ayahs"
-                            android:textColor="#FFFFFF"
-                            android:textSize="@dimen/_14sdp"
-                            android:textStyle="bold" />
-
-                    </LinearLayout>
-
-                    <TextView
-                        android:id="@+id/ayahArabic"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/ayah"
-                        android:textColor="#FFFFFF"
-                        android:textSize="@dimen/_16sdp"
-                        android:textStyle="bold"
-                        android:layout_marginTop="@dimen/_8sdp" />
-
-                    <TextView
-                        android:id="@+id/ayahTranslation"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="All praise and thanks be to the Lord of the worlds."
-                        android:textColor="#B0B0B0"
-                        android:textSize="@dimen/_12sdp"
-                        android:layout_marginTop="@dimen/_4sdp" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
                         android:gravity="center_vertical"
-                        android:layout_marginTop="@dimen/_8sdp">
+                        android:padding="@dimen/_12sdp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <TextView
+                                android:id="@+id/dailyAyahTitle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="سورة الفاتحة"
+                                android:textColor="#FFFFFF"
+                                android:textSize="@dimen/_14sdp"
+                                android:textStyle="bold" />
+
+                            <View
+                                android:layout_width="0dp"
+                                android:layout_height="1dp"
+                                android:layout_weight="1" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/daily_ayahs"
+                                android:textColor="#FFFFFF"
+                                android:textSize="@dimen/_14sdp"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
 
                         <TextView
-                            android:layout_width="wrap_content"
+                            android:id="@+id/ayahArabic"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="سورة الفاتحة - الجزء الثلاثون - آية ١"
+                            android:text="@string/ayah"
+                            android:textColor="#FFFFFF"
+                            android:textSize="@dimen/_16sdp"
+                            android:textStyle="bold"
+                            android:layout_marginTop="@dimen/_8sdp" />
+
+                        <TextView
+                            android:id="@+id/ayahTranslation"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="All praise and thanks be to the Lord of the worlds."
                             android:textColor="#B0B0B0"
-                            android:textSize="@dimen/_10sdp" />
+                            android:textSize="@dimen/_12sdp"
+                            android:layout_marginTop="@dimen/_4sdp" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginTop="@dimen/_8sdp">
+
+                            <TextView
+                                android:id="@+id/ayahSource"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="سورة الفاتحة - الجزء الثلاثون - آية ١"
+                                android:textColor="#B0B0B0"
+                                android:textSize="@dimen/_10sdp" />
+
+                        </LinearLayout>
 
                     </LinearLayout>
 
-                </LinearLayout>
+                </FrameLayout>
 
-            </FrameLayout>
+            </androidx.cardview.widget.CardView>
 
-        </androidx.cardview.widget.CardView>
+            <!-- 🆕 Dots Indicator -->
+            <LinearLayout
+                android:id="@+id/dotsContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="@dimen/_12sdp"
+                android:layout_marginBottom="@dimen/_8sdp">
+
+                <!-- Dots will be added programmatically -->
+
+            </LinearLayout>
+
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/custom_bottom_nav"

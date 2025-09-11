@@ -8,10 +8,15 @@ import android.os.Build
 import android.provider.Settings
 import android.util.Log
 import com.example.zakrni.clean.ui.models.PresentationTimings
+import com.example.zakrni.clean.ui.utils.NetworkManager
 import com.example.zakrni.clean.ui.utils.PrayerTimeUtils
 import java.util.*
+import javax.inject.Inject
 
-class PrayerAlarmManager(private val context: Context) {
+class PrayerAlarmManager @Inject constructor(
+    private val context: Context,
+    private val networkManager: NetworkManager
+) {
 
     private val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
@@ -34,11 +39,17 @@ class PrayerAlarmManager(private val context: Context) {
     }
 
     /**
-     * Schedule all prayer alarms for today
+     * Schedule all prayer alarms for today (only if online)
      */
     fun scheduleAllPrayerAlarms(timings: PresentationTimings) {
         try {
-            Log.d(TAG, "Starting to schedule prayer alarms")
+            // 🚀 Check network connection first
+            if (!networkManager.isNetworkAvailable()) {
+                Log.w(TAG, "📵 Device is offline. Skipping prayer alarm scheduling.")
+                return
+            }
+
+            Log.d(TAG, "🌐 Device is online. Starting to schedule prayer alarms")
 
             // Cancel previous alarms first
             cancelAllAlarms()
@@ -103,7 +114,15 @@ class PrayerAlarmManager(private val context: Context) {
     }
 
     /**
-     * Schedule a specific prayer alert
+     * 🚀 Schedule prayer alarms when back online
+     */
+    fun scheduleAlarmsWhenBackOnline(timings: PresentationTimings) {
+        Log.d(TAG, "🌐 Back online! Rescheduling prayer alarms...")
+        scheduleAllPrayerAlarms(timings)
+    }
+
+    /**
+     * Schedule a specific prayer alert (only if online)
      */
     private fun schedulePrayerAlert(
         name: String,
@@ -112,6 +131,12 @@ class PrayerAlarmManager(private val context: Context) {
         requestCode: Int
     ): Boolean {
         return try {
+            // Double check network connection
+            if (!networkManager.isNetworkAvailable()) {
+                Log.w(TAG, "📵 Cannot schedule $name alert - device offline")
+                return false
+            }
+
             val intent = Intent(context, PrayerAlarmReceiver::class.java).apply {
                 action = PrayerAlarmReceiver.ACTION_PRAYER_ALERT
                 putExtra(PrayerAlarmReceiver.EXTRA_PRAYER_NAME, name)
@@ -135,7 +160,7 @@ class PrayerAlarmManager(private val context: Context) {
     }
 
     /**
-     * Schedule countdown notification (10 minutes before prayer)
+     * Schedule countdown notification (10 minutes before prayer) - only if online
      */
     private fun scheduleCountdownNotification(
         name: String,
@@ -145,6 +170,12 @@ class PrayerAlarmManager(private val context: Context) {
         requestCode: Int
     ): Boolean {
         return try {
+            // Check network connection
+            if (!networkManager.isNetworkAvailable()) {
+                Log.w(TAG, "📵 Cannot schedule $name countdown - device offline")
+                return false
+            }
+
             val intent = Intent(context, PrayerAlarmReceiver::class.java).apply {
                 action = PrayerAlarmReceiver.ACTION_COUNTDOWN_NOTIFICATION
                 putExtra(PrayerAlarmReceiver.EXTRA_PRAYER_NAME, name)
@@ -217,9 +248,14 @@ class PrayerAlarmManager(private val context: Context) {
     }
 
     /**
-     * Schedule next day's Fajr if all today's prayers have passed
+     * Schedule next day's Fajr if all today's prayers have passed (only if online)
      */
     private fun scheduleNextDayFajrIfNeeded(timings: PresentationTimings) {
+        if (!networkManager.isNetworkAvailable()) {
+            Log.w(TAG, "📵 Cannot schedule tomorrow's Fajr - device offline")
+            return
+        }
+
         val currentTime = System.currentTimeMillis()
         val ishaTime = getPrayerTimeInMillis(timings.Isha)
 

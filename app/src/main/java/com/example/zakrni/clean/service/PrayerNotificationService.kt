@@ -7,13 +7,13 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
-import android.text.Spannable
-import android.text.style.ForegroundColorSpan
+import android.util.Log
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.example.zakrni.R
 import com.example.zakrni.clean.App
+import com.example.zakrni.clean.ui.utils.NetworkManager
 import com.example.zakrni.clean.ui.utils.PrayerTimeUtils
 import com.example.zakrni.clean.ui.views.HomeActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -23,6 +23,9 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class PrayerNotificationService : Service() {
 
+    @Inject
+    lateinit var networkManager: NetworkManager
+
     private val serviceScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private var countdownJob: Job? = null
     private lateinit var notificationManager: NotificationManager
@@ -30,6 +33,7 @@ class PrayerNotificationService : Service() {
     companion object {
         const val NOTIFICATION_ID = 1001
         const val PRAYER_ALERT_NOTIFICATION_ID = 1002
+        private const val TAG = "PrayerNotificationService"
 
         const val ACTION_START_COUNTDOWN = "START_COUNTDOWN"
         const val ACTION_STOP_SERVICE = "STOP_SERVICE"
@@ -82,6 +86,13 @@ class PrayerNotificationService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
             ACTION_START_COUNTDOWN -> {
+                // 🚀 Only start countdown if online
+                if (!networkManager.isNetworkAvailable()) {
+                    Log.w(TAG, "📵 Device offline - stopping prayer notification service")
+                    stopSelf()
+                    return START_NOT_STICKY
+                }
+
                 val prayerName = intent.getStringExtra(EXTRA_PRAYER_NAME) ?: ""
                 val prayerNameArabic = intent.getStringExtra(EXTRA_PRAYER_NAME_ARABIC) ?: ""
                 val prayerTime = intent.getStringExtra(EXTRA_PRAYER_TIME) ?: ""
@@ -94,6 +105,12 @@ class PrayerNotificationService : Service() {
                 stopSelf()
             }
             ACTION_SHOW_PRAYER_ALERT -> {
+                // 🚀 Only show prayer alert if online
+                if (!networkManager.isNetworkAvailable()) {
+                    Log.w(TAG, "📵 Device offline - cannot show prayer alert")
+                    return START_NOT_STICKY
+                }
+
                 val prayerName = intent.getStringExtra(EXTRA_PRAYER_NAME) ?: ""
                 val prayerNameArabic = intent.getStringExtra(EXTRA_PRAYER_NAME_ARABIC) ?: ""
                 showPrayerAlertNotification(prayerName, prayerNameArabic)
@@ -134,6 +151,13 @@ class PrayerNotificationService : Service() {
             var remainingSeconds = initialSeconds
 
             while (remainingSeconds > 0) {
+                // 🚀 Check network status during countdown
+                if (!networkManager.isNetworkAvailable()) {
+                    Log.w(TAG, "📵 Device went offline during countdown - stopping service")
+                    stopSelf()
+                    return@launch
+                }
+
                 val formattedTime = PrayerTimeUtils.formatTimeRemaining(remainingSeconds)
                 updatePersistentNotification(prayerName, prayerNameArabic, prayerTime, formattedTime)
 
@@ -141,8 +165,8 @@ class PrayerNotificationService : Service() {
                 remainingSeconds--
             }
 
-            // When countdown reaches 0, show prayer alert
-            if (remainingSeconds <= 0) {
+            // When countdown reaches 0, show prayer alert (only if still online)
+            if (remainingSeconds <= 0 && networkManager.isNetworkAvailable()) {
                 updatePersistentNotification(prayerName, prayerNameArabic, prayerTime, "00:00")
                 showPrayerAlertNotification(prayerName, prayerNameArabic)
             }
@@ -170,14 +194,12 @@ class PrayerNotificationService : Service() {
             )
         }
 
-
-
         val notification = NotificationCompat.Builder(this, App.PRAYER_CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_dua)
             .setContentIntent(pendingIntent)
             .setOngoing(true)
             .setCustomContentView(remoteView)
-            .setCustomBigContentView(remoteView) // يبان Expanded على طول
+            .setCustomBigContentView(remoteView)
             .setStyle(NotificationCompat.DecoratedCustomViewStyle())
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
@@ -186,12 +208,13 @@ class PrayerNotificationService : Service() {
         notificationManager.notify(NOTIFICATION_ID, notification)
     }
 
-
-
-
-
-
     private fun showPrayerAlertNotification(prayerName: String, prayerNameArabic: String) {
+        // Final check before showing prayer alert
+        if (!networkManager.isNetworkAvailable()) {
+            Log.w(TAG, "📵 Cannot show prayer alert - device offline")
+            return
+        }
+
         val pendingIntent = PendingIntent.getActivity(
             this,
             0,
@@ -211,6 +234,7 @@ class PrayerNotificationService : Service() {
             .build()
 
         notificationManager.notify(PRAYER_ALERT_NOTIFICATION_ID + prayerName.hashCode(), alertNotification)
+        Log.d(TAG, "✅ Prayer alert notification shown for $prayerName")
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
@@ -219,5 +243,6 @@ class PrayerNotificationService : Service() {
         super.onDestroy()
         countdownJob?.cancel()
         serviceScope.cancel()
+        Log.d(TAG, "🛑 Prayer notification service destroyed")
     }
 }

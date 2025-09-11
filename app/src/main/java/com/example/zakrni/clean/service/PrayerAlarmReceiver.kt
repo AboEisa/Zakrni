@@ -13,9 +13,16 @@ import androidx.core.app.NotificationCompat
 import com.example.zakrni.R
 import com.example.zakrni.clean.App
 import com.example.zakrni.clean.ui.views.HomeActivity
+import com.example.zakrni.clean.ui.utils.NetworkManager
 import com.example.zakrni.clean.ui.utils.PrayerStorageManager
+import javax.inject.Inject
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class PrayerAlarmReceiver : BroadcastReceiver() {
+
+    @Inject
+    lateinit var networkManager: NetworkManager
 
     companion object {
         const val ACTION_PRAYER_ALERT = "com.example.zakrni.PRAYER_ALERT"
@@ -34,12 +41,24 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         when (intent.action) {
             ACTION_PRAYER_ALERT -> {
+                // 🚀 Only show prayer alerts if device is online
+                if (!networkManager.isNetworkAvailable()) {
+                    Log.w(TAG, "📵 Device offline - skipping prayer alert")
+                    return
+                }
+
                 val prayerName = intent.getStringExtra(EXTRA_PRAYER_NAME) ?: return
                 val prayerNameArabic = intent.getStringExtra(EXTRA_PRAYER_NAME_ARABIC) ?: return
                 showPrayerAlertNotification(context, prayerName, prayerNameArabic)
             }
 
             ACTION_COUNTDOWN_NOTIFICATION -> {
+                // 🚀 Only show countdown if device is online
+                if (!networkManager.isNetworkAvailable()) {
+                    Log.w(TAG, "📵 Device offline - skipping countdown notification")
+                    return
+                }
+
                 val prayerName = intent.getStringExtra(EXTRA_PRAYER_NAME) ?: return
                 val prayerNameArabic = intent.getStringExtra(EXTRA_PRAYER_NAME_ARABIC) ?: return
                 val prayerTime = intent.getStringExtra(EXTRA_PRAYER_TIME) ?: return
@@ -54,7 +73,7 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
     }
 
     /**
-     * Show prayer alert notification with sound and vibration
+     * Show prayer alert notification with sound and vibration (only when online)
      */
     @SuppressLint("FullScreenIntentPolicy")
     private fun showPrayerAlertNotification(
@@ -63,6 +82,12 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
         prayerNameArabic: String
     ) {
         try {
+            // Double check network
+            if (!networkManager.isNetworkAvailable()) {
+                Log.w(TAG, "📵 Cannot show prayer alert - device offline")
+                return
+            }
+
             val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
             // Create intent to open app when notification is tapped
@@ -90,8 +115,8 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
                 .setCategory(NotificationCompat.CATEGORY_ALARM)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setSound(defaultSoundUri)
-                .setVibrate(longArrayOf(0, 1000, 500, 1000, 500, 1000)) // Enhanced vibration pattern
-                .setLights(0xFF00FF00.toInt(), 1000, 500) // Green light
+                .setVibrate(longArrayOf(0, 1000, 500, 1000, 500, 1000))
+                .setLights(0xFF00FF00.toInt(), 1000, 500)
                 .setDefaults(NotificationCompat.DEFAULT_ALL)
                 .setStyle(
                     NotificationCompat.BigTextStyle()
@@ -100,16 +125,17 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
                 .setFullScreenIntent(pendingIntent, true)
                 .build()
 
-            // Use unique ID for each prayer to avoid replacing previous notifications
             val notificationId = PRAYER_ALERT_NOTIFICATION_ID + prayerName.hashCode()
             notificationManager.notify(notificationId, notification)
+
+            Log.d(TAG, "✅ Prayer alert shown for $prayerName")
         } catch (e: Exception) {
-            Toast.makeText(context, "Error showing prayer alert notification", Toast.LENGTH_SHORT).show()
+            Log.e(TAG, "❌ Error showing prayer alert notification", e)
         }
     }
 
     /**
-     * Show countdown notification (10 minutes before prayer)
+     * Show countdown notification (10 minutes before prayer) - only when online
      */
     private fun showCountdownNotification(
         context: Context,
@@ -118,9 +144,14 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
         prayerTime: String
     ) {
         try {
+            // Double check network
+            if (!networkManager.isNetworkAvailable()) {
+                Log.w(TAG, "📵 Cannot show countdown notification - device offline")
+                return
+            }
+
             val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-            // Create intent to open app
             val intent = Intent(context, HomeActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
             }
@@ -148,8 +179,10 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
 
             val notificationId = COUNTDOWN_NOTIFICATION_ID + prayerName.hashCode()
             notificationManager.notify(notificationId, notification)
+
+            Log.d(TAG, "✅ Countdown notification shown for $prayerName")
         } catch (e: Exception) {
-            Toast.makeText(context, "Error showing countdown notification", Toast.LENGTH_SHORT).show()
+            Log.e(TAG, "❌ Error showing countdown notification", e)
         }
     }
 
@@ -158,17 +191,24 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
      */
     private fun rescheduleAlarms(context: Context) {
         try {
+            // Only reschedule if online
+            if (!networkManager.isNetworkAvailable()) {
+                Log.w(TAG, "📵 Device offline - cannot reschedule alarms after reboot")
+                return
+            }
+
             val storageManager = PrayerStorageManager(context)
             val savedTimings = storageManager.getSavedPrayerTimes()
 
             if (savedTimings != null && storageManager.areSavedTimesValid()) {
-                val alarmManager = PrayerAlarmManager(context)
+                val alarmManager = PrayerAlarmManager(context, networkManager)
                 alarmManager.scheduleAllPrayerAlarms(savedTimings)
+                Log.d(TAG, "✅ Alarms rescheduled successfully after reboot")
             } else {
-               Toast.makeText(context, "❌ Error rescheduling alarms after reboot", Toast.LENGTH_SHORT).show()
+                Log.w(TAG, "⚠️ No valid saved timings found for rescheduling")
             }
         } catch (e: Exception) {
-           Toast.makeText(context, "❌ Error rescheduling alarms after reboot", Toast.LENGTH_SHORT).show()
+            Log.e(TAG, "❌ Error rescheduling alarms after reboot", e)
         }
     }
 }
