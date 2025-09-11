@@ -312,7 +312,6 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-    // Enhanced method to show full-screen fragment with transition
     private fun showFullScreenFragment(destinationId: Int) {
         // First hide main content with animation
         binding.mainContentContainer.animate()
@@ -321,16 +320,13 @@ class HomeActivity : AppCompatActivity() {
             .withEndAction {
                 binding.mainContentContainer.visibility = android.view.View.GONE
 
-                // Show fullscreen container
                 binding.fullscreenFragmentContainer.visibility = android.view.View.VISIBLE
                 binding.fullscreenFragmentContainer.alpha = 0f
 
-                // Get the appropriate fragment
                 val fragmentFactory = fullScreenFragments[destinationId]
                 if (fragmentFactory != null) {
                     val fragment = fragmentFactory.invoke()
 
-                    // Add fragment with custom animation
                     supportFragmentManager.beginTransaction()
                         .setCustomAnimations(
                             R.anim.animation,
@@ -340,8 +336,6 @@ class HomeActivity : AppCompatActivity() {
                         )
                         .replace(R.id.fullscreen_fragment_container, fragment)
                         .commit()
-
-                    // Animate fullscreen container in
                     binding.fullscreenFragmentContainer.animate()
                         .alpha(1f)
                         .setDuration(300)
@@ -390,7 +384,7 @@ class HomeActivity : AppCompatActivity() {
         super.onDestroy()
         hideNoInternetDialog()
         // Stop the notification service when the app is destroyed
-        prayerTimeViewModel.stopNotificationService()
+//        prayerTimeViewModel.stopNotificationService()
         _binding = null
     }
 }

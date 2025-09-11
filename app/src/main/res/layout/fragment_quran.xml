@@ -163,6 +163,9 @@
                 android:scaleType="centerInside"
                 app:tint="@android:color/white" />
 
+
+
+
             <!-- Progress and Time Layout -->
             <LinearLayout
                 android:layout_width="0dp"

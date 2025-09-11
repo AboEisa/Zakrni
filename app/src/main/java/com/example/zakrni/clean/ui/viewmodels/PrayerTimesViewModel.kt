@@ -9,6 +9,7 @@ import com.example.zakrni.R
 import com.example.zakrni.clean.App
 import com.example.zakrni.clean.data.location.LocationManager
 import com.example.zakrni.clean.domain.usecases.GetPrayerTimesUseCase
+import com.example.zakrni.clean.service.PrayerAlarmManager
 import com.example.zakrni.clean.service.PrayerNotificationService
 import com.example.zakrni.clean.ui.models.PresentationPrayerTimesResponse
 import com.example.zakrni.clean.ui.models.mapToPresentation
@@ -53,11 +54,18 @@ class PrayerTimesViewModel @Inject constructor(
     private val _locationName = MutableStateFlow("جاري تحديد الموقع...")
     val locationName: StateFlow<String> get() = _locationName
 
+    private val _hasExactAlarmPermission = MutableStateFlow(true)
+    val hasExactAlarmPermission: StateFlow<Boolean> get() = _hasExactAlarmPermission
+
     private var timerJob: Job? = null
     private var nextPrayerTimeInSeconds: Long = 0
 
+    // Initialize AlarmManager
+    private val prayerAlarmManager = PrayerAlarmManager(context)
+
     init {
         checkLocationPermission()
+        checkExactAlarmPermission()
     }
 
     fun checkLocationPermission() {
@@ -65,6 +73,14 @@ class PrayerTimesViewModel @Inject constructor(
         if (_hasLocationPermission.value) {
             loadPrayerTimes()
         }
+    }
+
+    fun checkExactAlarmPermission() {
+        _hasExactAlarmPermission.value = prayerAlarmManager.hasExactAlarmPermission()
+    }
+
+    fun requestExactAlarmPermission() {
+        prayerAlarmManager.requestExactAlarmPermission()
     }
 
     fun loadPrayerTimes() {
@@ -78,19 +94,13 @@ class PrayerTimesViewModel @Inject constructor(
             _error.value = null
 
             try {
-                // Get location with name
                 val locationInfo = locationManager.getCurrentLocationWithName()
                 if (locationInfo == null) {
                     _error.value = "Unable to get location"
                     return@launch
                 }
-
-                // Update location name
                 _locationName.value = locationInfo.displayName
-
-                // Get prayer times
                 getPrayerTimes(locationInfo.latitude, locationInfo.longitude)
-
             } catch (e: Exception) {
                 _error.value = e.message ?: "Unknown error"
             } finally {
@@ -106,8 +116,8 @@ class PrayerTimesViewModel @Inject constructor(
                 val presentationData = result.getOrThrow().mapToPresentation()
                 _prayerTimes.value = presentationData
 
-                // Calculate current and next prayer
                 updatePrayerInfo(presentationData)
+                schedulePrayerAlarms(presentationData)
             } else {
                 _error.value = result.exceptionOrNull()?.message ?: "Unknown error"
             }
@@ -121,15 +131,38 @@ class PrayerTimesViewModel @Inject constructor(
         _currentPrayer.value = current
         _nextPrayer.value = next
 
-        // Start countdown timer for next prayer
         next?.let { nextPrayerInfo ->
             nextPrayerTimeInSeconds = nextPrayerInfo.timeRemainingInSeconds
 
-            // Start notification service
             startNotificationService(nextPrayerInfo)
-
-            // Start local countdown timer
             startCountdownTimer()
+        }
+    }
+
+
+    private fun schedulePrayerAlarms(presentationData: PresentationPrayerTimesResponse) {
+        try {
+            prayerAlarmManager.scheduleAllPrayerAlarms(presentationData.data.timings)
+
+            // Save prayer times to SharedPreferences for device reboot recovery
+            savePrayerTimesToPreferences(presentationData)
+
+        } catch (e: Exception) {
+            _error.value = "Failed to schedule prayer alarms: ${e.message}"
+        }
+    }
+
+
+    private fun savePrayerTimesToPreferences(presentationData: PresentationPrayerTimesResponse) {
+        val sharedPrefs = context.getSharedPreferences("prayer_times", Context.MODE_PRIVATE)
+        with(sharedPrefs.edit()) {
+            putString("fajr", presentationData.data.timings.Fajr)
+            putString("dhuhr", presentationData.data.timings.Dhuhr)
+            putString("asr", presentationData.data.timings.Asr)
+            putString("maghrib", presentationData.data.timings.Maghrib)
+            putString("isha", presentationData.data.timings.Isha)
+            putLong("last_updated", System.currentTimeMillis())
+            apply()
         }
     }
 
@@ -144,67 +177,13 @@ class PrayerTimesViewModel @Inject constructor(
     }
 
     private fun startCountdownTimer() {
-        // Cancel previous timer if running
         timerJob?.cancel()
-
         timerJob = viewModelScope.launch {
             while (nextPrayerTimeInSeconds > 0) {
                 val formattedTime = PrayerTimeUtils.formatTimeRemaining(nextPrayerTimeInSeconds)
                 _remainingTime.value = formattedTime
-
-                delay(1000) // Wait 1 second
-                nextPrayerTimeInSeconds--
-            }
-
-            // 🔔 لما العد التنازلي يخلص
-            if (nextPrayerTimeInSeconds <= 0) {
-                _remainingTime.value = "00:00"
-
-                // أرسل إشعار جديد للصلاة الحالية
-                _nextPrayer.value?.let { next ->
-                    PrayerNotificationService.showPrayerAlert(
-                        context,
-                        next.name,
-                        next.nameArabic
-                    )
-                }
-
-                // بعدها حدث المواقيت عشان ينتقل للصلاة التالية
-                _prayerTimes.value?.let { updatePrayerInfo(it) }
+                delay(1000)
             }
         }
-    }
-
-
-
-    fun showPrayerTimeNotification(context: Context, prayerName: String, prayerNameArabic: String) {
-        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-        val notification = NotificationCompat.Builder(context, App.PRAYER_CHANNEL_ID)
-            .setContentTitle("حان الآن وقت $prayerName ($prayerNameArabic)")
-            .setContentText("أدِ الصلاة في وقتها")
-            .setSmallIcon(R.drawable.ic_dua)
-            .setAutoCancel(true)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .build()
-
-        // خلي ID مختلف عشان يظهر إشعار جديد مش يستبدل القديم
-        val uniqueId = System.currentTimeMillis().toInt()
-        notificationManager.notify(uniqueId, notification)
-    }
-
-
-    fun retry() {
-        loadPrayerTimes()
-    }
-
-    fun stopNotificationService() {
-        PrayerNotificationService.stopService(context)
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        timerJob?.cancel()
     }
 }
