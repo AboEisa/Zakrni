@@ -1,5 +1,6 @@
 package com.example.zakrni.clean.data.remote
 
+import com.example.zakrni.clean.data.models.ArticlesResponse
 import com.example.zakrni.clean.data.models.AsmaAlHusnaResponse
 import com.example.zakrni.clean.data.models.AudioEdition
 import com.example.zakrni.clean.data.models.AudioEditionsResponse
@@ -9,8 +10,11 @@ import com.example.zakrni.clean.data.models.HadithResponse
 import com.example.zakrni.clean.data.models.PrayerTimesResponse
 import com.example.zakrni.clean.data.models.QuranAudioResponse
 import com.example.zakrni.clean.data.models.QuranResponse
+import com.example.zakrni.clean.data.models.RadioResponse
+import com.example.zakrni.clean.data.models.VideosResponse
 import com.example.zakrni.clean.data.network.AzkarApiService
 import com.example.zakrni.clean.data.network.HadithApiService
+import com.example.zakrni.clean.data.network.MediaApiService
 import com.example.zakrni.clean.data.network.PrayerApiService
 import com.example.zakrni.clean.data.network.QuranApiService
 import com.example.zakrni.clean.domain.models.DomainAyah
@@ -22,7 +26,8 @@ class RemoteDataSource @Inject constructor(
     private val apiPrayerServices: PrayerApiService,
     private val apiHadithsServices: HadithApiService,
     private val apiAzkarServices: AzkarApiService,
-    private val quranApiService: QuranApiService
+    private val quranApiService: QuranApiService,
+    private val mediaApiService: MediaApiService
 ): IRemoteDataSource {
 
     override suspend fun getPrayerTimes(
@@ -215,6 +220,41 @@ class RemoteDataSource @Inject constructor(
     override suspend fun getAyahAudio(reference: String, edition: String): Result<QuranAudioResponse> {
         return try {
             val response = quranApiService.getAyahAudio(reference, edition)
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getArticles(page: Int, category: String?): Result<ArticlesResponse> {
+        return try {
+            val response = mediaApiService.getArticles(page, category = category)
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getAudioLectures(page: Int, sheikh: String?): Result<RadioResponse> {
+        return try {
+            val response = mediaApiService.getAudioLectures(page, sheikh)
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    override suspend fun getVideos(page: Int, query: String?): Result<VideosResponse> {
+        return try {
+            val response = mediaApiService.getVideos(page, query = query)
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getRadioStations(): Result<RadioResponse> {
+        return try {
+            val response = mediaApiService.getRadioStations()
             Result.success(response)
         } catch (e: Exception) {
             Result.failure(e)

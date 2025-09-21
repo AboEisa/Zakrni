@@ -116,6 +116,46 @@
         </action>
     </fragment>
 
+    <!-- Add to nav_graph.xml -->
+    <fragment
+        android:id="@+id/articlesFragment"
+        android:name="com.example.zakrni.clean.ui.views.ArticlesFragment"
+        android:label="المقالات"
+        tools:layout="@layout/fragment_articles" />
 
+    <fragment
+        android:id="@+id/radioFragment"
+        android:name="com.example.zakrni.clean.ui.views.RadioFragment"
+        android:label="الإذاعة"
+        tools:layout="@layout/fragment_radio" />
+
+    <fragment
+        android:id="@+id/videosFragment"
+        android:name="com.example.zakrni.clean.ui.views.VideosFragment"
+        android:label="الفيديوهات"
+        tools:layout="@layout/fragment_videos" />
+
+    <fragment
+        android:id="@+id/recitersFragment"
+        android:name="com.example.zakrni.clean.ui.views.RecitersFragment"
+        android:label="القراء"
+        tools:layout="@layout/fragment_reciters" />
+
+    <!-- Add navigation actions from AllCategoriesFragment -->
+    <action
+        android:id="@+id/action_allCategoriesFragment_to_articlesFragment"
+        app:destination="@id/articlesFragment" />
+
+    <action
+        android:id="@+id/action_allCategoriesFragment_to_radioFragment"
+        app:destination="@id/radioFragment" />
+
+    <action
+        android:id="@+id/action_allCategoriesFragment_to_videosFragment"
+        app:destination="@id/videosFragment" />
+
+    <action
+        android:id="@+id/action_allCategoriesFragment_to_recitersFragment"
+        app:destination="@id/recitersFragment" />
 
 </navigation>

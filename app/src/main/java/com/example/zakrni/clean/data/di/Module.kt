@@ -27,6 +27,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 import javax.inject.Named
+import javax.inject.Qualifier
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -172,4 +173,28 @@ object Module {
     ): IRepo {
         return Repo(remoteDataSource, localDataSource)
     }
+
+    // data/di/Module.kt (add to existing)
+
+    @Qualifier
+    @Retention(AnnotationRetention.BINARY)
+    annotation class MediaApi
+
+    @Provides
+    @Singleton
+    @MediaApi
+    fun provideMediaRetrofit(okHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .client(okHttpClient)
+            .baseUrl("https://api.islamicmedia.com/") // Replace with actual API
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideMediaApiService(@MediaApi retrofit: Retrofit): MediaApiService {
+        return retrofit.create(MediaApiService::class.java)
+    }
+
 }

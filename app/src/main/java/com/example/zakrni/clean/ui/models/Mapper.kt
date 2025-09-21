@@ -1,8 +1,11 @@
 package com.example.zakrni.clean.ui.models
 
-import com.example.zakrni.clean.data.models.AzkarResponse
-import com.example.zakrni.clean.data.models.Content
+import PresentationRadioStation
+import PresentationReciter
+import PresentationVideo
 import com.example.zakrni.clean.domain.models.*
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 
 // ---------------- Prayer Times Presentation Mappers ----------------
@@ -437,4 +440,141 @@ fun DomainAudioEditionsResponse.mapToPresentation(): PresentationAudioEditionsRe
         status = status,
         data = data.map { it.mapToPresentation() }
     )
+}
+
+
+// ui/models/Mapper.kt (add to existing)
+
+fun DomainArticle.mapToPresentation(): PresentationArticle {
+    return PresentationArticle(
+        id = id,
+        title = title,
+        content = content,
+        author = author,
+        category = category,
+        imageUrl = imageUrl,
+        publishedDate = publishedDate,
+        viewsCount = viewsCount,
+        formattedDate = formatDate(publishedDate),
+        readingTime = TODO()
+    )
+}
+
+private fun formatDate(date: String): String {
+    // Format date for display
+    return try {
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val parsedDate = sdf.parse(date)
+        SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(parsedDate)
+    } catch (e: Exception) {
+        date
+    }
+}
+// ui/models/Mapper.kt (add missing presentation mappers)
+
+
+
+// Audio Mappers
+fun DomainAudioLecture.mapToPresentation(): PresentationAudio {
+    return PresentationAudio(
+        id = id,
+        title = title,
+        sheikh = sheikh,
+        description = description,
+        audioUrl = audioUrl,
+        duration = formatDuration(duration),
+        seriesName = seriesName,
+        episodeNumber = episodeNumber,
+        publishedDate = publishedDate,
+        playsCount = formatPlaysCount(playsCount)
+    )
+}
+
+// Video Mappers
+fun DomainVideo.mapToPresentation(): PresentationVideo {
+    return PresentationVideo(
+        id = id,
+        title = title,
+        description = description,
+        videoUrl = videoUrl,
+        thumbnailUrl = thumbnailUrl,
+        duration = duration,
+        views = formatViewCount(views),
+        channelName = channelName,
+        publishedDate = publishedDate,
+        category = category,
+        formattedDate = formatArabicDate(publishedDate)
+    )
+}
+
+// Radio Mappers
+fun DomainRadioStation.mapToPresentation(): PresentationRadioStation {
+    return PresentationRadioStation(
+        id = id,
+        name = name,
+        streamUrl = streamUrl,
+        description = description,
+        country = country,
+        language = language,
+        logoUrl = logoUrl,
+        isLive = isLive
+    )
+}
+
+// Reciters Mappers
+fun DomainReciter.mapToPresentation(): PresentationReciter {
+    return PresentationReciter(
+        id = id,
+        name = name,
+        nameAr = nameAr,
+        style = style,
+        photoUrl = photoUrl,
+        server = server,
+        rewaya = rewaya,
+        surahCount = "$surahCount سورة",
+        availableSurahs = availableSurahs
+    )
+}
+
+fun DomainReciterSurah.mapToPresentation(reciterName: String): PresentationReciterSurah {
+    return PresentationReciterSurah(
+        number = number,
+        name = name,
+        audioUrl = audioUrl,
+        reciterName = reciterName
+    )
+}
+
+// Helper functions
+private fun formatDuration(seconds: Int): String {
+    val minutes = seconds / 60
+    val remainingSeconds = seconds % 60
+    return String.format("%02d:%02d", minutes, remainingSeconds)
+}
+
+private fun formatPlaysCount(count: Int): String {
+    return when {
+        count >= 1000000 -> "${count / 1000000}M استماع"
+        count >= 1000 -> "${count / 1000}k استماع"
+        else -> "$count استماع"
+    }
+}
+
+private fun formatViewCount(count: Int): String {
+    return when {
+        count >= 1000000 -> "${count / 1000000}M مشاهدة"
+        count >= 1000 -> "${count / 1000}k مشاهدة"
+        else -> "$count مشاهدة"
+    }
+}
+
+private fun formatArabicDate(date: String): String {
+    return try {
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val parsedDate = sdf.parse(date) ?: return date
+        val arabicFormat = SimpleDateFormat("dd MMMM yyyy", Locale("ar"))
+        arabicFormat.format(parsedDate)
+    } catch (e: Exception) {
+        date
+    }
 }

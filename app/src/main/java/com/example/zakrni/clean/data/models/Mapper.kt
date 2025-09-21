@@ -1,6 +1,10 @@
 package com.example.zakrni.clean.data.models
 
 import com.example.zakrni.clean.domain.models.*
+import com.example.zakrni.clean.ui.models.PresentationArticle
+import java.text.SimpleDateFormat
+import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 // ---------------- Prayer Mappers ----------------
 
@@ -422,5 +426,193 @@ fun AudioEditionsResponse.mapToDomain(): DomainAudioEditionsResponse {
         code = code,
         status = status,
         data = data.map { it.mapToDomain() }
+    )
+}
+// data/models/Mapper.kt (add to existing)
+fun ArticlesResponse.mapToDomain(): DomainArticlesResponse {
+    return DomainArticlesResponse(
+        code = code,
+        status = status,
+        articles = data.articles.map { it.mapToDomain() },
+        pagination = DomainPagination(
+            total = data.total,
+            currentPage = data.current_page,
+            lastPage = data.last_page
+        )
+    )
+}
+
+fun Article.mapToDomain(): DomainArticle {
+    return DomainArticle(
+        id = id,
+        title = title,
+        content = content,
+        author = author,
+        category = category,
+        imageUrl = image_url,
+        publishedDate = published_date,
+        viewsCount = views_count,
+        readingTime = reading_time
+    )
+}
+
+// ui/models/Mapper.kt (add to existing)
+fun DomainArticle.mapToPresentation(): PresentationArticle {
+    return PresentationArticle(
+        id = id,
+        title = title,
+        content = content,
+        author = author,
+        category = category,
+        imageUrl = imageUrl,
+        publishedDate = publishedDate,
+        viewsCount = formatViewCount(viewsCount),
+        readingTime = "$readingTime دقيقة قراءة",
+        formattedDate = formatArabicDate(publishedDate)
+    )
+}
+
+private fun formatViewCount(count: Int): String {
+    return when {
+        count >= 1000 -> "${count / 1000}k مشاهدة"
+        else -> "$count مشاهدة"
+    }
+}
+
+private fun formatArabicDate(date: String): String {
+    return try {
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val parsedDate = sdf.parse(date)
+        val diffInDays = TimeUnit.MILLISECONDS.toDays(
+            System.currentTimeMillis() - parsedDate.time
+        )
+        when {
+            diffInDays == 0L -> "اليوم"
+            diffInDays == 1L -> "أمس"
+            diffInDays < 7 -> "منذ $diffInDays أيام"
+            diffInDays < 30 -> "منذ ${diffInDays / 7} أسابيع"
+            else -> SimpleDateFormat("dd MMM yyyy", Locale("ar")).format(parsedDate)
+        }
+    } catch (e: Exception) {
+        date
+    }
+}
+
+// data/models/Mapper.kt (add missing mappers)
+
+// Audio/Lectures Mappers
+fun AudioResponse.mapToDomain(): DomainAudioResponse {
+    return DomainAudioResponse(
+        code = code,
+        status = status,
+        lectures = data.lectures.map { it.mapToDomain() }
+    )
+}
+
+fun AudioLecture.mapToDomain(): DomainAudioLecture {
+    return DomainAudioLecture(
+        id = id,
+        title = title,
+        sheikh = sheikh,
+        description = description,
+        audioUrl = audio_url,
+        duration = duration,
+        seriesName = series_name,
+        episodeNumber = episode_number,
+        publishedDate = published_date,
+        playsCount = plays_count
+    )
+}
+
+// Videos Mappers
+fun VideosResponse.mapToDomain(): DomainVideosResponse {
+    return DomainVideosResponse(
+        code = code,
+        status = status,
+        videos = data.videos.map { it.mapToDomain() },
+        total = data.total
+    )
+}
+
+fun Video.mapToDomain(): DomainVideo {
+    return DomainVideo(
+        id = id,
+        title = title,
+        description = description,
+        videoUrl = video_url,
+        thumbnailUrl = thumbnail_url,
+        duration = duration,
+        views = views,
+        channelName = channel_name,
+        publishedDate = published_date,
+        category = category
+    )
+}
+
+// Radio Mappers
+fun RadioResponse.mapToDomain(): DomainRadioResponse {
+    return DomainRadioResponse(
+        code = code,
+        status = status,
+        stations = data.stations.map { it.mapToDomain() }
+    )
+}
+
+fun RadioStation.mapToDomain(): DomainRadioStation {
+    return DomainRadioStation(
+        id = id,
+        name = name,
+        streamUrl = url,
+        description = description,
+        country = country,
+        language = language,
+        logoUrl = logo_url,
+        isLive = is_live
+    )
+}
+
+// Reciters Mappers
+fun RecitersResponse.mapToDomain(): DomainRecitersResponse {
+    return DomainRecitersResponse(
+        code = code,
+        status = status,
+        reciters = data.reciters.map { it.mapToDomain() }
+    )
+}
+
+fun Reciter.mapToDomain(): DomainReciter {
+    return DomainReciter(
+        id = id,
+        name = name,
+        nameAr = name_ar,
+        style = style,
+        photoUrl = photo_url,
+        server = server,
+        rewaya = rewaya,
+        surahCount = count,
+        availableSurahs = suras_list
+    )
+}
+
+fun ReciterSurahsResponse.mapToDomain(): DomainReciterSurahsResponse {
+    return DomainReciterSurahsResponse(
+        reciterInfo = data.reciter.mapToDomain(),
+        surahs = data.surahs.map { it.mapToDomain() }
+    )
+}
+
+fun ReciterInfo.mapToDomain(): DomainReciterInfo {
+    return DomainReciterInfo(
+        id = id,
+        name = name,
+        server = server
+    )
+}
+
+fun ReciterSurah.mapToDomain(): DomainReciterSurah {
+    return DomainReciterSurah(
+        number = number,
+        name = name,
+        audioUrl = audio_url
     )
 }

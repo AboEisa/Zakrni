@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.fragment.findNavController
 import com.example.zakrni.R
 import com.example.zakrni.databinding.FragmentAllMediaBinding
 
@@ -31,6 +32,24 @@ class AllMediaFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun setupNewFeatures() {
+        binding.articlesCard.setOnClickListener {
+            findNavController().navigate(R.id.action_allCategoriesFragment_to_articlesFragment)
+        }
+
+        binding.audioCard.setOnClickListener {
+            findNavController().navigate(R.id.action_allCategoriesFragment_to_audioFragment)
+        }
+
+        binding.videosCard.setOnClickListener {
+            findNavController().navigate(R.id.action_allCategoriesFragment_to_videosFragment)
+        }
+
+        binding.radioCard.setOnClickListener {
+            findNavController().navigate(R.id.action_allCategoriesFragment_to_radioFragment)
+        }
     }
 
 

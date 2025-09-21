@@ -5,24 +5,34 @@ import androidx.media3.common.util.Log
 import androidx.media3.common.util.UnstableApi
 import com.example.zakrni.clean.domain.models.DomainSurah
 import com.example.zakrni.clean.data.local.ILocalDataSource
+import com.example.zakrni.clean.data.models.ArticlesResponse
 import com.example.zakrni.clean.data.models.AsmaAlHusnaResponse
 import com.example.zakrni.clean.data.models.AudioEdition
 import com.example.zakrni.clean.data.models.AudioEditionsResponse
 import com.example.zakrni.clean.data.models.PrayerTimesResponse
 import com.example.zakrni.clean.data.models.QuranResponse
+import com.example.zakrni.clean.data.models.RadioResponse
+import com.example.zakrni.clean.data.models.RecitersResponse
+import com.example.zakrni.clean.data.models.VideosResponse
 import com.example.zakrni.clean.data.models.mapToDomain
+import com.example.zakrni.clean.data.network.MediaApiService
 import com.example.zakrni.clean.data.network.PrayerApiService
 import com.example.zakrni.clean.data.remote.IRemoteDataSource
 import com.example.zakrni.clean.domain.IRepo
 import com.example.zakrni.clean.domain.models.DomainAllahNameData
+import com.example.zakrni.clean.domain.models.DomainArticlesResponse
 import com.example.zakrni.clean.domain.models.DomainAsmaAlHusnaResponse
 import com.example.zakrni.clean.domain.models.DomainAudioEditionsResponse
+import com.example.zakrni.clean.domain.models.DomainAudioResponse
 import com.example.zakrni.clean.domain.models.DomainAyah
 import com.example.zakrni.clean.domain.models.DomainAzkarResponse
 import com.example.zakrni.clean.domain.models.DomainDuaResponse
 import com.example.zakrni.clean.domain.models.DomainHadithResponse
 import com.example.zakrni.clean.domain.models.DomainPrayerTimesResponse
 import com.example.zakrni.clean.domain.models.DomainQuranAudioResponse
+import com.example.zakrni.clean.domain.models.DomainRadioResponse
+import com.example.zakrni.clean.domain.models.DomainRecitersResponse
+import com.example.zakrni.clean.domain.models.DomainVideosResponse
 import com.example.zakrni.clean.ui.utils.Constant.Companion.APIKEY
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -30,7 +40,8 @@ import javax.inject.Inject
 
 class Repo @Inject constructor(
     private val remoteDataSource: IRemoteDataSource,
-    private val localDataSource: ILocalDataSource
+    private val localDataSource: ILocalDataSource,
+    private val mediaApiService: MediaApiService
 ) : IRepo {
     override suspend fun getPrayerTimes(
         latitude: Double,
@@ -81,12 +92,12 @@ class Repo @Inject constructor(
     }
 
     override suspend fun getAzkarPostPlayer(): Result<DomainAzkarResponse> {
-       return try {
-           val data = remoteDataSource.getAzkarPostPlayer()
-              Result.success(data.getOrThrow().mapToDomain())
-         } catch (e: Exception) {
-              Result.failure(e)
-       }
+        return try {
+            val data = remoteDataSource.getAzkarPostPlayer()
+            Result.success(data.getOrThrow().mapToDomain())
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
     override suspend fun getAzkarNoom(): Result<DomainAzkarResponse> {
@@ -136,24 +147,25 @@ class Repo @Inject constructor(
 
 
     @OptIn(UnstableApi::class)
-    override suspend fun getQuranVerses(suraNumber: Int): List<DomainAyah> = withContext(Dispatchers.IO) {
-        try {
-            // Check local cache first
-            val cachedAyahs = localDataSource.getAyahsBySurah(suraNumber)
-            if (cachedAyahs.isNotEmpty()) {
-                return@withContext cachedAyahs
-            }
-            val remoteAyahs = remoteDataSource.getQuranVerses(suraNumber)
-            if (remoteAyahs.isNotEmpty()) {
-                localDataSource.saveAyahs(suraNumber, remoteAyahs)
-            }
+    override suspend fun getQuranVerses(suraNumber: Int): List<DomainAyah> =
+        withContext(Dispatchers.IO) {
+            try {
+                // Check local cache first
+                val cachedAyahs = localDataSource.getAyahsBySurah(suraNumber)
+                if (cachedAyahs.isNotEmpty()) {
+                    return@withContext cachedAyahs
+                }
+                val remoteAyahs = remoteDataSource.getQuranVerses(suraNumber)
+                if (remoteAyahs.isNotEmpty()) {
+                    localDataSource.saveAyahs(suraNumber, remoteAyahs)
+                }
 
-            remoteAyahs
-        } catch (e: Exception) {
-            println("DEBUG: Repo - Error fetching ayahs: ${e.message}")
-            localDataSource.getAyahsBySurah(suraNumber)
+                remoteAyahs
+            } catch (e: Exception) {
+                println("DEBUG: Repo - Error fetching ayahs: ${e.message}")
+                localDataSource.getAyahsBySurah(suraNumber)
+            }
         }
-    }
 
     suspend fun preloadAllQuranData(onProgress: (Int, Int) -> Unit = { _, _ -> }) {
         withContext(Dispatchers.IO) {
@@ -231,7 +243,10 @@ class Repo @Inject constructor(
         }
     }
 
-    override suspend fun getAyahAudio(reference: String, edition: String): Result<DomainQuranAudioResponse> {
+    override suspend fun getAyahAudio(
+        reference: String,
+        edition: String
+    ): Result<DomainQuranAudioResponse> {
         return try {
             val response = remoteDataSource.getAyahAudio(reference, edition)
             if (response.isSuccess) {
@@ -244,4 +259,56 @@ class Repo @Inject constructor(
             Result.failure(e)
         }
     }
+
+    override suspend fun getArticles(page: Int, category: String?): Result<ArticlesResponse> {
+        return try {
+            val response = mediaApiService.getArticles(page, category = category)
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getVideos(page: Int, category: String?, query: String?): Result<VideosResponse> {
+        return try {
+            val response = mediaApiService.getVideos(page, category, query)
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+
+
+    override suspend fun getAudioLectures(
+        page: Int,
+        sheikh: String?
+    ): Result<DomainAudioResponse> {
+        return try {
+            val response = mediaApiService.getAudioLectures(page, sheikh)
+            Result.success(response.mapToDomain()) // implement mapToDomain()
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+
+    override suspend fun getRadioStations(country: String?, language: String?): Result<RadioResponse> {
+        return try {
+            val response = mediaApiService.getRadioStations(country, language)
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getReciters(rewaya: String?): Result<RecitersResponse> {
+        return try {
+            val response = mediaApiService.getReciters(rewaya)
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
 }

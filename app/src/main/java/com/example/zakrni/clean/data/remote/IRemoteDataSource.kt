@@ -1,5 +1,6 @@
 package com.example.zakrni.clean.data.remote
 
+import com.example.zakrni.clean.data.models.ArticlesResponse
 import com.example.zakrni.clean.data.models.AsmaAlHusnaResponse
 import com.example.zakrni.clean.data.models.AudioEdition
 import com.example.zakrni.clean.data.models.AudioEditionsResponse
@@ -9,6 +10,8 @@ import com.example.zakrni.clean.data.models.HadithResponse
 import com.example.zakrni.clean.data.models.PrayerTimesResponse
 import com.example.zakrni.clean.data.models.QuranAudioResponse
 import com.example.zakrni.clean.data.models.QuranResponse
+import com.example.zakrni.clean.data.models.RadioResponse
+import com.example.zakrni.clean.data.models.VideosResponse
 import com.example.zakrni.clean.domain.models.DomainAyah
 import com.example.zakrni.clean.domain.models.DomainSurah
 
@@ -44,4 +47,13 @@ interface IRemoteDataSource {
     suspend fun getAudioEditions(language: String): Result<AudioEditionsResponse>
 
     suspend fun getAyahAudio(reference: String, edition: String): Result<QuranAudioResponse>
+
+    suspend fun getArticles(page: Int, category: String? = null): Result<ArticlesResponse>
+
+    suspend fun getRadioStations(): Result<RadioResponse>
+    suspend fun getVideos(page: Int, query: String?): Result<VideosResponse>
+
+    suspend fun getAudioLectures(page: Int,sheikh: String?): Result<RadioResponse>
+
+
 }
