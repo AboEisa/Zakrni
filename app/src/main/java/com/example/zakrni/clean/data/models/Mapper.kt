@@ -183,6 +183,17 @@ fun En.mapToDomain(): DomainEn {
         meaning = meaning
     )
 }
+// ---------------- Articles Presentation Mappers ----------------
+fun ArticleResponse.mapToDomain(): DomainArticleResponse {
+    return this.map { item ->
+        DomainArticle(
+            apiurl = item.apiurl,
+            id = item.id,
+            shortdescription = item.shortdescription,
+            title = item.title
+        )
+    }
+}
 
 // ---------------- Hadith Mappers ----------------
 

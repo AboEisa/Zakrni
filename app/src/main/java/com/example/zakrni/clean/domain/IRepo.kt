@@ -4,6 +4,7 @@ import com.example.zakrni.clean.data.models.AudioEditionsResponse
 import com.example.zakrni.clean.data.models.AzkarResponse
 import com.example.zakrni.clean.data.models.QuranAudioResponse
 import com.example.zakrni.clean.data.models.QuranResponse
+import com.example.zakrni.clean.domain.models.DomainArticleResponse
 import com.example.zakrni.clean.domain.models.DomainAsmaAlHusnaResponse
 import com.example.zakrni.clean.domain.models.DomainAudioEdition
 import com.example.zakrni.clean.domain.models.DomainAudioEditionsResponse
@@ -41,4 +42,8 @@ interface IRepo {
     suspend fun getSurahAudio(surahNumber: Int, reciter: String): Result<QuranResponse>
     suspend fun getAudioEditions(language: String): Result<DomainAudioEditionsResponse>
     suspend fun getAyahAudio(reference: String, edition: String): Result<DomainQuranAudioResponse>
+
+
+    // Articles
+    suspend fun getArticles(): Result<DomainArticleResponse>
 }

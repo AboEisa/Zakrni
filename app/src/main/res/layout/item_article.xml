@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginVertical="4dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="#F0E6D2">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Article Title -->
+        <TextView
+            android:id="@+id/tvArticleTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="عنوان المقال"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#333333"
+            android:fontFamily="@font/scheherazade"
+            android:gravity="end"
+            android:layoutDirection="rtl" />
+
+        <!-- Article Description -->
+        <TextView
+            android:id="@+id/tvArticleDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="وصف المقال"
+            android:textSize="14sp"
+            android:textColor="#666666"
+            android:fontFamily="@font/scheherazade"
+            android:gravity="end"
+            android:layoutDirection="rtl"
+            android:maxLines="3"
+            android:ellipsize="end" />
+
+        <!-- Read More -->
+        <TextView
+            android:id="@+id/tvReadMore"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="اقرأ المزيد"
+            android:textSize="14sp"
+            android:textColor="#795547"
+            android:fontFamily="@font/scheherazade"
+            android:layout_gravity="end" />
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

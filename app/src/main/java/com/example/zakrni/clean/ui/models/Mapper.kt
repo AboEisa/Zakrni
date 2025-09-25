@@ -186,6 +186,20 @@ fun DomainEn.mapToPresentation(): PresentationEn {
         meaning = meaning
     )
 }
+// ---------------- Articles Presentation Mappers ----------------
+
+fun DomainArticleResponse.mapToPresentation(): PresentationArticleResponse {
+    return PresentationArticleResponse(
+        articles = this.map {  // Use 'this' directly, not 'this.articles'
+            PresentationArticle(
+                shortdescription = it.shortdescription,
+                title = it.title,
+                id = it.id
+            )
+        }
+    )
+}
+
 
 // ---------------- Hadith Presentation Mappers ----------------
 
@@ -438,3 +452,5 @@ fun DomainAudioEditionsResponse.mapToPresentation(): PresentationAudioEditionsRe
         data = data.map { it.mapToPresentation() }
     )
 }
+
+

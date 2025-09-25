@@ -5,33 +5,76 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.NavOptions
+import androidx.navigation.fragment.findNavController
 import com.example.zakrni.R
+import com.example.zakrni.databinding.FragmentAllCategoriesBinding
 import com.example.zakrni.databinding.FragmentAllMediaBinding
-
+import kotlin.apply
 
 class AllMediaFragment : Fragment() {
+
 
     private var _binding: FragmentAllMediaBinding? = null
     private val binding get() = _binding!!
 
+    private val navOptions by lazy {
+        NavOptions.Builder()
+            .setEnterAnim(R.anim.animation)
+            .setExitAnim(R.anim.animation2)
+            .setPopEnterAnim(R.anim.animation3)
+            .setPopExitAnim(R.anim.animation4)
+            .build()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_all_media, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentAllMediaBinding.bind(view)
+
+        onClick()
+    }
+
+    private fun onClick() {
+        binding.apply {
+            articlesFragment.setOnClickListener {
+                findNavController().navigate(
+                    AllMediaFragmentDirections.actionAllMediaFragmentToArticleFragment(),
+                    navOptions
+                )
+            }
+//
+//            audiosFragment.setOnClickListener {
+//                findNavController().navigate(
+//                    AllMediaFragmentDirections.actionAllMediaFragmentToAudioFragment(),
+//                    navOptions
+//                )
+//            }
+//            videosFragment.setOnClickListener {
+//                findNavController().navigate(
+//                    AllMediaFragmentDirections.actionAllMediaFragmentToVideoFragment(),
+//                    navOptions
+//                )
+//            }
+//            sermonsFragment.setOnClickListener {
+//                findNavController().navigate(
+//                    AllMediaFragmentDirections.actionAllMediaFragmentToSermonsFragment(),
+//                    navOptions
+//                )
+//            }
+
+        }
+
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
-
-
 }

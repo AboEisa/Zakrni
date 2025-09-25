@@ -55,7 +55,21 @@
         android:id="@+id/allMediaFragment"
         android:name="com.example.zakrni.clean.ui.views.AllMediaFragment"
         android:label="fragment_all_media"
-        tools:layout="@layout/fragment_all_media" />
+        tools:layout="@layout/fragment_all_media">
+        <action
+            android:id="@+id/action_AllMediaFragment_to_articleFragment"
+            app:destination="@id/articleFragment"/>
+<!--        <action-->
+<!--            android:id="@+id/action_AllMediaFragment_to_videoFragment"-->
+<!--            app:destination="@id/videoFragment"></action>-->
+<!--        <action-->
+<!--            android:id="@+id/action_AllMediaFragment_to_audioFragment"-->
+<!--            app:destination="@id/audioFragment"></action>-->
+<!--        <action-->
+<!--            android:id="@+id/action_AllMediaFragment_to_sermonsFragment"-->
+<!--            app:destination="@id/sermonsFragment"></action>-->
+
+    </fragment>
 
     <fragment
         android:id="@+id/playerTimesFragment"
@@ -116,6 +130,25 @@
         </action>
     </fragment>
 
+    <fragment
+        android:id="@+id/articleFragment"
+        android:name="com.example.zakrni.clean.ui.views.ArticleFragment"
+        android:label="fragment_all_media"
+        tools:layout="@layout/fragment_articles" />
 
-
+<!--    <fragment-->
+<!--        android:id="@+id/videoFragment"-->
+<!--        android:name="com.example.zakrni.clean.ui.views.VideoFragment"-->
+<!--        android:label="fragment_all_media"-->
+<!--        tools:layout="@layout/fragment_articles" />-->
+<!--    <fragment-->
+<!--        android:id="@+id/audioFragment"-->
+<!--        android:name="com.example.zakrni.clean.ui.views.AudioFragment"-->
+<!--        android:label="fragment_all_media"-->
+<!--        tools:layout="@layout/fragment_articles" />-->
+<!--    <fragment-->
+<!--        android:id="@+id/sermonsFragment"-->
+<!--        android:name="com.example.zakrni.clean.ui.views.SermonsFragment"-->
+<!--        android:label="fragment_all_media"-->
+<!--        tools:layout="@layout/fragment_articles" />-->
 </navigation>

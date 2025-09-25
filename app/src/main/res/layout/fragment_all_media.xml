@@ -24,6 +24,7 @@
             android:paddingBottom="@dimen/_20sdp">
 
             <LinearLayout
+                android:id="@+id/articlesFragment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/green_card_background"
@@ -58,6 +59,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/audiosFragment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/black_card_background"
@@ -90,6 +92,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/videosFragment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/brown_card_background"
@@ -122,6 +125,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/sermonsFragment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/purple_card_background"

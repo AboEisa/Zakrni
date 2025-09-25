@@ -8,6 +8,7 @@ import com.example.zakrni.clean.data.local.LocalDataSource
 import com.example.zakrni.clean.data.local.QuranDatabase
 import com.example.zakrni.clean.data.local.QuranDao
 import com.example.zakrni.clean.data.location.LocationManager
+import com.example.zakrni.clean.data.network.ArticleApiService
 import com.example.zakrni.clean.data.network.AzkarApiService
 import com.example.zakrni.clean.data.network.HadithApiService
 import com.example.zakrni.clean.data.network.PrayerApiService
@@ -113,10 +114,29 @@ object Module {
             .build()
     }
 
+
     @Provides
     @Singleton
     fun provideQuranApiService(@Named("QuranApi") retrofit: Retrofit): QuranApiService {
         return retrofit.create(QuranApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    @Named("ArticleApi")
+    fun provideArticlefit(okHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .client(okHttpClient)
+            .baseUrl("https://api3.islamhouse.com/v3/paV29H2gm56kvLPy/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+
+    @Provides
+    @Singleton
+    fun provideArticleApiService(@Named("ArticleApi") retrofit: Retrofit): ArticleApiService {
+        return retrofit.create(ArticleApiService::class.java)
     }
 
     @Singleton
@@ -125,9 +145,16 @@ object Module {
         prayerApiService: PrayerApiService,
         hadithApiService: HadithApiService,
         azkarApiService: AzkarApiService,
-        quranApiService: QuranApiService
+        quranApiService: QuranApiService,
+        articleApiService: ArticleApiService
     ): IRemoteDataSource {
-        return RemoteDataSource(prayerApiService, hadithApiService, azkarApiService, quranApiService)
+        return RemoteDataSource(
+            prayerApiService,
+            hadithApiService,
+            azkarApiService,
+            quranApiService,
+            articleApiService
+        )
     }
 
     @Provides
@@ -172,4 +199,6 @@ object Module {
     ): IRepo {
         return Repo(remoteDataSource, localDataSource)
     }
+
+
 }

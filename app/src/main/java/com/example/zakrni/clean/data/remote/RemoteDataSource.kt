@@ -1,5 +1,6 @@
 package com.example.zakrni.clean.data.remote
 
+import com.example.zakrni.clean.data.models.ArticleResponse
 import com.example.zakrni.clean.data.models.AsmaAlHusnaResponse
 import com.example.zakrni.clean.data.models.AudioEdition
 import com.example.zakrni.clean.data.models.AudioEditionsResponse
@@ -9,6 +10,7 @@ import com.example.zakrni.clean.data.models.HadithResponse
 import com.example.zakrni.clean.data.models.PrayerTimesResponse
 import com.example.zakrni.clean.data.models.QuranAudioResponse
 import com.example.zakrni.clean.data.models.QuranResponse
+import com.example.zakrni.clean.data.network.ArticleApiService
 import com.example.zakrni.clean.data.network.AzkarApiService
 import com.example.zakrni.clean.data.network.HadithApiService
 import com.example.zakrni.clean.data.network.PrayerApiService
@@ -22,7 +24,8 @@ class RemoteDataSource @Inject constructor(
     private val apiPrayerServices: PrayerApiService,
     private val apiHadithsServices: HadithApiService,
     private val apiAzkarServices: AzkarApiService,
-    private val quranApiService: QuranApiService
+    private val quranApiService: QuranApiService,
+    private val articleApiService: ArticleApiService
 ): IRemoteDataSource {
 
     override suspend fun getPrayerTimes(
@@ -216,6 +219,16 @@ class RemoteDataSource @Inject constructor(
         return try {
             val response = quranApiService.getAyahAudio(reference, edition)
             Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    //articles
+    override suspend fun getArticles(): Result<ArticleResponse> {
+        return try {
+            val response = articleApiService.getArticles()
+            Result.success(response)  // response is already a List<ArticleItem>
         } catch (e: Exception) {
             Result.failure(e)
         }

@@ -15,6 +15,7 @@ import com.example.zakrni.clean.data.network.PrayerApiService
 import com.example.zakrni.clean.data.remote.IRemoteDataSource
 import com.example.zakrni.clean.domain.IRepo
 import com.example.zakrni.clean.domain.models.DomainAllahNameData
+import com.example.zakrni.clean.domain.models.DomainArticleResponse
 import com.example.zakrni.clean.domain.models.DomainAsmaAlHusnaResponse
 import com.example.zakrni.clean.domain.models.DomainAudioEditionsResponse
 import com.example.zakrni.clean.domain.models.DomainAyah
@@ -244,4 +245,15 @@ class Repo @Inject constructor(
             Result.failure(e)
         }
     }
+
+    //articles
+    override suspend fun getArticles(): Result<DomainArticleResponse> {
+        return try {
+            val data = remoteDataSource.getArticles()
+            Result.success(data.getOrThrow().mapToDomain())
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
 }

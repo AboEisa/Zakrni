@@ -1,5 +1,6 @@
 package com.example.zakrni.clean.data.remote
 
+import com.example.zakrni.clean.data.models.ArticleResponse
 import com.example.zakrni.clean.data.models.AsmaAlHusnaResponse
 import com.example.zakrni.clean.data.models.AudioEdition
 import com.example.zakrni.clean.data.models.AudioEditionsResponse
@@ -44,4 +45,7 @@ interface IRemoteDataSource {
     suspend fun getAudioEditions(language: String): Result<AudioEditionsResponse>
 
     suspend fun getAyahAudio(reference: String, edition: String): Result<QuranAudioResponse>
+
+    //articles
+    suspend fun getArticles(): Result<ArticleResponse>
 }
