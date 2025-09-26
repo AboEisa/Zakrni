@@ -8,13 +8,13 @@ import android.content.Context
 import android.content.Intent
 import android.media.RingtoneManager
 import android.util.Log
-import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import com.example.zakrni.R
 import com.example.zakrni.clean.App
-import com.example.zakrni.clean.ui.views.HomeActivity
 import com.example.zakrni.clean.ui.utils.NetworkManager
 import com.example.zakrni.clean.ui.utils.PrayerStorageManager
+import com.example.zakrni.clean.ui.utils.PrayerTimeUtils
+import com.example.zakrni.clean.ui.views.HomeActivity
 import javax.inject.Inject
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -24,9 +24,13 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
     @Inject
     lateinit var networkManager: NetworkManager
 
+    @Inject
+    lateinit var prayerStorageManager: PrayerStorageManager
+
     companion object {
         const val ACTION_PRAYER_ALERT = "com.example.zakrni.PRAYER_ALERT"
         const val ACTION_COUNTDOWN_NOTIFICATION = "com.example.zakrni.COUNTDOWN_NOTIFICATION"
+        const val ACTION_AUTO_RESCHEDULE = "com.example.zakrni.AUTO_RESCHEDULE" // 🆕 New action
 
         const val EXTRA_PRAYER_NAME = "prayer_name"
         const val EXTRA_PRAYER_NAME_ARABIC = "prayer_name_arabic"
@@ -49,7 +53,12 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
 
                 val prayerName = intent.getStringExtra(EXTRA_PRAYER_NAME) ?: return
                 val prayerNameArabic = intent.getStringExtra(EXTRA_PRAYER_NAME_ARABIC) ?: return
+
+                // Show prayer alert
                 showPrayerAlertNotification(context, prayerName, prayerNameArabic)
+
+                // **KEY FIX: Start service for next prayer automatically**
+                startServiceForNextPrayer(context)
             }
 
             ACTION_COUNTDOWN_NOTIFICATION -> {
@@ -65,10 +74,71 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
                 showCountdownNotification(context, prayerName, prayerNameArabic, prayerTime)
             }
 
+            ACTION_AUTO_RESCHEDULE -> {
+                // 🆕 Handle automatic reschedule for new day
+                handleAutoReschedule(context)
+            }
+
             Intent.ACTION_BOOT_COMPLETED,
             Intent.ACTION_MY_PACKAGE_REPLACED -> {
                 rescheduleAlarms(context)
             }
+        }
+    }
+
+    // **NEW METHOD: Automatically start service for next prayer**
+    private fun startServiceForNextPrayer(context: Context) {
+        try {
+            val savedTimings = prayerStorageManager.getSavedPrayerTimes()
+            if (savedTimings != null && prayerStorageManager.areSavedTimesValid()) {
+                val (_, nextPrayer) = PrayerTimeUtils.getCurrentAndNextPrayer(savedTimings)
+
+                nextPrayer?.let { next ->
+                    Log.d(TAG, "🔄 Starting service for next prayer: ${next.name}")
+
+                    PrayerNotificationService.startService(
+                        context = context,
+                        prayerName = next.name,
+                        prayerNameArabic = next.nameArabic,
+                        prayerTime = next.time,
+                        remainingSeconds = next.timeRemainingInSeconds
+                    )
+                }
+            } else {
+                Log.w(TAG, "⚠️ No valid saved timings found for next prayer service")
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "❌ Error starting service for next prayer", e)
+        }
+    }
+
+    // **NEW METHOD: Handle automatic reschedule for new day**
+    private fun handleAutoReschedule(context: Context) {
+        try {
+            if (!networkManager.isNetworkAvailable()) {
+                Log.w(TAG, "📵 Device offline - cannot auto reschedule")
+                return
+            }
+
+            Log.d(TAG, "🔄 Auto reschedule triggered for new day")
+
+            // Check if we have valid saved times from yesterday
+            val savedTimings = prayerStorageManager.getSavedPrayerTimes()
+            if (savedTimings != null) {
+                // Create alarm manager and reschedule with saved times
+                val alarmManager = PrayerAlarmManager(context, networkManager, prayerStorageManager)
+                alarmManager.scheduleAllPrayerAlarms(savedTimings)
+
+                // Start service for today's next prayer
+                startServiceForNextPrayer(context)
+
+                Log.d(TAG, "✅ Auto reschedule completed for new day")
+            } else {
+                Log.w(TAG, "⚠️ No saved timings available for auto reschedule")
+            }
+
+        } catch (e: Exception) {
+            Log.e(TAG, "❌ Error in auto reschedule", e)
         }
     }
 
@@ -197,12 +267,15 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
                 return
             }
 
-            val storageManager = PrayerStorageManager(context)
-            val savedTimings = storageManager.getSavedPrayerTimes()
+            val savedTimings = prayerStorageManager.getSavedPrayerTimes()
 
-            if (savedTimings != null && storageManager.areSavedTimesValid()) {
-                val alarmManager = PrayerAlarmManager(context, networkManager)
+            if (savedTimings != null && prayerStorageManager.areSavedTimesValid()) {
+                val alarmManager = PrayerAlarmManager(context, networkManager, prayerStorageManager)
                 alarmManager.scheduleAllPrayerAlarms(savedTimings)
+
+                // Start service for next prayer
+                startServiceForNextPrayer(context)
+
                 Log.d(TAG, "✅ Alarms rescheduled successfully after reboot")
             } else {
                 Log.w(TAG, "⚠️ No valid saved timings found for rescheduling")

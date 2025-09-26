@@ -9,13 +9,16 @@ import android.provider.Settings
 import android.util.Log
 import com.example.zakrni.clean.ui.models.PresentationTimings
 import com.example.zakrni.clean.ui.utils.NetworkManager
-import com.example.zakrni.clean.ui.utils.PrayerTimeUtils
+import com.example.zakrni.clean.ui.utils.PrayerStorageManager
 import java.util.*
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class PrayerAlarmManager @Inject constructor(
     private val context: Context,
-    private val networkManager: NetworkManager
+    private val networkManager: NetworkManager,
+    private val prayerStorageManager: PrayerStorageManager
 ) {
 
     private val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
@@ -36,6 +39,9 @@ class PrayerAlarmManager @Inject constructor(
         const val ASR_COUNTDOWN_REQUEST_CODE = 2003
         const val MAGHRIB_COUNTDOWN_REQUEST_CODE = 2004
         const val ISHA_COUNTDOWN_REQUEST_CODE = 2005
+
+        // Request codes for automatic next prayer scheduling
+        const val AUTO_SCHEDULE_REQUEST_CODE = 3001
     }
 
     /**
@@ -50,6 +56,9 @@ class PrayerAlarmManager @Inject constructor(
             }
 
             Log.d(TAG, "🌐 Device is online. Starting to schedule prayer alarms")
+
+            // Save prayer times for later use
+            prayerStorageManager.savePrayerTimes(timings)
 
             // Cancel previous alarms first
             cancelAllAlarms()
@@ -110,6 +119,43 @@ class PrayerAlarmManager @Inject constructor(
 
         } catch (e: Exception) {
             Log.e(TAG, "❌ Error scheduling prayer alarms", e)
+        }
+    }
+
+    /**
+     * 🆕 Schedule automatic alarm to reschedule next day prayers at midnight
+     */
+    fun scheduleAutoRescheduleForNextDay() {
+        try {
+            if (!networkManager.isNetworkAvailable()) {
+                Log.w(TAG, "📵 Device offline - cannot schedule auto reschedule")
+                return
+            }
+
+            val calendar = Calendar.getInstance().apply {
+                add(Calendar.DAY_OF_MONTH, 1)
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 5) // 5 minutes after midnight
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }
+
+            val intent = Intent(context, PrayerAlarmReceiver::class.java).apply {
+                action = PrayerAlarmReceiver.ACTION_AUTO_RESCHEDULE
+            }
+
+            val pendingIntent = PendingIntent.getBroadcast(
+                context,
+                AUTO_SCHEDULE_REQUEST_CODE,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+
+            scheduleExactAlarm(calendar.timeInMillis, pendingIntent)
+            Log.d(TAG, "⏰ Auto reschedule set for tomorrow at ${formatTime(calendar.timeInMillis)}")
+
+        } catch (e: Exception) {
+            Log.e(TAG, "❌ Error scheduling auto reschedule", e)
         }
     }
 
@@ -285,6 +331,9 @@ class PrayerAlarmManager @Inject constructor(
 
             Log.d(TAG, "🌅 Scheduled tomorrow's Fajr at ${formatTime(tomorrowFajrTime)} (Prayer: $prayerScheduled, Countdown: $countdownScheduled)")
         }
+
+        // Schedule auto reschedule for next day
+        scheduleAutoRescheduleForNextDay()
     }
 
     /**
@@ -298,7 +347,9 @@ class PrayerAlarmManager @Inject constructor(
             ASR_COUNTDOWN_REQUEST_CODE, MAGHRIB_COUNTDOWN_REQUEST_CODE,
             ISHA_COUNTDOWN_REQUEST_CODE,
             // Tomorrow's codes
-            FAJR_REQUEST_CODE + 100, FAJR_COUNTDOWN_REQUEST_CODE + 100
+            FAJR_REQUEST_CODE + 100, FAJR_COUNTDOWN_REQUEST_CODE + 100,
+            // Auto schedule code
+            AUTO_SCHEDULE_REQUEST_CODE
         )
 
         requestCodes.forEach { requestCode ->

@@ -200,5 +200,10 @@ object Module {
         return Repo(remoteDataSource, localDataSource)
     }
 
+    @Provides
+    @Singleton
+    fun provideContext(@ApplicationContext context: Context): Context {
+        return context
+    }
 
 }

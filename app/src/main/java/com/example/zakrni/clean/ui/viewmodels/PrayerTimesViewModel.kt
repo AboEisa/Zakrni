@@ -10,6 +10,7 @@ import com.example.zakrni.clean.service.PrayerNotificationService
 import com.example.zakrni.clean.ui.models.PresentationPrayerTimesResponse
 import com.example.zakrni.clean.ui.models.mapToPresentation
 import com.example.zakrni.clean.ui.utils.NetworkManager
+import com.example.zakrni.clean.ui.utils.PrayerStorageManager
 import com.example.zakrni.clean.ui.utils.PrayerTimeUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -25,7 +26,8 @@ class PrayerTimesViewModel @Inject constructor(
     private val prayerTimesUseCase: GetPrayerTimesUseCase,
     private val locationManager: LocationManager,
     @ApplicationContext private val context: Context,
-   private val networkManager: NetworkManager
+    private val networkManager: NetworkManager,
+    private val prayerStorageManager: PrayerStorageManager
 ) : ViewModel() {
 
     private val _prayerTimes = MutableStateFlow<PresentationPrayerTimesResponse?>(null)
@@ -58,8 +60,8 @@ class PrayerTimesViewModel @Inject constructor(
     private var timerJob: Job? = null
     private var nextPrayerTimeInSeconds: Long = 0
 
-    // Initialize AlarmManager
-    private val prayerAlarmManager = PrayerAlarmManager(context,networkManager)
+    // Initialize AlarmManager with PrayerStorageManager
+    private val prayerAlarmManager = PrayerAlarmManager(context, networkManager, prayerStorageManager)
 
     init {
         checkLocationPermission()
@@ -75,10 +77,6 @@ class PrayerTimesViewModel @Inject constructor(
 
     fun checkExactAlarmPermission() {
         _hasExactAlarmPermission.value = prayerAlarmManager.hasExactAlarmPermission()
-    }
-
-    fun requestExactAlarmPermission() {
-        prayerAlarmManager.requestExactAlarmPermission()
     }
 
     fun loadPrayerTimes() {
@@ -137,30 +135,14 @@ class PrayerTimesViewModel @Inject constructor(
         }
     }
 
-
     private fun schedulePrayerAlarms(presentationData: PresentationPrayerTimesResponse) {
         try {
             prayerAlarmManager.scheduleAllPrayerAlarms(presentationData.data.timings)
 
-            // Save prayer times to SharedPreferences for device reboot recovery
-            savePrayerTimesToPreferences(presentationData)
+            // Prayer times are now saved automatically in PrayerAlarmManager via PrayerStorageManager
 
         } catch (e: Exception) {
             _error.value = "Failed to schedule prayer alarms: ${e.message}"
-        }
-    }
-
-
-    private fun savePrayerTimesToPreferences(presentationData: PresentationPrayerTimesResponse) {
-        val sharedPrefs = context.getSharedPreferences("prayer_times", Context.MODE_PRIVATE)
-        with(sharedPrefs.edit()) {
-            putString("fajr", presentationData.data.timings.Fajr)
-            putString("dhuhr", presentationData.data.timings.Dhuhr)
-            putString("asr", presentationData.data.timings.Asr)
-            putString("maghrib", presentationData.data.timings.Maghrib)
-            putString("isha", presentationData.data.timings.Isha)
-            putLong("last_updated", System.currentTimeMillis())
-            apply()
         }
     }
 
@@ -181,6 +163,7 @@ class PrayerTimesViewModel @Inject constructor(
                 val formattedTime = PrayerTimeUtils.formatTimeRemaining(nextPrayerTimeInSeconds)
                 _remainingTime.value = formattedTime
                 delay(1000)
+                nextPrayerTimeInSeconds--
             }
         }
     }

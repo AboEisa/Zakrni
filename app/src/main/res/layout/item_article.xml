@@ -77,75 +77,9 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvArticleTitle" />
 
-        <!-- Article Metadata Container -->
-        <LinearLayout
-            android:id="@+id/metadataContainer"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="12dp"
-            android:layout_marginEnd="8dp"
-            android:orientation="horizontal"
-            android:gravity="end"
-            app:layout_constraintStart_toEndOf="@+id/categoryCard"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvArticleDescription">
-
-            <!-- Reading Time -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginStart="16dp">
 
 
 
-
-
-            </LinearLayout>
-
-            <!-- Date -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-
-
-
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <!-- Category Tag -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/categoryTagCard"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            app:cardCornerRadius="12dp"
-            app:cardBackgroundColor="#E8F5E8"
-            app:cardElevation="0dp"
-            app:layout_constraintStart_toEndOf="@+id/categoryCard"
-            app:layout_constraintTop_toBottomOf="@+id/metadataContainer">
-
-<!--            <TextView-->
-<!--                android:id="@+id/tvCategoryTag"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:paddingHorizontal="12dp"-->
-<!--                android:paddingVertical="6dp"-->
-<!--                android:text="الفقه"-->
-<!--                android:textSize="11sp"-->
-<!--                android:textColor="#2E7D32"-->
-<!--                android:textStyle="bold"-->
-<!--                android:fontFamily="@font/scheherazade" />-->
-
-        </androidx.cardview.widget.CardView>
 
         <!-- Divider Line -->
         <View
