@@ -1,45 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="#F5F5DC">
-    <LinearLayout
-        android:id="@+id/errorLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:visibility="gone"
-        app:layout_constraintTop_toTopOf="@+id/recyclerView"
-        app:layout_constraintBottom_toBottomOf="@+id/recyclerView"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
 
-
-
-        <TextView
-            android:id="@+id/tvError"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="حدث خطأ في تحميل البيانات"
-            android:textSize="16sp"
-            android:textColor="#666666"
-            android:gravity="center" />
-
-        <Button
-            android:id="@+id/btnRetry"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="إعادة المحاولة"
-            android:textColor="@android:color/white"
-            android:backgroundTint="#795547"
-            style="@style/Widget.Material3.Button" />
-
-    </LinearLayout>
     <!-- Header -->
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
@@ -68,6 +35,7 @@
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:gravity="center"
+                android:textColor="#795547"
                 android:fontFamily="@font/scheherazade" />
 
             <ImageView
@@ -79,72 +47,93 @@
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
-<!--    &lt;!&ndash; Categories Tabs &ndash;&gt;-->
-<!--    <HorizontalScrollView-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:scrollbars="none"-->
-<!--        android:layout_marginTop="8dp">-->
+    <!-- Search Card -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/searchCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        app:cardElevation="2dp"
+        app:cardCornerRadius="8dp"
+        android:visibility="gone">
 
-<!--        <com.google.android.material.chip.ChipGroup-->
-<!--            android:id="@+id/categoriesChipGroup"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:paddingHorizontal="16dp"-->
-<!--            app:singleSelection="true">-->
+        <EditText
+            android:id="@+id/searchEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:hint="ابحث في المقالات..."
+            android:textDirection="rtl"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:fontFamily="@font/scheherazade"
+            android:background="@android:color/transparent" />
 
-<!--            <com.google.android.material.chip.Chip-->
-<!--                android:id="@+id/chipAll"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="الكل"-->
-<!--                style="@style/Widget.MaterialComponents.Chip.Choice" />-->
+    </androidx.cardview.widget.CardView>
 
-<!--            <com.google.android.material.chip.Chip-->
-<!--                android:id="@+id/chipAqidah"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="العقيدة"-->
-<!--                style="@style/Widget.MaterialComponents.Chip.Choice" />-->
-
-<!--            <com.google.android.material.chip.Chip-->
-<!--                android:id="@+id/chipFiqh"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="الفقه"-->
-<!--                style="@style/Widget.MaterialComponents.Chip.Choice" />-->
-
-<!--            <com.google.android.material.chip.Chip-->
-<!--                android:id="@+id/chipSirah"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="السيرة"-->
-<!--                style="@style/Widget.MaterialComponents.Chip.Choice" />-->
-
-<!--        </com.google.android.material.chip.ChipGroup>-->
-<!--    </HorizontalScrollView>-->
-
-    <!-- Articles RecyclerView -->
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/swipeRefresh"
+    <!-- Main Content Area -->
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/articlesRecyclerView"
+        <!-- SwipeRefreshLayout with RecyclerView -->
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipeRefresh"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="8dp" />
+            android:layout_height="match_parent">
 
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/articlesRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="8dp"
+                android:clipToPadding="false"
+                tools:listitem="@layout/item_article" />
 
-    <!-- Loading Progress -->
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:visibility="gone" />
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+        <!-- Error Layout (Centered) -->
+        <LinearLayout
+            android:id="@+id/errorLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/tvError"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="حدث خطأ في تحميل البيانات"
+                android:textSize="16sp"
+                android:textColor="#666666"
+                android:gravity="center"
+                android:fontFamily="@font/scheherazade" />
+
+            <Button
+                android:id="@+id/btnRetry"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="إعادة المحاولة"
+                android:textColor="@android:color/white"
+                android:backgroundTint="#795547"
+                android:fontFamily="@font/scheherazade"
+                style="@style/Widget.Material3.Button" />
+
+        </LinearLayout>
+
+        <!-- Loading Progress (Centered) -->
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone" />
+
+    </FrameLayout>
 
 </LinearLayout>

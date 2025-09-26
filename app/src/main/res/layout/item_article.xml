@@ -3,58 +3,162 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="8dp"
-    android:layout_marginVertical="4dp"
+    android:layout_margin="8dp"
     app:cardCornerRadius="12dp"
-    app:cardElevation="2dp"
-    app:cardBackgroundColor="#F0E6D2">
+    app:cardElevation="4dp"
+    app:cardBackgroundColor="#FFFFFF"
+    android:foreground="?android:attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:padding="16dp">
+
+        <!-- Article Icon/Category -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/categoryCard"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            app:cardCornerRadius="24dp"
+            app:cardBackgroundColor="#795547"
+            app:cardElevation="2dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/ivCategoryIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_article"
+                android:tint="#FFFFFF"
+                android:contentDescription="مقال" />
+
+        </androidx.cardview.widget.CardView>
 
         <!-- Article Title -->
         <TextView
             android:id="@+id/tvArticleTitle"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="8dp"
             android:text="عنوان المقال"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:textColor="#333333"
-            android:fontFamily="@font/scheherazade"
+            android:textColor="#795547"
             android:gravity="end"
-            android:layoutDirection="rtl" />
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:fontFamily="@font/scheherazade"
+            app:layout_constraintStart_toEndOf="@+id/categoryCard"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <!-- Article Description -->
         <TextView
             android:id="@+id/tvArticleDescription"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="وصف المقال"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="8dp"
+            android:text="وصف المقال أو المقدمة الخاصة بالمحتوى..."
             android:textSize="14sp"
             android:textColor="#666666"
-            android:fontFamily="@font/scheherazade"
             android:gravity="end"
-            android:layoutDirection="rtl"
             android:maxLines="3"
-            android:ellipsize="end" />
+            android:ellipsize="end"
+            android:lineSpacingExtra="2dp"
+            android:fontFamily="@font/scheherazade"
+            app:layout_constraintStart_toEndOf="@+id/categoryCard"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvArticleTitle" />
 
-        <!-- Read More -->
-        <TextView
-            android:id="@+id/tvReadMore"
+        <!-- Article Metadata Container -->
+        <LinearLayout
+            android:id="@+id/metadataContainer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="8dp"
+            android:orientation="horizontal"
+            android:gravity="end"
+            app:layout_constraintStart_toEndOf="@+id/categoryCard"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvArticleDescription">
+
+            <!-- Reading Time -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginStart="16dp">
+
+
+
+
+
+            </LinearLayout>
+
+            <!-- Date -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+
+
+
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Category Tag -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/categoryTagCard"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
-            android:text="اقرأ المزيد"
-            android:textSize="14sp"
-            android:textColor="#795547"
-            android:fontFamily="@font/scheherazade"
-            android:layout_gravity="end" />
+            app:cardCornerRadius="12dp"
+            app:cardBackgroundColor="#E8F5E8"
+            app:cardElevation="0dp"
+            app:layout_constraintStart_toEndOf="@+id/categoryCard"
+            app:layout_constraintTop_toBottomOf="@+id/metadataContainer">
 
-    </LinearLayout>
+<!--            <TextView-->
+<!--                android:id="@+id/tvCategoryTag"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:paddingHorizontal="12dp"-->
+<!--                android:paddingVertical="6dp"-->
+<!--                android:text="الفقه"-->
+<!--                android:textSize="11sp"-->
+<!--                android:textColor="#2E7D32"-->
+<!--                android:textStyle="bold"-->
+<!--                android:fontFamily="@font/scheherazade" />-->
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- Divider Line -->
+        <View
+            android:layout_width="1dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="8dp"
+            android:background="#E0E0E0"
+            app:layout_constraintStart_toEndOf="@+id/categoryCard"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.cardview.widget.CardView>

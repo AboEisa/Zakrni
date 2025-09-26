@@ -5,7 +5,7 @@ typealias ArticleResponse = List<ArticleItem>
 data class ArticleItem(
     val apiurl: String,
     val id: Int,
-    val source_id: Int,  // Added this field from API response
+    val source_id: Int,
     val shortdescription: String?,
     val title: String
 )

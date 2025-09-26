@@ -86,6 +86,7 @@ class HomeActivity : AppCompatActivity() {
         R.id.allahNamesFragment to { AllahNamesFragment() },
         R.id.tasbehFragment to { TasbehFragment() },
         R.id.quran2Fragment to { Quran2Fragment() },
+        R.id.articleFragment to { ArticleFragment() }
     )
 
     private val locationPermissionRequest = registerForActivityResult(
