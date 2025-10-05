@@ -4,8 +4,6 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.graphics.Color
-import android.media.AudioAttributes
-import android.media.RingtoneManager
 import android.os.Build
 import dagger.hilt.android.HiltAndroidApp
 
@@ -26,39 +24,29 @@ class App: Application() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val notificationManager = getSystemService(NotificationManager::class.java)
 
-            // Prayer times channel for prayer alerts
+            // Prayer times channel for persistent notification
             val prayerChannel = NotificationChannel(
                 PRAYER_CHANNEL_ID,
-                "أوقات الصلاة - Prayer Times",
-                NotificationManager.IMPORTANCE_HIGH // Changed to HIGH for prayer alerts
+                "أوقات الصلاة",
+                NotificationManager.IMPORTANCE_LOW
             ).apply {
-                description = "إشعارات أوقات الصلاة والتنبيهات"
+                description = "إشعارات أوقات الصلاة مع العد التنازلي"
                 lightColor = Color.GREEN
-
-                // Set custom sound
-                val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-                setSound(defaultSoundUri, AudioAttributes.Builder()
-                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                    .setUsage(AudioAttributes.USAGE_ALARM)
-                    .build())
-
-                enableVibration(true)
-                vibrationPattern = longArrayOf(0, 1000, 500, 1000)
+                setSound(null, null)
+                enableVibration(false)
                 setShowBadge(true)
                 lockscreenVisibility = android.app.Notification.VISIBILITY_PUBLIC
-                enableLights(true)
             }
 
             // General app notifications channel
             val generalChannel = NotificationChannel(
                 NOTIFICATION_CHANNEL_ID,
-                "إشعارات التطبيق - App Notifications",
+                "إشعارات التطبيق",
                 NotificationManager.IMPORTANCE_DEFAULT
             ).apply {
                 description = "الإشعارات العامة للتطبيق"
                 lightColor = Color.BLUE
                 setShowBadge(true)
-                enableVibration(true)
             }
 
             notificationManager.createNotificationChannel(prayerChannel)

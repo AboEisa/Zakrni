@@ -32,4 +32,13 @@
     <string name="unknown_error">Unknown error occurred</string>
     <string name="failed_to_load_verses">Failed to load verses</string>
     <string name="failed_to_load_surahs">Failed to load surahs</string>
+
+
+    <string name="back">رجوع</string>
+    <string name="menu">القائمة</string>
+    <string name="reset">إعادة تعيين</string>
+    <string name="tap">اضغط</string>
+    <string name="undo">تراجع</string>
+    <string name="add">إضافة</string>
+    <string name="status">الحالة</string>
 </resources>
