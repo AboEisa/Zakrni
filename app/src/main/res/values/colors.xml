@@ -5,54 +5,110 @@
     <color name="white">#FFFFFFFF</color>
 
     <!-- Custom colors for bottom navigation -->
-    <color name="selected_text_color">#8B4513</color> <!-- Dark brown for selected text -->
-    <color name="unselected_text_color">#FFFFFF</color> <!-- White for unselected text -->
-    <color name="selected_background">#D4B896</color> <!-- Light brown for selected background -->
-    <color name="nav_background">#8B4513</color>
-    <color name="gray">#A1A1A1</color> <!-- Dark brown for navigation background -->
+    <color name="selected_text_color">#1A3C34</color>
+    <color name="unselected_text_color">#FFFFFF</color>
+    <color name="selected_background">#D4AF37</color>
+    <color name="nav_background">#1A3C34</color>
+    <color name="gray">#A1A1A1</color>
 
-    <color name="primary_color">#4CAF50</color>
+    <color name="primary_color">#2E7D32</color>
 
-    <!-- Add these colors to your existing colors.xml -->
+    <!-- Playing State Colors -->
     <color name="playing_accent">#4CAF50</color>
     <color name="normal_accent">#2E7D32</color>
     <color name="playing_text">#1B5E20</color>
     <color name="normal_text">#1A1A1A</color>
 
+    <!-- Primary Colors - Dark Teal Green -->
     <color name="primary">#2E7D32</color>
+    <color name="primary_variant">#1B5E20</color>
+    <color name="primary_light">#4CAF50</color>
     <color name="on_primary">#FFFFFF</color>
     <color name="primary_container">#A8DAB5</color>
     <color name="on_primary_container">#00210A</color>
+
+    <!-- Secondary Color -->
+    <color name="secondary">#C9A227</color>
+    <color name="secondary_variant">#A68B00</color>
+    <color name="secondary_light">#FFD54F</color>
+    <color name="on_secondary">#FFFFFF</color>
+    <color name="secondary_container">#FFF8E1</color>
+    <color name="on_secondary_container">#3D2E00</color>
+
+    <!-- Tertiary Colors -->
+    <color name="tertiary">#4A7C59</color>
+    <color name="tertiary_container">#C8E6C9</color>
+    <color name="on_tertiary">#FFFFFF</color>
 
     <!-- Surface Colors -->
     <color name="surface">#FEFBFF</color>
     <color name="on_surface">#1A1C18</color>
     <color name="surface_variant">#F4F7F0</color>
     <color name="on_surface_variant">#6A706B</color>
+    <color name="surface_container">#EEEEEE</color>
 
     <!-- Background -->
-    <color name="background">#F8F9FA</color>
+    <color name="background">#FEFBF4</color>
     <color name="on_background">#1A1C18</color>
 
     <!-- Outline -->
     <color name="outline">#E0E3DE</color>
     <color name="outline_variant">#F1F4EE</color>
 
+    <!-- Divider -->
+    <color name="divider">#E0E0E0</color>
+
     <!-- Text Colors -->
     <color name="text_primary">#1A1A1A</color>
     <color name="text_secondary">#666666</color>
+    <color name="text_secondary_40">#66666666</color>
     <color name="text_tertiary">#999999</color>
 
     <!-- Accent Colors -->
     <color name="islamic_gold">#D4AF37</color>
+    <color name="islamic_gold_soft">#F0C040</color>
     <color name="islamic_teal">#008B8B</color>
 
+    <!-- Error Colors -->
+    <color name="error">#B00020</color>
+    <color name="error_container">#FFDAD6</color>
+    <color name="on_error">#FFFFFF</color>
+    <color name="on_error_container">#410002</color>
 
+    <!-- Category Colors -->
+    <color name="category_azkar">#1565C0</color>
+    <color name="category_names">#F9A825</color>
+    <color name="category_prayer">#C62828</color>
 
+    <!-- Player Colors -->
+    <color name="player_progress">#C9A227</color>
+    <color name="player_progress_track">#4A6B4A</color>
+    <color name="player_text_secondary">#CCCCCC</color>
+    <color name="player_thumb">#C9A227</color>
+    <color name="player_background_gradient_start">#1A3C34</color>
+    <color name="player_background_gradient_end">#0D2818</color>
+    <color name="player_button_icon">#FFFFFF</color>
+    <color name="player_button_background">#1A3C34</color>
+    <color name="player_background">#FFFFFF</color>
+    <color name="player_accent">#1A3C34</color>
 
+    <!-- Prayer Colors -->
+    <color name="prayer_item_bg">#F1F8E9</color>
 
+    <!-- Reciter Colors -->
+    <color name="reciter_item_background">#FFFFFF</color>
+    <color name="reciter_item_border">#E0E0E0</color>
+    <color name="reciter_item_selected">#E8F5E9</color>
 
-    <!-- Dark Theme Colors (Optional) -->
+    <!-- Switch Colors -->
+    <color name="switch_thumb_color">#FFFFFF</color>
+    <color name="switch_track_color">#BDBDBD</color>
+
+    <!-- Quran Header Colors -->
+    <color name="quran_header">#1A3C34</color>
+    <color name="quran_header_text">#FFFFFF</color>
+
+    <!-- Dark Theme Colors -->
     <color name="primary_dark">#90CAF9</color>
     <color name="primary_container_dark">#1565C0</color>
     <color name="on_primary_container_dark">#E3F2FD</color>
@@ -62,14 +118,6 @@
     <color name="on_surface_dark">#E6E1E5</color>
     <color name="on_surface_variant_dark">#CAC4D0</color>
 
-
-
-
-
-
-
-
-
     <!-- Traditional Mushaf Colors -->
     <color name="mushaf_page_color">#F8F6F0</color>
     <color name="mushaf_text_color">#2C2C2C</color>
@@ -78,14 +126,138 @@
     <color name="verse_number_color">#FFFFFF</color>
     <color name="bismillah_color">#1B5E20</color>
     <color name="translation_color">#5D4037</color>
-    <color name="traditional_separator">#8D6E63</color>
+    <color name="traditional_separator">#4A7C59</color>
     <color name="traditional_progress_track">#EFEBE9</color>
 
     <!-- Background Colors -->
-    <color name="mushaf_main_background">#F5F5DC</color>
-    <color name="page_border_color">#D7CCC8</color>
+    <color name="mushaf_main_background">#FEFBF4</color>
+    <color name="page_border_color">#C8E6C9</color>
 
+    <!-- Side Sheet Colors - Light Mode -->
+    <color name="side_sheet_header">#1A3C34</color>
+    <color name="side_sheet_header_text">#FEFBF4</color>
+    <color name="side_sheet_background">#FEFBF4</color>
+    
+    <!-- Hardcoded Colors - Now centralized -->
+    <color name="text_dark">#2C2C2C</color>
+    <color name="text_brown">#2E7D32</color>
+    <color name="background_warm">#FEFBF4</color>
+    <color name="stroke_warm">#C8E6C9</color>
+    <color name="stroke_warm_light">#A5D6A7</color>
+    <color name="background_warm_light">#E8F5E9</color>
+    <color name="text_dark_secondary">#333333</color>
+    
+    <!-- Status Colors -->
+    <color name="status_success">#27AE60</color>
+    <color name="status_warning">#E67E22</color>
+    <color name="status_info">#3498DB</color>
+    <color name="status_special">#9B59B6</color>
+    <color name="status_error">#E74C3C</color>
+    <color name="status_teal">#16A085</color>
+    <color name="status_completed_bg">#E8F5E9</color>
+    <color name="status_incompleted_bg">#FFEBEE</color>
 
-<!--    <color name="s.xml">#F5E8C7</color> &lt;!&ndash; Adjust to match Figma design &ndash;&gt;-->
-<!--    <color name="s.xml">#F9F1E0</color> &lt;!&ndash; Slightly lighter shade &ndash;&gt;-->
+    <!-- Brand Colors -->
+    <color name="brand_dark">#1A3C34</color>
+    <color name="brand_cream">#FEFBF4</color>
+    <color name="brand_gold">#D4AF37</color>
+    <color name="brand_gold_muted">#C8B896</color>
+    <color name="brand_green">#2E7D32</color>
+
+    <!-- Prayer Screen Colors -->
+    <color name="prayer_text_hint">#7A8A7A</color>
+    <color name="prayer_text_muted">#94A394</color>
+    <color name="prayer_text_white">#FFFFFF</color>
+    <color name="prayer_text_white_f6">#F6FFFFFF</color>
+    <color name="prayer_text_white_e6">#E6FFFFFF</color>
+    <color name="prayer_text_white_e0">#E0FFFFFF</color>
+    <color name="prayer_text_white_90">#E6FFFFFF</color>
+    <color name="prayer_text_white_80">#CCFFFFFF</color>
+    <color name="prayer_text_white_70">#B3FFFFFF</color>
+    <color name="prayer_text_white_60">#99FFFFFF</color>
+    <color name="prayer_text_white_50">#80FFFFFF</color>
+    <color name="prayer_text_white_40">#66FFFFFF</color>
+    <color name="prayer_text_white_30">#30FFFFFF</color>
+    <color name="prayer_text_white_c0">#C0FFFFFF</color>
+    <color name="prayer_text_white_20">#33FFFFFF</color>
+    <color name="prayer_action_text">#0A1A14</color>
+    <color name="prayer_gold_light">#FFD54F</color>
+    <color name="prayer_button_text">#FFFFFF</color>
+    <color name="prayer_maghrib_accent">#FF8A65</color>
+    <color name="prayer_isha_accent">#5C6BC0</color>
+    <color name="prayer_bg">#E8F5E9</color>
+    <color name="prayer_active_bg">#2E7D32</color>
+    <color name="prayer_time_text">#1A3C34</color>
+
+    <!-- Surface Container Variants -->
+    <color name="surface_container_high">#E0E0E0</color>
+    <color name="surface_container_low">#F5F5F5</color>
+    <color name="surface_container_dark">#252525</color>
+
+    <!-- Background Gradients -->
+    <color name="background_gradient_start">#FEFBF4</color>
+    <color name="background_gradient_end">#E8F5E9</color>
+    <color name="background_dark">#121212</color>
+
+    <!-- Teal Primary -->
+    <color name="teal_primary">#2E7D32</color>
+
+    <!-- Text Extras -->
+    <color name="text_on_primary">#FFFFFF</color>
+    <color name="text_link">#1565C0</color>
+    <color name="text_medium">#757575</color>
+    <color name="text_dark_heavy">#333333</color>
+    <color name="text_hint_light">#BDBDBD</color>
+
+    <!-- Success Colors -->
+    <color name="success">#4CAF50</color>
+    <color name="success_container">#C8E6C9</color>
+
+    <!-- Warning Colors -->
+    <color name="warning">#FF9800</color>
+    <color name="warning_container">#FFE0B2</color>
+
+    <!-- Card Colors -->
+    <color name="card_background">#FFFFFF</color>
+    <color name="card_border">#E0E0E0</color>
+    <color name="card_background_dark">#1E1E1E</color>
+    <color name="daily_ayah_card_start">#2F3238</color>
+    <color name="daily_ayah_card_end">#26292F</color>
+
+    <!-- Category Extras -->
+    <color name="category_quran">#2E7D32</color>
+    <color name="category_hadith">#1B5E20</color>
+    <color name="category_dua">#7B1FA2</color>
+
+    <!-- Shimmer Colors -->
+    <color name="shimmer_base">#E0E0E0</color>
+    <color name="shimmer_highlight">#F5F5F5</color>
+
+    <!-- Navigation Colors -->
+    <color name="nav_selected">#2E7D32</color>
+    <color name="nav_unselected">#757575</color>
+    <color name="nav_indicator">#E8F5E9</color>
+
+    <!-- Gray Scale -->
+    <color name="gray_light">#E0E0E0</color>
+    <color name="gray_dark">#616161</color>
+
+    <!-- Outline Dark -->
+    <color name="outline_dark">#757575</color>
+
+    <!-- Brand Extras -->
+    <color name="brand_darker">#1B5E20</color>
+
+    <!-- Dialog Colors -->
+    <color name="dialog_bg">#FFFFFF</color>
+    <color name="dialog_title_text">#1A1A1A</color>
+    <color name="dialog_body_text">#666666</color>
+    <color name="dialog_button_primary">#2E7D32</color>
+    <color name="dialog_button_text">#FFFFFF</color>
+    <color name="dialog_divider">#E0E0E0</color>
+    <color name="dialog_icon_bg">#E8F5E9</color>
+    <color name="dialog_scrim">#66000000</color>
+
+    <!-- Quran Badge -->
+    <color name="quran_badge_bg">#E8F5E9</color>
 </resources>

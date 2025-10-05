@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="#FEFBF4"
+    android:background="@color/background"
     tools:context=".clean.ui.views.DuaFragment">
 
     <androidx.cardview.widget.CardView
@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         app:cardCornerRadius="0dp"
         app:cardElevation="4dp"
-        app:cardBackgroundColor="@android:color/white"
+        app:cardBackgroundColor="@color/brand_dark"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -34,18 +34,23 @@
                 android:focusable="true"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_back"
+                android:tint="@color/prayer_text_white"
                 android:contentDescription="Back" />
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="الأدعية"
+                android:text="@string/layout_localized_024"
                 android:textSize="20sp"
                 android:textStyle="bold"
-                android:textColor="#795547"
+                android:textColor="@color/prayer_text_white"
                 android:gravity="center"
                 />
+
+            <View
+                android:layout_width="24dp"
+                android:layout_height="24dp" />
 
         </LinearLayout>
 
@@ -95,9 +100,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="حدث خطأ في تحميل البيانات"
+            android:text="@string/layout_localized_083"
             android:textSize="16sp"
-            android:textColor="#666666"
+            android:textColor="@color/text_secondary"
             android:gravity="center" />
 
         <Button
@@ -105,9 +110,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="إعادة المحاولة"
+            android:text="@string/layout_localized_007"
             android:textColor="@android:color/white"
-            android:backgroundTint="#795547"
+            android:backgroundTint="@color/primary"
             style="@style/Widget.Material3.Button" />
 
     </LinearLayout>

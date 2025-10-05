@@ -8,7 +8,7 @@
     app:cardCornerRadius="12dp"
     app:cardElevation="0dp"
     app:cardBackgroundColor="@android:color/transparent"
-    android:layoutDirection="rtl">
+    android:layoutDirection="ltr">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -34,11 +34,11 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="start"
-                android:text="ادعية نبوية"
-                android:textColor="#F0E6D2"
+                android:text="@string/layout_localized_015"
+                android:textColor="@color/prayer_text_white"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:textDirection="rtl" />
+                android:textDirection="ltr" />
 
             <ImageView
                 android:id="@+id/ivChevron"

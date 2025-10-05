@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".clean.ui.views.HomeActivity"
-    android:background="#FEFBF4">
+    android:background="@color/background">
 
     <!-- Main content container that can be hidden for full-screen fragments -->
     <LinearLayout
@@ -19,47 +19,57 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <LinearLayout
-            android:id="@+id/searchLayout"
+        <!-- Offline indicator bar -->
+        <TextView
+            android:id="@+id/offlineBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/layout_localized_125"
+            android:textColor="@color/prayer_text_white"
+            android:textSize="11sp"
+            android:gravity="center"
+            android:background="@color/status_warning"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:visibility="gone" />
+
+        <!-- Header with title and settings icon -->
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/_10sdp"
             android:layout_marginTop="@dimen/_5sdp"
             android:layout_marginEnd="@dimen/_10sdp"
-            android:orientation="horizontal"
-            android:padding="@dimen/_10sdp"
-            android:gravity="center_vertical">
-
-            <ImageView
-                android:id="@+id/searchIcon"
-                android:layout_width="@dimen/_24sdp"
-                android:layout_height="@dimen/_24sdp"
-                android:src="@drawable/ic_search" />
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1" />
+            android:paddingStart="@dimen/_10sdp"
+            android:paddingEnd="@dimen/_6sdp"
+            android:paddingTop="@dimen/_10sdp"
+            android:paddingBottom="@dimen/_10sdp">
 
             <TextView
                 android:id="@+id/titleText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
                 android:text="@string/quran"
-                android:textColor="#795547"
+                android:textColor="@color/text_brown"
                 android:textSize="@dimen/_16sdp"
-                android:textStyle="bold"
-                android:layout_marginEnd="@dimen/_8sdp"
-                android:gravity="center" />
+                android:textStyle="bold" />
 
             <ImageView
-                android:id="@+id/menuIcon"
-                android:layout_width="@dimen/_24sdp"
-                android:layout_height="@dimen/_24sdp"
-                android:src="@drawable/ic_menu"
-                android:contentDescription="Menu" />
+                android:id="@+id/btnSettings"
+                android:layout_width="@dimen/_28sdp"
+                android:layout_height="@dimen/_28sdp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_settings"
+                android:padding="@dimen/_3sdp"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="@string/layout_localized_030"
+                app:tint="@color/text_brown" />
 
-        </LinearLayout>
+        </RelativeLayout>
 
         <androidx.cardview.widget.CardView
             android:id="@+id/prayerCard"
@@ -95,7 +105,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/esha"
-                        android:textColor="#795547"
+                        android:textColor="@color/text_brown"
                         android:textSize="@dimen/_14sdp"
                         android:textStyle="bold" />
 
@@ -103,8 +113,8 @@
                         android:id="@+id/prayerTime"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="19:01"
-                        android:textColor="#795547"
+                        android:text="--:-- --"
+                        android:textColor="@color/text_brown"
                         android:textSize="@dimen/_28sdp"
                         android:textStyle="bold"
                         android:layout_marginTop="@dimen/_2sdp" />
@@ -114,7 +124,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/next_player_time"
-                        android:textColor="#795547"
+                        android:textColor="@color/text_brown"
                         android:textSize="@dimen/_11sdp"
                         android:layout_marginTop="@dimen/_8sdp" />
 
@@ -122,8 +132,8 @@
                         android:id="@+id/nextPrayerTime"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="05:30 صباحاً"
-                        android:textColor="#795547"
+                        android:text="@string/layout_localized_001"
+                        android:textColor="@color/text_brown"
                         android:textSize="@dimen/_14sdp"
                         android:textStyle="bold"
                         android:layout_marginTop="@dimen/_2sdp" />
@@ -157,7 +167,7 @@
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="#2E2E2E" />
+                        android:background="@drawable/bg_daily_ayah_card" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -176,8 +186,8 @@
                                 android:id="@+id/dailyAyahTitle"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="سورة الفاتحة"
-                                android:textColor="#FFFFFF"
+                                android:text="@string/layout_localized_090"
+                                android:textColor="@color/prayer_text_white"
                                 android:textSize="@dimen/_14sdp"
                                 android:textStyle="bold" />
 
@@ -190,7 +200,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/daily_ayahs"
-                                android:textColor="#FFFFFF"
+                                android:textColor="@color/prayer_text_white"
                                 android:textSize="@dimen/_14sdp"
                                 android:textStyle="bold" />
 
@@ -201,7 +211,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/ayah"
-                            android:textColor="#FFFFFF"
+                            android:textColor="@color/prayer_text_white"
                             android:textSize="@dimen/_16sdp"
                             android:textStyle="bold"
                             android:layout_marginTop="@dimen/_8sdp" />
@@ -211,7 +221,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="All praise and thanks be to the Lord of the worlds."
-                            android:textColor="#B0B0B0"
+                            android:textColor="@color/text_tertiary"
                             android:textSize="@dimen/_12sdp"
                             android:layout_marginTop="@dimen/_4sdp" />
 
@@ -226,8 +236,8 @@
                                 android:id="@+id/ayahSource"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="سورة الفاتحة - الجزء الثلاثون - آية ١"
-                                android:textColor="#B0B0B0"
+                                android:text="@string/layout_localized_091"
+                                android:textColor="@color/text_tertiary"
                                 android:textSize="@dimen/_10sdp" />
 
                         </LinearLayout>
@@ -271,7 +281,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="@string/player_times"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/prayer_text_white"
                 android:textSize="12sp"
                 android:gravity="center"
                 android:clickable="true"
@@ -284,7 +294,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="@string/all_media"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/prayer_text_white"
                 android:textSize="12sp"
                 android:gravity="center"
                 android:clickable="true"
@@ -297,7 +307,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="@string/all_categories"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/prayer_text_white"
                 android:textSize="12sp"
                 android:gravity="center"
                 android:clickable="true"

@@ -5,14 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#F5F5DC">
+    android:background="@color/background">
 
     <!-- Header -->
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:cardElevation="4dp"
-        app:cardBackgroundColor="@android:color/white">
+        app:cardBackgroundColor="@color/brand_dark">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -25,23 +25,26 @@
                 android:id="@+id/backButton"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
+                android:tint="@color/prayer_text_white"
                 android:src="@drawable/ic_back" />
 
             <TextView
+                android:id="@+id/tvHeaderTitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="المقالات"
+                android:text="@string/layout_localized_042"
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:gravity="center"
-                android:textColor="#795547"
+                android:textColor="@color/prayer_text_white"
                 android:fontFamily="@font/scheherazade" />
 
             <ImageView
                 android:id="@+id/searchButton"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
+                android:tint="@color/prayer_text_white"
                 android:src="@drawable/ic_search" />
 
         </LinearLayout>
@@ -62,8 +65,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="16dp"
-            android:hint="ابحث في المقالات..."
-            android:textDirection="rtl"
+            android:hint="@string/layout_localized_012"
+            android:textDirection="ltr"
             android:imeOptions="actionSearch"
             android:inputType="text"
             android:fontFamily="@font/scheherazade"
@@ -107,9 +110,9 @@
                 android:id="@+id/tvError"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="حدث خطأ في تحميل البيانات"
+                android:text="@string/layout_localized_083"
                 android:textSize="16sp"
-                android:textColor="#666666"
+                android:textColor="@color/text_secondary"
                 android:gravity="center"
                 android:fontFamily="@font/scheherazade" />
 
@@ -118,9 +121,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="إعادة المحاولة"
+                android:text="@string/layout_localized_007"
                 android:textColor="@android:color/white"
-                android:backgroundTint="#795547"
+                android:backgroundTint="@color/primary"
                 android:fontFamily="@font/scheherazade"
                 style="@style/Widget.Material3.Button" />
 

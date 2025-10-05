@@ -30,7 +30,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="8dp"
-            android:text="لا يوجد اتصال بالإنترنت"
+            android:text="@string/layout_localized_106"
             android:textColor="@color/on_surface"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -42,7 +42,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="24dp"
             android:gravity="center"
-            android:text="يرجى التحقق من اتصالك بالإنترنت\nوالمحاولة مرة أخرى"
+            android:text="@string/layout_localized_119"
             android:textColor="@color/on_surface_variant"
             android:textSize="14sp"
             android:lineSpacingMultiplier="1.3" />
@@ -71,7 +71,7 @@
                 android:layout_height="48dp"
                 android:layout_marginBottom="8dp"
                 android:backgroundTint="@color/primary"
-                android:text="إعادة المحاولة"
+                android:text="@string/layout_localized_007"
                 android:textColor="@color/on_primary"
                 android:textSize="16sp"
                 app:cornerRadius="12dp" />
@@ -83,7 +83,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_marginBottom="8dp"
-                android:text="إعدادات الشبكة"
+                android:text="@string/layout_localized_008"
                 android:textColor="@color/primary"
                 android:textSize="16sp"
                 app:cornerRadius="12dp"
@@ -95,7 +95,7 @@
                 style="@style/Widget.Material3.Button.TextButton"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:text="إلغاء"
+                android:text="@string/layout_localized_010"
                 android:textColor="@color/on_surface_variant"
                 android:textSize="16sp" />
 

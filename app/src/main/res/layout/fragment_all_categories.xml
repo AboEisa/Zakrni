@@ -51,15 +51,15 @@
                         android:layout_height="40dp"
                         android:src="@drawable/ic_allah_names"
                         android:layout_marginBottom="8dp"
-                        android:contentDescription="أسماء الله الحسنى"
+                        android:contentDescription="@string/layout_localized_004"
                         android:scaleType="centerInside" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="أسماء الله الحسنى"
+                        android:text="@string/layout_localized_004"
                         android:textSize="12sp"
-                        android:textColor="#333333"
+                        android:textColor="@color/brand_dark"
                         android:gravity="center"
                         android:maxLines="2"
                         android:ellipsize="end"
@@ -87,15 +87,15 @@
                         android:layout_height="40dp"
                         android:src="@drawable/ic_tasbeh"
                         android:layout_marginBottom="8dp"
-                        android:contentDescription="التسبيح الذكر"
+                        android:contentDescription="@string/layout_localized_036"
                         android:scaleType="centerInside" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="التسبيح الذكر"
+                        android:text="@string/layout_localized_036"
                         android:textSize="12sp"
-                        android:textColor="#333333"
+                        android:textColor="@color/brand_dark"
                         android:gravity="center"
                         android:maxLines="2"
                         android:ellipsize="end"
@@ -123,15 +123,15 @@
                         android:layout_height="40dp"
                         android:src="@drawable/ic_dua"
                         android:layout_marginBottom="8dp"
-                        android:contentDescription="الادعية"
+                        android:contentDescription="@string/layout_localized_032"
                         android:scaleType="centerInside" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="الادعية"
+                        android:text="@string/layout_localized_032"
                         android:textSize="12sp"
-                        android:textColor="#333333"
+                        android:textColor="@color/brand_dark"
                         android:gravity="center"
                         android:maxLines="2"
                         android:ellipsize="end"
@@ -168,15 +168,15 @@
                         android:layout_height="40dp"
                         android:src="@drawable/ic_hadith"
                         android:layout_marginBottom="8dp"
-                        android:contentDescription="الاحاديث"
+                        android:contentDescription="@string/layout_localized_031"
                         android:scaleType="centerInside" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="الاحاديث"
+                        android:text="@string/layout_localized_031"
                         android:textSize="12sp"
-                        android:textColor="#333333"
+                        android:textColor="@color/brand_dark"
                         android:gravity="center"
                         android:maxLines="2"
                         android:ellipsize="end"
@@ -204,15 +204,15 @@
                         android:layout_height="40dp"
                         android:src="@drawable/ic_azkar"
                         android:layout_marginBottom="8dp"
-                        android:contentDescription="الاذكار"
+                        android:contentDescription="@string/layout_localized_033"
                         android:scaleType="centerInside" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="الاذكار"
+                        android:text="@string/layout_localized_033"
                         android:textSize="12sp"
-                        android:textColor="#333333"
+                        android:textColor="@color/brand_dark"
                         android:gravity="center"
                         android:maxLines="2"
                         android:ellipsize="end"
@@ -240,15 +240,15 @@
                         android:layout_height="40dp"
                         android:src="@drawable/ic_quran"
                         android:layout_marginBottom="8dp"
-                        android:contentDescription="القرآن"
+                        android:contentDescription="@string/layout_localized_055"
                         android:scaleType="centerInside" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="القرآن"
+                        android:text="@string/layout_localized_055"
                         android:textSize="12sp"
-                        android:textColor="#333333"
+                        android:textColor="@color/brand_dark"
                         android:gravity="center"
                         android:maxLines="2"
                         android:ellipsize="end"

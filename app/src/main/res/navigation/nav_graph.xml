@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/allCategoriesFragment"
-        android:name="com.example.zakrni.clean.ui.views.AllCategoriesFragment"
+        android:name="com.zakrni.app.clean.ui.views.AllCategoriesFragment"
         android:label="fragment_all_categories"
         tools:layout="@layout/fragment_all_categories">
 
@@ -48,12 +48,15 @@
         <action
             android:id="@+id/action_allCategoriesFragment_to_quran2Fragment"
             app:destination="@id/quran2Fragment" />
+        <action
+            android:id="@+id/action_allCategoriesFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
     </fragment>
 
     <!-- Other fragments remain the same -->
     <fragment
         android:id="@+id/allMediaFragment"
-        android:name="com.example.zakrni.clean.ui.views.AllMediaFragment"
+        android:name="com.zakrni.app.clean.ui.views.AllMediaFragment"
         android:label="fragment_all_media"
         tools:layout="@layout/fragment_all_media">
         <action
@@ -73,82 +76,123 @@
 
     <fragment
         android:id="@+id/playerTimesFragment"
-        android:name="com.example.zakrni.clean.ui.views.PrayerTimesFragment"
+        android:name="com.zakrni.app.clean.ui.views.PrayerTimesFragment"
         android:label="fragment_player_times"
-        tools:layout="@layout/fragment_prayer_times" />
+        tools:layout="@layout/fragment_prayer_times">
+        <action
+            android:id="@+id/action_playerTimesFragment_to_allPrayerTimesFragment"
+            app:destination="@id/allPrayerTimesFragment"
+            app:enterAnim="@anim/animation"
+            app:exitAnim="@anim/animation2"
+            app:popEnterAnim="@anim/animation"
+            app:popExitAnim="@anim/animation2" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/allPrayerTimesFragment"
+        android:name="com.zakrni.app.clean.ui.views.AllPrayerTimesFragment"
+        android:label="مواقيت الصلاة"
+        tools:layout="@layout/fragment_all_prayer_times" />
 
     <fragment
         android:id="@+id/hadithFragment"
-        android:name="com.example.zakrni.clean.ui.views.HadithFragment"
+        android:name="com.zakrni.app.clean.ui.views.HadithFragment"
         android:label="الأحاديث"
         tools:layout="@layout/fragment_hadith" />
 
     <fragment
         android:id="@+id/duaFragment"
-        android:name="com.example.zakrni.clean.ui.views.DuaFragment"
+        android:name="com.zakrni.app.clean.ui.views.DuaFragment"
         android:label="الأدعية"
         tools:layout="@layout/fragment_dua" />
 
     <fragment
         android:id="@+id/azkarFragment"
-        android:name="com.example.zakrni.clean.ui.views.AzkarFragment"
+        android:name="com.zakrni.app.clean.ui.views.AzkarFragment"
         android:label="الأذكار"
         tools:layout="@layout/fragment_azkar" />
 
     <fragment
         android:id="@+id/allahNamesFragment"
-        android:name="com.example.zakrni.clean.ui.views.AllahNamesFragment"
+        android:name="com.zakrni.app.clean.ui.views.AllahNamesFragment"
         android:label="أسماء الله الحسنى"
         tools:layout="@layout/fragment_allah_names" />
 
     <fragment
         android:id="@+id/tasbehFragment"
-        android:name="com.example.zakrni.clean.ui.views.TasbehFragment"
+        android:name="com.zakrni.app.clean.ui.views.TasbehFragment"
         android:label="التسبيح"
         tools:layout="@layout/fragment_tasbeh" />
 
 
     <fragment
         android:id="@+id/quranFragment"
-        android:name="com.example.zakrni.clean.ui.views.QuranFragment"
+        android:name="com.zakrni.app.clean.ui.views.QuranFragment"
         tools:layout="@layout/fragment_quran">
         <argument
             android:name="surahNumber"
-            android:defaultValue="-1"
+            android:defaultValue="1"
             app:argType="integer" />
     </fragment>
     <fragment
         android:id="@+id/quran2Fragment"
-        android:name="com.example.zakrni.clean.ui.views.Quran2Fragment"
+        android:name="com.zakrni.app.clean.ui.views.Quran2Fragment"
         tools:layout="@layout/fragment_quran2">
         <action
             android:id="@+id/action_quran2Fragment_to_quranFragment"
-            app:destination="@id/quranFragment">
-            <argument
-                android:name="surahNumber"
-                app:argType="integer" />
-        </action>
+            app:destination="@id/quranFragment"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
     </fragment>
 
     <fragment
         android:id="@+id/articleFragment"
-        android:name="com.example.zakrni.clean.ui.views.ArticleFragment"
+        android:name="com.zakrni.app.clean.ui.views.ArticleFragment"
         android:label="fragment_all_media"
-        tools:layout="@layout/fragment_articles" />
+        tools:layout="@layout/fragment_articles">
+        
+        <argument
+            android:name="contentType"
+            app:argType="string"
+            android:defaultValue="all" />
+        
+        <action
+            android:id="@+id/action_articleFragment_to_videoPlayerFragment"
+            app:destination="@id/videoPlayerFragment" />
+    </fragment>
 
-<!--    <fragment-->
-<!--        android:id="@+id/videoFragment"-->
-<!--        android:name="com.example.zakrni.clean.ui.views.VideoFragment"-->
-<!--        android:label="fragment_all_media"-->
-<!--        tools:layout="@layout/fragment_articles" />-->
-<!--    <fragment-->
-<!--        android:id="@+id/audioFragment"-->
-<!--        android:name="com.example.zakrni.clean.ui.views.AudioFragment"-->
-<!--        android:label="fragment_all_media"-->
-<!--        tools:layout="@layout/fragment_articles" />-->
-<!--    <fragment-->
-<!--        android:id="@+id/sermonsFragment"-->
-<!--        android:name="com.example.zakrni.clean.ui.views.SermonsFragment"-->
-<!--        android:label="fragment_all_media"-->
-<!--        tools:layout="@layout/fragment_articles" />-->
+    <fragment
+        android:id="@+id/videoPlayerFragment"
+        android:name="com.zakrni.app.clean.ui.views.VideoPlayerFragment"
+        android:label="VideoPlayer"
+        tools:layout="@layout/fragment_video_player">
+        
+        <argument
+            android:name="videoId"
+            app:argType="string" />
+        <argument
+            android:name="videoTitle"
+            app:argType="string" />
+        <argument
+            android:name="channelName"
+            app:argType="string" />
+        <argument
+            android:name="viewCount"
+            app:argType="string" />
+        <argument
+            android:name="publishedAt"
+            app:argType="string" />
+        <argument
+            android:name="description"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.zakrni.app.clean.ui.views.SettingsFragment"
+        android:label="الإعدادات"
+        tools:layout="@layout/fragment_settings" />
+
 </navigation>

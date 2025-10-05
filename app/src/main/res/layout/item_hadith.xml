@@ -34,7 +34,7 @@
                 android:layout_weight="1"
 
                 android:gravity="start"
-                android:text="صحيح البخاري"
+                android:text="@string/layout_localized_097"
                 android:textColor="@color/on_primary_container"
                 android:textSize="16sp"
                 tools:text="صحيح البخاري" />
@@ -70,7 +70,7 @@
                 android:layout_height="wrap_content"
 
                 android:gravity="end"
-                android:text="عن عمر بن الخطاب رضي الله عنه قال:"
+                android:text="@string/layout_localized_101"
                 android:textColor="@color/on_surface_variant"
                 android:textSize="15sp"
                 tools:text="عن عمر بن الخطاب رضي الله عنه قال:" />
@@ -97,7 +97,7 @@
 
                     android:gravity="center"
                     android:lineSpacingMultiplier="1.6"
-                    android:text="إِنَّمَا الْأَعْمَالُ بِالنِّيَّاتِ وَإِنَّمَا لِكُلِّ امْرِئٍ مَا نَوَى"
+                    android:text="@string/layout_localized_011"
                     android:textColor="@color/on_surface"
                     android:textSize="20sp"
                     tools:text="إِنَّمَا الْأَعْمَالُ بِالنِّيَّاتِ وَإِنَّمَا لِكُلِّ امْرِئٍ مَا نَوَى" />
@@ -119,7 +119,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:gravity="center"
-                android:text="باب بدء الوحي"
+                android:text="@string/layout_localized_063"
                 android:textColor="@color/text_secondary"
                 android:textSize="14sp"
                 android:textStyle="italic"

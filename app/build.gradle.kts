@@ -7,27 +7,46 @@ plugins {
 }
 
 android {
-    namespace = "com.example.zakrni"
+    namespace = "com.zakrni.app"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.zakrni"
+        applicationId = "com.zakrni.app"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
+        
+        // YouTube API Key from local.properties (or fallback)
+        val youtubeApiKey = project.findProperty("YOUTUBE_API_KEY")?.toString() 
+            ?: "AIzaSyB6IPG99ZxmBKlVbVUByXUScClw28Y_UeA"
+        buildConfigField("String", "YOUTUBE_API_KEY", "\"$youtubeApiKey\"")
+    }
+
+    signingConfigs {
+        create("release") {
+            storeFile = file("../zakrni-release.keystore")
+            storePassword = "zakrni2026"
+            keyAlias = "zakrni"
+            keyPassword = "zakrni2026"
+        }
     }
 
     buildTypes {
-        release {
+        debug {
             isMinifyEnabled = false
+            isDebuggable = true
+        }
+        release {
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 
@@ -42,6 +61,7 @@ android {
 
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 
     packaging {
@@ -66,12 +86,19 @@ dependencies {
     implementation(libs.androidx.activity)
 
     testImplementation("junit:junit:4.13.2")
+    testImplementation("org.mockito:mockito-core:5.8.0")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
+    testImplementation("io.mockk:mockk:1.13.8")
+    testImplementation("app.cash.turbine:turbine:1.0.0")
+    
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 
-    implementation("androidx.room:room-runtime:2.6.1")
-    implementation("androidx.room:room-ktx:2.6.1")
-    kapt("androidx.room:room-compiler:2.6.1")
+    implementation("androidx.room:room-runtime:2.7.2")
+    implementation("androidx.room:room-ktx:2.7.2")
+    kapt("androidx.room:room-compiler:2.7.2")
 
     val lifecycle_version = "2.8.6"
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")
@@ -105,12 +132,22 @@ dependencies {
     implementation("com.google.android.gms:play-services-maps:18.1.0")
 
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
-
+    
+    // GridLayout
+    implementation("androidx.gridlayout:gridlayout:1.0.0")
 
     implementation("androidx.media3:media3-exoplayer:1.1.0")
     implementation("androidx.media3:media3-ui:1.1.0")
+    
+    // Media session for notifications
+    implementation("androidx.media:media:1.7.0")
 
-   
+    // Google AdMob
+    implementation("com.google.android.gms:play-services-ads:23.6.0")
 
+    // WorkManager for periodic azkar reminders
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
 
+    // Google Play Billing (for subscriptions)
+    implementation("com.android.billingclient:billing-ktx:7.1.1")
 }
