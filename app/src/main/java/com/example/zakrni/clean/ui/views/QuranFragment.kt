@@ -1,5 +1,6 @@
 package com.example.zakrni.clean.ui.views
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +11,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.zakrni.R
 import com.example.zakrni.clean.domain.models.DomainSurah
 import com.example.zakrni.clean.ui.adapters.QuranAdapter
 import com.example.zakrni.clean.ui.viewmodels.QuranViewModel
@@ -26,6 +28,7 @@ class QuranFragment : Fragment() {
     private lateinit var adapter: QuranAdapter
     private var currentSurahNumber: Int = -1
     private var isUserSeeking = false
+    private var currentReciterName: String = "مشاري راشد العفاسي"
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -47,22 +50,6 @@ class QuranFragment : Fragment() {
 
         if (currentSurahNumber in 1..114) {
             viewModel.loadQuranVerses(currentSurahNumber)
-
-            // Auto-play audio when surah is loaded
-            viewModel.currentSurah.observe(viewLifecycleOwner) { surah ->
-                surah?.let {
-                    // Check if we haven't already started playing audio for this surah
-                    if (!viewModel.isPlayingSurah(currentSurahNumber) &&
-                        !viewModel.hasAutoPlayedSurah(currentSurahNumber)) {
-                        lifecycleScope.launch {
-                            // Small delay to let UI settle
-                            kotlinx.coroutines.delay(500)
-                            viewModel.markSurahAsAutoPlayed(currentSurahNumber)
-                            viewModel.playSurahAudio(currentSurahNumber, autoPlay = true)
-                        }
-                    }
-                }
-            }
         }
     }
 
@@ -113,6 +100,11 @@ class QuranFragment : Fragment() {
             }
         }
 
+        // Reciter selection button
+        binding.reciterButton.setOnClickListener {
+            showReciterSelectionDialog()
+        }
+
         // Setup SeekBar listener
         binding.audioProgress.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
@@ -137,6 +129,52 @@ class QuranFragment : Fragment() {
                 }
             }
         })
+        
+        // Update reciter name display
+        updateReciterName()
+    }
+    
+    private fun showReciterSelectionDialog() {
+        val reciters = getRecitersWithArabicNames()
+        val reciterNames = reciters.map { it.second }.toTypedArray()
+        val currentReciterIndex = reciters.indexOfFirst { it.first == viewModel.selectedReciter.value }
+        
+        AlertDialog.Builder(requireContext())
+            .setTitle("اختر القارئ")
+            .setSingleChoiceItems(reciterNames, currentReciterIndex.coerceAtLeast(0)) { dialog, which ->
+                val selectedReciter = reciters[which]
+                viewModel.setReciter(selectedReciter.first)
+                currentReciterName = selectedReciter.second
+                updateReciterName()
+                
+                // If audio was playing, restart with new reciter
+                if (viewModel.audioPlayerManager.isCurrentSurah(currentSurahNumber)) {
+                    viewModel.stopAudio()
+                }
+                
+                dialog.dismiss()
+            }
+            .setNegativeButton("إلغاء", null)
+            .show()
+    }
+    
+    private fun getRecitersWithArabicNames(): List<Pair<String, String>> {
+        return listOf(
+            "ar.alafasy" to "مشاري راشد العفاسي",
+            "ar.husary" to "محمود خليل الحصري",
+            "ar.sudais" to "عبدالرحمن السديس",
+            "ar.ghamadi" to "سعد الغامدي",
+            "ar.minshawi" to "محمد صديق المنشاوي",
+            "ar.tablawi" to "محمد محمود الطبلاوي",
+            "ar.abdulsamad" to "عبدالباسط عبدالصمد"
+        )
+    }
+    
+    private fun updateReciterName() {
+        val reciters = getRecitersWithArabicNames()
+        val currentReciter = reciters.find { it.first == viewModel.selectedReciter.value }
+        currentReciterName = currentReciter?.second ?: "مشاري راشد العفاسي"
+        binding.reciterName.text = currentReciterName
     }
 
     private fun updateCurrentTime(progress: Int) {
@@ -227,9 +265,9 @@ class QuranFragment : Fragment() {
 
     private fun updatePlayPauseButton(isPlaying: Boolean) {
         if (isPlaying) {
-            binding.playButton.setImageResource(android.R.drawable.ic_media_pause)
+            binding.playButton.setImageResource(R.drawable.ic_pause)
         } else {
-            binding.playButton.setImageResource(android.R.drawable.ic_media_play)
+            binding.playButton.setImageResource(R.drawable.ic_play)
         }
     }
 
