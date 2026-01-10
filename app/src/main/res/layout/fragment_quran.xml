@@ -142,7 +142,44 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- Reciter Selection Row -->
+        <LinearLayout
+            android:id="@+id/reciter_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="4dp"
+            android:background="?android:attr/selectableItemBackground">
 
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_drop_down"
+                app:tint="#4CAF50" />
+
+            <TextView
+                android:id="@+id/reciter_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="القارئ: "
+                android:textSize="14sp"
+                android:textColor="#666666"
+                android:layout_marginStart="8dp" />
+
+            <TextView
+                android:id="@+id/reciter_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="مشاري راشد العفاسي"
+                android:textSize="14sp"
+                android:textColor="#4CAF50"
+                android:textStyle="bold" />
+
+        </LinearLayout>
 
         <!-- Audio Player Controls -->
         <LinearLayout
@@ -161,10 +198,8 @@
                 android:src="@drawable/ic_play"
                 android:contentDescription="Play"
                 android:scaleType="centerInside"
+                android:padding="12dp"
                 app:tint="@android:color/white" />
-
-
-
 
             <!-- Progress and Time Layout -->
             <LinearLayout
@@ -175,7 +210,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp">
 
-                <!-- SeekBar for audio progress (changed from ProgressBar) -->
+                <!-- SeekBar for audio progress -->
                 <SeekBar
                     android:id="@+id/audio_progress"
                     android:layout_width="match_parent"
@@ -218,7 +253,7 @@
 
             </LinearLayout>
 
-            <!-- Additional Controls -->
+            <!-- Settings Button (hidden for now) -->
             <ImageButton
                 android:id="@+id/settings_button"
                 android:layout_width="40dp"
