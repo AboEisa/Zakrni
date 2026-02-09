@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="6dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="3dp"
+    app:cardBackgroundColor="#FEFBF4"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackground">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/surah_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <!-- Surah Number Circle -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/surah_number_circle"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="#1A3C34"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <TextView
+                android:id="@+id/surah_number"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:textSize="18sp"
+                android:textColor="#FFFFFF"
+                android:fontFamily="sans-serif-medium"
+                android:textStyle="bold"
+                android:text="1" />
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- Surah Information Container -->
+        <LinearLayout
+            android:id="@+id/surah_info_container"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="12dp"
+            android:orientation="vertical"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/surah_number_circle"
+            app:layout_constraintEnd_toStartOf="@id/surah_details_container">
+
+            <!-- Arabic Surah Name -->
+            <TextView
+                android:id="@+id/surah_name_arabic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textColor="#1A3C34"
+                android:fontFamily="serif"
+                android:textStyle="bold"
+                android:textDirection="ltr"
+                android:text="@string/layout_localized_093" />
+
+            <!-- English Surah Name -->
+            <TextView
+                android:id="@+id/surah_name_english"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:textSize="16sp"
+                android:textColor="#2E7D32"
+                android:fontFamily="sans-serif"
+                android:text="Al-Faatiha" />
+
+            <!-- English Translation -->
+            <TextView
+                android:id="@+id/surah_translation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:textSize="13sp"
+                android:textColor="#7A8A7A"
+                android:fontFamily="sans-serif"
+                android:textStyle="italic"
+                android:text="The Opening" />
+
+        </LinearLayout>
+
+        <!-- Surah Details Container -->
+        <LinearLayout
+            android:id="@+id/surah_details_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="end"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <!-- Revelation Type Badge -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/revelation_type_badge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="1dp"
+                app:cardBackgroundColor="#E8F5E9"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:id="@+id/revelation_type"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="4dp"
+                    android:textSize="11sp"
+                    android:textColor="#1A3C34"
+                    android:fontFamily="serif"
+                    android:textStyle="bold"
+                    android:text="@string/layout_localized_115" />
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Ayahs Count -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/ayahs_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="#7A8A7A"
+                    android:fontFamily="sans-serif"
+                    android:text="@string/layout_localized_002" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Divider Line -->
+        <View
+            android:id="@+id/surah_divider"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginTop="12dp"
+            android:background="#C8E6C9"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/surah_info_container"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Progress Indicator (for reading progress) -->
+        <ProgressBar
+            android:id="@+id/reading_progress"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="3dp"
+            android:layout_marginTop="8dp"
+            android:progressTint="#2E7D32"
+            android:progressBackgroundTint="#C8E6C9"
+            android:max="100"
+            android:progress="0"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/surah_divider"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>

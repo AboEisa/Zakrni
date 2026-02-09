@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Phone dimensions -->
+    <dimen name="content_max_width">1200dp</dimen>
+    <dimen name="content_padding_horizontal">16dp</dimen>
+</resources>

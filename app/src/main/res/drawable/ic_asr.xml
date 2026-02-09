@@ -1,0 +1,28 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Afternoon sun tilted -->
+    <path
+        android:fillColor="#FF9800"
+        android:pathData="M12,9C10.34,9 9,10.34 9,12C9,13.66 10.34,15 12,15C13.66,15 15,13.66 15,12C15,10.34 13.66,9 12,9Z"/>
+    <path
+        android:fillColor="#FF9800"
+        android:pathData="M11,3H13V6H11V3Z"/>
+    <path
+        android:fillColor="#FF9800"
+        android:pathData="M11,18H13V21H11V18Z"/>
+    <path
+        android:fillColor="#FF9800"
+        android:pathData="M3,11H6V13H3V11Z"/>
+    <path
+        android:fillColor="#FF9800"
+        android:pathData="M18,11H21V13H18V11Z"/>
+    <path
+        android:fillColor="#FF9800"
+        android:pathData="M5.99,5.99L8.12,8.12L6.7,9.54L4.58,7.41L5.99,5.99Z"/>
+    <path
+        android:fillColor="#FF9800"
+        android:pathData="M15.88,15.88L18.01,18.01L16.59,19.43L14.46,17.3L15.88,15.88Z"/>
+</vector>

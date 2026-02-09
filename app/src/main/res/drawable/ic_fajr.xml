@@ -1,0 +1,16 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Moon and stars for Fajr -->
+    <path
+        android:fillColor="#1A5F4A"
+        android:pathData="M12.43,2.3C10.15,2.3 8.09,3.08 6.47,4.4C7.93,5.85 8.85,7.89 8.85,10.14C8.85,12.39 7.93,14.43 6.47,15.88C8.09,17.2 10.15,18 12.43,18C17.42,18 21.43,13.97 21.43,9C21.43,4.03 17.42,0.3 12.43,0.3L12.43,2.3ZM12.43,16C11.43,16 10.52,15.7 9.73,15.23C10.43,13.75 10.85,12 10.85,10.14C10.85,8.28 10.43,6.53 9.73,5.05C10.52,4.58 11.43,4.3 12.43,4.3C15.92,4.3 18.73,6.33 18.73,9C18.73,11.67 15.92,16 12.43,16Z"/>
+    <path
+        android:fillColor="#FFD700"
+        android:pathData="M3.5,11L4.5,13L6.5,14L4.5,15L3.5,17L2.5,15L0.5,14L2.5,13L3.5,11Z"/>
+    <path
+        android:fillColor="#FFD700"
+        android:pathData="M5,19L5.5,20L6.5,20.5L5.5,21L5,22L4.5,21L3.5,20.5L4.5,20L5,19Z"/>
+</vector>

@@ -1,0 +1,238 @@
+package com.zakrni.app.clean.data.di
+
+import android.content.Context
+import androidx.room.Room
+import com.zakrni.app.clean.data.Repo
+import com.zakrni.app.clean.data.local.CacheManager
+import com.zakrni.app.clean.data.local.ILocalDataSource
+import com.zakrni.app.clean.data.local.LocalDataSource
+import com.zakrni.app.clean.data.local.QuranDatabase
+import com.zakrni.app.clean.data.local.QuranDao
+import com.zakrni.app.clean.data.location.LocationManager
+import com.zakrni.app.clean.data.network.ArticleApiService
+import com.zakrni.app.clean.data.network.AzkarApiService
+import com.zakrni.app.clean.data.network.HadithApiService
+import com.zakrni.app.clean.data.network.PrayerApiService
+import com.zakrni.app.clean.data.network.QuranApiService
+import com.zakrni.app.clean.data.network.YouTubeApiService
+import com.zakrni.app.clean.data.remote.IRemoteDataSource
+import com.zakrni.app.clean.data.remote.RemoteDataSource
+import com.zakrni.app.clean.domain.IRepo
+import com.zakrni.app.clean.ui.utils.AudioPreferences
+import com.zakrni.app.clean.ui.utils.NetworkManager
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
+import javax.inject.Named
+import javax.inject.Singleton
+
+@InstallIn(SingletonComponent::class)
+@Module
+object Module {
+
+    // Common OkHttp Client with logging
+    @Provides
+    @Singleton
+    fun provideOkHttpClient(): OkHttpClient {
+        val loggingInterceptor = HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        }
+
+        return OkHttpClient.Builder()
+            .addInterceptor(loggingInterceptor)
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .build()
+    }
+
+    // Prayer API
+    @Provides
+    @Singleton
+    @Named("PrayerApi")
+    fun providePrayerRetrofit(okHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .client(okHttpClient)
+            .baseUrl("https://api.aladhan.com/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun providePrayerApiService(@Named("PrayerApi") retrofit: Retrofit): PrayerApiService {
+        return retrofit.create(PrayerApiService::class.java)
+    }
+
+    // Hadith API
+    @Provides
+    @Singleton
+    @Named("HadithApi")
+    fun provideHadithRetrofit(okHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .client(okHttpClient)
+            .baseUrl("https://hadithapi.com/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideHadithApiService(@Named("HadithApi") retrofit: Retrofit): HadithApiService {
+        return retrofit.create(HadithApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    @Named("DuaApi")
+    fun provideDuaRetrofit(okHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .client(okHttpClient)
+            .baseUrl("https://ahegazy.github.io/muslimKit/json/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideAzkarApiService(@Named("DuaApi") retrofit: Retrofit): AzkarApiService {
+        return retrofit.create(AzkarApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    @Named("QuranApi")
+    fun provideQuranRetrofit(okHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .client(okHttpClient)
+            .baseUrl("https://api.alquran.cloud/v1/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+
+    @Provides
+    @Singleton
+    fun provideQuranApiService(@Named("QuranApi") retrofit: Retrofit): QuranApiService {
+        return retrofit.create(QuranApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    @Named("ArticleApi")
+    fun provideArticlefit(okHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .client(okHttpClient)
+            .baseUrl("https://api3.islamhouse.com/v3/paV29H2gm56kvLPy/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+
+    @Provides
+    @Singleton
+    fun provideArticleApiService(@Named("ArticleApi") retrofit: Retrofit): ArticleApiService {
+        return retrofit.create(ArticleApiService::class.java)
+    }
+
+    // YouTube API
+    @Provides
+    @Singleton
+    @Named("YouTubeApi")
+    fun provideYouTubeRetrofit(okHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .client(okHttpClient)
+            .baseUrl("https://www.googleapis.com/youtube/v3/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideYouTubeApiService(@Named("YouTubeApi") retrofit: Retrofit): YouTubeApiService {
+        return retrofit.create(YouTubeApiService::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun getRemoteDataSource(
+        prayerApiService: PrayerApiService,
+        hadithApiService: HadithApiService,
+        azkarApiService: AzkarApiService,
+        quranApiService: QuranApiService,
+        articleApiService: ArticleApiService
+    ): IRemoteDataSource {
+        return RemoteDataSource(
+            prayerApiService,
+            hadithApiService,
+            azkarApiService,
+            quranApiService,
+            articleApiService
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideLocationManager(@ApplicationContext context: Context): LocationManager {
+        return LocationManager(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideNetworkManager(@ApplicationContext context: Context): NetworkManager {
+        return NetworkManager(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideQuranDatabase(@ApplicationContext context: Context): QuranDatabase {
+        return Room.databaseBuilder(context, QuranDatabase::class.java, "QuranDatabase")
+            .fallbackToDestructiveMigration()
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideQuranDao(database: QuranDatabase): QuranDao {
+        return database.quranDao()
+    }
+
+    @Singleton
+    @Provides
+    fun getLocalDataSource(
+        quranDao: QuranDao
+    ): ILocalDataSource {
+        return LocalDataSource(quranDao)
+    }
+
+    @Singleton
+    @Provides
+    fun getRepository(
+        remoteDataSource: IRemoteDataSource,
+        localDataSource: ILocalDataSource,
+        cacheManager: CacheManager,
+        @ApplicationContext context: Context
+    ): IRepo {
+        return Repo(remoteDataSource, localDataSource, cacheManager, context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideContext(@ApplicationContext context: Context): Context {
+        return context
+    }
+
+    @Provides
+    @Singleton
+    fun provideAudioPreferences(@ApplicationContext context: Context): AudioPreferences {
+        return AudioPreferences(context)
+    }
+
+}

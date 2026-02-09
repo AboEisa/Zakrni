@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/reciter_card"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginVertical="4dp"
+    app:cardBackgroundColor="@color/reciter_item_background"
+    app:cardCornerRadius="14dp"
+    app:cardElevation="0dp"
+    app:strokeWidth="1dp"
+    app:strokeColor="@color/reciter_item_border">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="12dp">
+
+        <ImageView
+            android:id="@+id/reciter_avatar"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:src="@drawable/ic_reciter"
+            android:padding="8dp"
+            android:background="@drawable/bg_reciter_avatar"
+            app:tint="@color/primary"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <TextView
+            android:id="@+id/reciter_name_arabic"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="@string/layout_localized_112"
+            android:textColor="@color/text_primary"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:maxLines="1"
+            android:ellipsize="end"
+            app:layout_constraintStart_toEndOf="@id/reciter_avatar"
+            app:layout_constraintTop_toTopOf="@id/reciter_avatar"
+            app:layout_constraintEnd_toStartOf="@id/selected_indicator" />
+
+        <TextView
+            android:id="@+id/reciter_name_english"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Mishary Rashid Alafasy"
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:layout_marginTop="2dp"
+            app:layout_constraintStart_toStartOf="@id/reciter_name_arabic"
+            app:layout_constraintTop_toBottomOf="@id/reciter_name_arabic"
+            app:layout_constraintEnd_toEndOf="@id/reciter_name_arabic" />
+
+        <TextView
+            android:id="@+id/reciter_meta"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_tertiary"
+            android:textSize="10sp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:layout_marginTop="3dp"
+            app:layout_constraintStart_toStartOf="@id/reciter_name_arabic"
+            app:layout_constraintTop_toBottomOf="@id/reciter_name_english"
+            app:layout_constraintEnd_toEndOf="@id/reciter_name_arabic" />
+
+        <ImageView
+            android:id="@+id/selected_indicator"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:src="@drawable/ic_check_circle"
+            android:visibility="gone"
+            app:tint="@color/primary"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/selected_badge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_reciter_selected_chip"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="3dp"
+            android:textColor="@color/primary"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="@id/reciter_name_arabic"
+            app:layout_constraintTop_toBottomOf="@id/reciter_meta"
+            app:layout_constraintBottom_toBottomOf="@id/reciter_avatar" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>
