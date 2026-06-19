@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="qibla_title">Qibla</string>
+    <string name="qibla_rotate_hint">Rotate your phone until the needle points up</string>
+    <string name="qibla_aligned">You are facing the Qibla</string>
+
+    <string name="qibla_bearing_label">Qibla direction</string>
+    <string name="qibla_distance_label">Distance to Makkah</string>
+    <string name="qibla_degrees_format">%1$d°</string>
+    <string name="qibla_km_format">%1$d km</string>
+
+    <string name="qibla_cardinal_n">N</string>
+    <string name="qibla_cardinal_e">E</string>
+    <string name="qibla_cardinal_s">S</string>
+    <string name="qibla_cardinal_w">W</string>
+
+    <string name="qibla_low_accuracy">Compass accuracy is low. Move your phone in a figure-8 to calibrate.</string>
+
+    <string name="qibla_permission_title">Location needed</string>
+    <string name="qibla_permission_message">We use your location to compute the exact direction of the Qibla. Your location stays on your device.</string>
+    <string name="qibla_grant_permission">Grant location access</string>
+
+    <string name="qibla_location_unavailable_title">Couldn\'t get your location</string>
+    <string name="qibla_location_unavailable_message">Make sure location services are on, then try again.</string>
+    <string name="qibla_retry">Try again</string>
+</resources>
