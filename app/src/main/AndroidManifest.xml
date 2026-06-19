@@ -120,6 +120,19 @@
             android:name=".clean.ui.compose.MainComposeActivity"
             android:exported="false"
             android:configChanges="orientation|screenSize|keyboardHidden|screenLayout|uiMode|locale|layoutDirection" />
+
+        <!-- Home-screen widget (Glance): next prayer + countdown + daily ayah -->
+        <receiver
+            android:name="com.zakrni.app.widget.ZakrniGlanceWidgetReceiver"
+            android:label="@string/widget_label"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_zakrni_info" />
+        </receiver>
     </application>
 
 </manifest>

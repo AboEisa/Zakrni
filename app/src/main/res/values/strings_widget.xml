@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_app_name">Zakrni</string>
+    <string name="widget_label">Zakrni — Prayer &amp; Ayah</string>
+    <string name="widget_description">Next prayer, countdown, and the daily ayah on your home screen.</string>
+    <string name="widget_next_prayer_label">Next prayer</string>
+    <string name="widget_remaining_prefix">in</string>
+    <string name="widget_daily_ayah_label">Daily ayah</string>
+    <string name="widget_no_data">Open the app to load prayer times</string>
+</resources>

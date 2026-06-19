@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_app_name">ذكرني</string>
+    <string name="widget_label">ذكرني — الصلاة والآية</string>
+    <string name="widget_description">الصلاة القادمة والعد التنازلي وآية اليوم على شاشتك الرئيسية.</string>
+    <string name="widget_next_prayer_label">الصلاة القادمة</string>
+    <string name="widget_remaining_prefix">بعد</string>
+    <string name="widget_daily_ayah_label">آية اليوم</string>
+    <string name="widget_no_data">افتح التطبيق لتحميل مواقيت الصلاة</string>
+</resources>
