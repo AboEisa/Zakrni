@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Strings for the Compose Hijri calendar feature. Kept separate to avoid collisions
+     with parallel migration work. All names prefixed hijri_. (default = English) -->
+<resources>
+    <string name="hijri_title">Hijri Calendar</string>
+    <string name="hijri_ah">AH</string>
+    <string name="hijri_close">Close</string>
+    <string name="hijri_gregorian_label">Gregorian date</string>
+
+    <string name="hijri_events_title">Events this month</string>
+    <string name="hijri_events_empty">No Islamic events this month</string>
+
+    <!-- Islamic events -->
+    <string name="hijri_event_new_year">Islamic New Year</string>
+    <string name="hijri_event_new_year_sub">1 Muharram</string>
+    <string name="hijri_event_ashura">Day of Ashura</string>
+    <string name="hijri_event_ashura_sub">10 Muharram</string>
+    <string name="hijri_event_mawlid">Mawlid an-Nabi</string>
+    <string name="hijri_event_mawlid_sub">Birth of the Prophet ﷺ</string>
+    <string name="hijri_event_isra_miraj">Israʾ &amp; Miʿraj</string>
+    <string name="hijri_event_isra_miraj_sub">The Night Journey</string>
+    <string name="hijri_event_ramadan">Start of Ramadan</string>
+    <string name="hijri_event_ramadan_sub">The month of fasting</string>
+    <string name="hijri_event_eid_fitr">Eid al-Fitr</string>
+    <string name="hijri_event_eid_fitr_sub">Festival of breaking the fast</string>
+    <string name="hijri_event_eid_adha">Eid al-Adha</string>
+    <string name="hijri_event_eid_adha_sub">Festival of the sacrifice</string>
+
+    <!-- Sun..Sat to match Calendar.DAY_OF_WEEK ordering -->
+    <string-array name="hijri_weekday_short">
+        <item>Sun</item>
+        <item>Mon</item>
+        <item>Tue</item>
+        <item>Wed</item>
+        <item>Thu</item>
+        <item>Fri</item>
+        <item>Sat</item>
+    </string-array>
+
+    <!-- Jan..Dec, indexed by Calendar.MONTH (0-based) -->
+    <string-array name="hijri_gregorian_months">
+        <item>Jan</item>
+        <item>Feb</item>
+        <item>Mar</item>
+        <item>Apr</item>
+        <item>May</item>
+        <item>Jun</item>
+        <item>Jul</item>
+        <item>Aug</item>
+        <item>Sep</item>
+        <item>Oct</item>
+        <item>Nov</item>
+        <item>Dec</item>
+    </string-array>
+</resources>

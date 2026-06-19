@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Arabic translations for the Compose Hijri calendar feature. -->
+<resources>
+    <string name="hijri_title">التقويم الهجري</string>
+    <string name="hijri_ah">هـ</string>
+    <string name="hijri_close">إغلاق</string>
+    <string name="hijri_gregorian_label">التاريخ الميلادي</string>
+
+    <string name="hijri_events_title">مناسبات هذا الشهر</string>
+    <string name="hijri_events_empty">لا توجد مناسبات إسلامية هذا الشهر</string>
+
+    <!-- Islamic events -->
+    <string name="hijri_event_new_year">رأس السنة الهجرية</string>
+    <string name="hijri_event_new_year_sub">١ محرم</string>
+    <string name="hijri_event_ashura">يوم عاشوراء</string>
+    <string name="hijri_event_ashura_sub">١٠ محرم</string>
+    <string name="hijri_event_mawlid">المولد النبوي</string>
+    <string name="hijri_event_mawlid_sub">مولد النبي ﷺ</string>
+    <string name="hijri_event_isra_miraj">الإسراء والمعراج</string>
+    <string name="hijri_event_isra_miraj_sub">رحلة الإسراء</string>
+    <string name="hijri_event_ramadan">بداية رمضان</string>
+    <string name="hijri_event_ramadan_sub">شهر الصيام</string>
+    <string name="hijri_event_eid_fitr">عيد الفطر</string>
+    <string name="hijri_event_eid_fitr_sub">عيد الفطر المبارك</string>
+    <string name="hijri_event_eid_adha">عيد الأضحى</string>
+    <string name="hijri_event_eid_adha_sub">عيد الأضحى المبارك</string>
+
+    <!-- Sun..Sat to match Calendar.DAY_OF_WEEK ordering -->
+    <string-array name="hijri_weekday_short">
+        <item>أحد</item>
+        <item>اثنين</item>
+        <item>ثلاثاء</item>
+        <item>أربعاء</item>
+        <item>خميس</item>
+        <item>جمعة</item>
+        <item>سبت</item>
+    </string-array>
+
+    <!-- Jan..Dec, indexed by Calendar.MONTH (0-based) -->
+    <string-array name="hijri_gregorian_months">
+        <item>يناير</item>
+        <item>فبراير</item>
+        <item>مارس</item>
+        <item>أبريل</item>
+        <item>مايو</item>
+        <item>يونيو</item>
+        <item>يوليو</item>
+        <item>أغسطس</item>
+        <item>سبتمبر</item>
+        <item>أكتوبر</item>
+        <item>نوفمبر</item>
+        <item>ديسمبر</item>
+    </string-array>
+</resources>
