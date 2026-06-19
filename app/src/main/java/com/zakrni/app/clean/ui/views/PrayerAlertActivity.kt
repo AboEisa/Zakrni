@@ -4,10 +4,17 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.Intent
+import android.media.AudioManager
+import android.media.AudioAttributes
+import android.media.MediaPlayer
+import android.media.RingtoneManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
+import android.view.KeyEvent
 import android.view.View
 import android.view.WindowManager
 import android.view.animation.AccelerateDecelerateInterpolator
@@ -26,11 +33,20 @@ class PrayerAlertActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPrayerAlertBinding
     private val clockHandler = Handler(Looper.getMainLooper())
     private lateinit var clockRunnable: Runnable
+    private var alertMediaPlayer: MediaPlayer? = null
+    private var activePrayerKey: String? = null
 
     companion object {
         const val EXTRA_PRAYER_NAME = "prayer_name"
         const val EXTRA_PRAYER_NAME_ARABIC = "prayer_name_arabic"
         const val EXTRA_PRAYER_TIME = "prayer_time"
+        private const val SOUND_DUPLICATE_WINDOW_MS = 120_000L
+
+        @Volatile
+        private var lastPlayedSoundPrayerKey: String? = null
+
+        @Volatile
+        private var lastPlayedSoundTimestampMs: Long = 0L
 
         data class PrayerVerse(
             val arabicText: String,
@@ -104,6 +120,7 @@ class PrayerAlertActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         LocaleHelper.enforceLtr(this)
+        volumeControlStream = AudioManager.STREAM_MUSIC
 
         // Show on lock screen and turn screen on
         setupWindowFlags()
@@ -117,10 +134,40 @@ class PrayerAlertActivity : AppCompatActivity() {
         val prayerNameArabic = intent.getStringExtra(EXTRA_PRAYER_NAME_ARABIC)
             ?: getString(R.string.prayer_alert_default_prayer_name_ar)
         val prayerTime = intent.getStringExtra(EXTRA_PRAYER_TIME) ?: ""
+        activePrayerKey = buildPrayerKey(prayerName, prayerNameArabic, prayerTime)
 
         setupUI(prayerName, prayerNameArabic, prayerTime)
         setupClickListeners()
         startAnimations()
+        startAlertSound()
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+
+        val prayerName = intent.getStringExtra(EXTRA_PRAYER_NAME)
+            ?: getString(R.string.prayer_alert_default_prayer_name)
+        val prayerNameArabic = intent.getStringExtra(EXTRA_PRAYER_NAME_ARABIC)
+            ?: getString(R.string.prayer_alert_default_prayer_name_ar)
+        val prayerTime = intent.getStringExtra(EXTRA_PRAYER_TIME) ?: ""
+        val nextPrayerKey = buildPrayerKey(prayerName, prayerNameArabic, prayerTime)
+        val samePrayerAlert = activePrayerKey == nextPrayerKey
+        val shouldRestartSound = if (samePrayerAlert) {
+            // If the same alert arrives again while player is preparing/playing,
+            // do not restart audio to avoid double adhan.
+            alertMediaPlayer == null
+        } else {
+            true
+        }
+        activePrayerKey = nextPrayerKey
+
+        setupUI(prayerName, prayerNameArabic, prayerTime)
+        if (shouldRestartSound) {
+            startAlertSound()
+        } else {
+            Log.d("PrayerAlertActivity", "Skipping duplicate alert sound restart for same prayer")
+        }
     }
 
     private fun setupWindowFlags() {
@@ -135,9 +182,6 @@ class PrayerAlertActivity : AppCompatActivity() {
                 WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
             )
         }
-
-        // Keep screen on
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         // Make fullscreen
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -363,7 +407,127 @@ class PrayerAlertActivity : AppCompatActivity() {
 
 
     private fun stopAlert() {
-        // No sound or vibration to stop
+        alertMediaPlayer?.let { player ->
+            try {
+                if (player.isPlaying) {
+                    player.stop()
+                }
+            } catch (e: Exception) {
+                Log.w("PrayerAlertActivity", "Failed to stop alert media player", e)
+            } finally {
+                try {
+                    player.release()
+                } catch (_: Exception) {
+                    // Ignore release errors
+                }
+            }
+        }
+        alertMediaPlayer = null
+    }
+
+    private fun startAlertSound() {
+        val prayerKey = activePrayerKey
+        if (isDuplicateSoundPlayback(prayerKey)) {
+            Log.d("PrayerAlertActivity", "Skipping duplicate prayer alert sound for key=$prayerKey")
+            return
+        }
+
+        Log.d("PrayerAlertActivity", "Starting prayer alert sound")
+        stopAlert()
+
+        val soundUri = resolveAlertSoundUri() ?: run {
+            Log.w("PrayerAlertActivity", "No alarm sound URI available for prayer alert")
+            return
+        }
+
+        try {
+            alertMediaPlayer = MediaPlayer().apply {
+                setAudioAttributes(
+                    AudioAttributes.Builder()
+                        .setUsage(AudioAttributes.USAGE_MEDIA)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                        .build()
+                )
+                setDataSource(this@PrayerAlertActivity, soundUri)
+                isLooping = false
+                setOnPreparedListener { preparedPlayer ->
+                    try {
+                        markSoundPlaybackStarted(prayerKey)
+                        preparedPlayer.start()
+                        Log.d("PrayerAlertActivity", "Prayer alert sound started")
+                    } catch (e: Exception) {
+                        Log.e("PrayerAlertActivity", "Failed to start prayer alert sound", e)
+                    }
+                }
+                setOnCompletionListener {
+                    Log.d("PrayerAlertActivity", "Prayer alert sound completed")
+                    stopAlert()
+                }
+                setOnErrorListener { _, what, extra ->
+                    Log.e(
+                        "PrayerAlertActivity",
+                        "Prayer alert sound error: what=$what extra=$extra"
+                    )
+                    stopAlert()
+                    true
+                }
+                prepareAsync()
+            }
+        } catch (e: Exception) {
+            Log.e("PrayerAlertActivity", "Failed to initialize prayer alert sound", e)
+            stopAlert()
+        }
+    }
+
+    private fun resolveAlertSoundUri(): Uri? {
+        return getBundledAdhanUri()
+            ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+            ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
+            ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+    }
+
+    private fun getBundledAdhanUri(): Uri? {
+        val candidates = intArrayOf(
+            R.raw.adhan_minshawi,
+            R.raw.adhan_mishary,
+            R.raw.adhan_alert
+        )
+
+        for (resId in candidates) {
+            try {
+                resources.openRawResourceFd(resId)?.close()
+                val resName = runCatching { resources.getResourceEntryName(resId) }
+                    .getOrDefault(resId.toString())
+                Log.d("PrayerAlertActivity", "Using bundled adhan resource: $resName ($resId)")
+                return Uri.parse("android.resource://$packageName/$resId")
+            } catch (_: Exception) {
+                // Try next bundled resource.
+            }
+        }
+
+        Log.w("PrayerAlertActivity", "No bundled adhan audio found, using ringtone fallback")
+        return null
+    }
+
+    private fun buildPrayerKey(prayerName: String, prayerNameArabic: String, prayerTime: String): String {
+        return "$prayerName|$prayerNameArabic|$prayerTime"
+    }
+
+    private fun isDuplicateSoundPlayback(prayerKey: String?): Boolean {
+        if (prayerKey.isNullOrBlank()) return false
+        val now = System.currentTimeMillis()
+        synchronized(PrayerAlertActivity::class.java) {
+            return lastPlayedSoundPrayerKey == prayerKey &&
+                (now - lastPlayedSoundTimestampMs) < SOUND_DUPLICATE_WINDOW_MS
+        }
+    }
+
+    private fun markSoundPlaybackStarted(prayerKey: String?) {
+        if (prayerKey.isNullOrBlank()) return
+        synchronized(PrayerAlertActivity::class.java) {
+            lastPlayedSoundPrayerKey = prayerKey
+            lastPlayedSoundTimestampMs = System.currentTimeMillis()
+        }
     }
 
     private fun stopAlertAndFinish() {
@@ -381,13 +545,18 @@ class PrayerAlertActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
-    override fun onPause() {
-        super.onPause()
-        // Stop sound and vibration when activity goes to background
-        stopAlert()
-    }
-
     override fun onBackPressed() {
         stopAlertAndFinish()
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        val isMuteKey =
+            keyCode == KeyEvent.KEYCODE_VOLUME_DOWN || keyCode == KeyEvent.KEYCODE_VOLUME_MUTE
+        if (isMuteKey && alertMediaPlayer != null) {
+            Log.d("PrayerAlertActivity", "Volume key pressed - muting prayer alert immediately")
+            stopAlert()
+            return true
+        }
+        return super.onKeyDown(keyCode, event)
     }
 }

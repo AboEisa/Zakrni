@@ -215,6 +215,12 @@
     <string name="layout_localized_123">✅  دعم تطوير التطبيق</string>
     <string name="layout_localized_124">﴿ إِنَّ الصَّلَاةَ كَانَتْ عَلَى الْمُؤْمِنِينَ كِتَابًا مَّوْقُوتًا ﴾</string>
     <string name="layout_localized_125">📵 لا يوجد اتصال بالإنترنت - بعض المحتوى قد لا يكون محدّثاً</string>
+    <string name="surah_tafsir_title_ar">تفسير السورة</string>
+    <string name="surah_tafsir_title_en">Surah tafsir</string>
+    <string name="surah_tafsir_button_ar">التفسير</string>
+    <string name="surah_tafsir_button_en">Tafsir</string>
+    <string name="surah_tafsir_unavailable_ar">التفسير غير متوفر لهذه السورة حالياً.</string>
+    <string name="surah_tafsir_unavailable_en">Tafsir is currently unavailable for this surah.</string>
 
     <string name="welcome_notification_title">مرحباً بك في تطبيق ذكّرني</string>
     <string name="welcome_notification_body">تم تفعيل الإشعارات بنجاح</string>
@@ -246,4 +252,6 @@
     <string name="subscription_yearly_title">اشتراك سنوي</string>
     <string name="subscription_yearly_with_save_title_format">اشتراك سنوي (وفّر %1$d%%)</string>
     <string name="subscription_yearly_unavailable">اشتراك سنوي — غير متاح</string>
+    <string name="native_ad_badge">إعلان</string>
+    <string name="native_ad_cta_fallback">اعرف المزيد</string>
 </resources>

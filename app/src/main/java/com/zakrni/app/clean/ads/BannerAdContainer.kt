@@ -24,24 +24,31 @@ class BannerAdContainer @JvmOverloads constructor(
 
     companion object {
         private const val TAG = "BannerAdContainer"
-        private const val MAX_RETRIES = 3
-        private const val RETRY_DELAY_MS = 5000L
+        private const val BASE_RETRY_DELAY_MS = 5_000L
+        private const val MAX_RETRY_DELAY_MS = 60_000L
+        private const val NO_FILL_CODE = 3
     }
 
     private var adView: AdView? = null
-    private var retryCount = 0
+    private var retryStep = 0
+    private var isLoading = false
     private var currentAdManager: AdManager? = null
     private val handler = Handler(Looper.getMainLooper())
+    private val retryRunnable = Runnable {
+        currentAdManager?.let { loadAdInternal(it) }
+    }
 
     /**
      * Load and show a banner ad. Call this from Activity/Fragment.
      * If user is subscribed, the view hides itself.
      * Waits for AdMob initialization before loading.
-     * Retries up to 3 times on failure with 5-second delay.
+     * Keeps retrying with capped backoff when inventory is temporarily unavailable.
      */
     fun loadAd(adManager: AdManager) {
         currentAdManager = adManager
-        retryCount = 0
+        retryStep = 0
+        isLoading = false
+        handler.removeCallbacks(retryRunnable)
 
         if (!adManager.shouldShowAds()) {
             visibility = View.GONE
@@ -55,38 +62,52 @@ class BannerAdContainer @JvmOverloads constructor(
     }
 
     private fun loadAdInternal(adManager: AdManager) {
-        if (!adManager.shouldShowAds()) {
+        if (!adManager.shouldShowAds() || isLoading) {
             visibility = View.GONE
             return
         }
-
-        visibility = View.VISIBLE
 
         // Clean up old ad view if any
         adView?.destroy()
         removeAllViews()
 
+        isLoading = true
+        visibility = View.GONE
+
+        val adWidthPixels = if (width > 0) width else resources.displayMetrics.widthPixels
+        val adWidthDp = (adWidthPixels / resources.displayMetrics.density).toInt().coerceAtLeast(1)
+        val adaptiveSize = AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(context, adWidthDp)
+
         adView = AdView(context).apply {
-            setAdSize(AdSize.BANNER)
+            setAdSize(adaptiveSize)
             adUnitId = AdManager.BANNER_AD_UNIT_ID
 
             adListener = object : AdListener() {
                 override fun onAdLoaded() {
                     Log.d(TAG, "✅ Banner ad loaded")
-                    retryCount = 0
+                    this@BannerAdContainer.isLoading = false
+                    retryStep = 0
                     this@BannerAdContainer.visibility = View.VISIBLE
                 }
 
                 override fun onAdFailedToLoad(error: LoadAdError) {
-                    Log.w(TAG, "❌ Banner failed (attempt ${retryCount + 1}/$MAX_RETRIES): ${error.message}")
-                    if (retryCount < MAX_RETRIES) {
-                        retryCount++
-                        handler.postDelayed({
-                            Log.d(TAG, "🔄 Retrying banner ad (attempt $retryCount)...")
-                            loadAdInternal(adManager)
-                        }, RETRY_DELAY_MS * retryCount)
-                    } else {
-                        this@BannerAdContainer.visibility = View.GONE
+                    this@BannerAdContainer.isLoading = false
+                    this@BannerAdContainer.visibility = View.GONE
+
+                    val isNoFill = error.code == NO_FILL_CODE
+                    retryStep = (retryStep + 1).coerceAtMost(12)
+                    val delay = minOf(BASE_RETRY_DELAY_MS * retryStep, MAX_RETRY_DELAY_MS)
+
+                    Log.w(
+                        TAG,
+                        "❌ Banner failed (code=${error.code}, message=${error.message}). Retrying in ${delay / 1000}s"
+                    )
+
+                    handler.removeCallbacks(retryRunnable)
+                    handler.postDelayed(retryRunnable, delay)
+
+                    if (!isNoFill) {
+                        Log.d(TAG, "Banner failure is not no-fill; keeping retry strategy active.")
                     }
                 }
             }
@@ -101,6 +122,8 @@ class BannerAdContainer @JvmOverloads constructor(
      * Hide the ad (e.g., when user subscribes)
      */
     fun hideAd() {
+        handler.removeCallbacks(retryRunnable)
+        isLoading = false
         visibility = View.GONE
         adView?.destroy()
         adView = null
@@ -110,6 +133,8 @@ class BannerAdContainer @JvmOverloads constructor(
     fun resumeAd() { adView?.resume() }
     fun pauseAd() { adView?.pause() }
     fun destroyAd() {
+        handler.removeCallbacks(retryRunnable)
+        isLoading = false
         adView?.destroy()
         adView = null
     }

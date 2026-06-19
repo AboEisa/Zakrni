@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- عربي — strings للريديزاين (Compose) -->
+<resources>
+    <string name="rd_categories_title">الأقسام</string>
+    <string name="rd_cat_quran">القرآن الكريم</string>
+    <string name="rd_cat_azkar">الأذكار</string>
+    <string name="rd_cat_dua">الأدعية</string>
+    <string name="rd_cat_hadith">الأحاديث</string>
+    <string name="rd_cat_allah_names">أسماء الله الحسنى</string>
+    <string name="rd_cat_tasbih">التسبيح</string>
+
+    <string name="rd_common_retry">إعادة المحاولة</string>
+    <string name="rd_common_loading">جاري التحميل…</string>
+    <string name="rd_common_error">حصل خطأ ما</string>
+    <string name="rd_common_empty">لا يوجد شيء بعد</string>
+</resources>

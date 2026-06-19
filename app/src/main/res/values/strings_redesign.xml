@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Strings for the Compose redesign. Kept in a separate file so parallel work
+     does not collide on the large legacy strings.xml. (default = English) -->
+<resources>
+    <string name="rd_categories_title">Categories</string>
+    <string name="rd_cat_quran">Holy Quran</string>
+    <string name="rd_cat_azkar">Azkar</string>
+    <string name="rd_cat_dua">Supplications</string>
+    <string name="rd_cat_hadith">Hadith</string>
+    <string name="rd_cat_allah_names">Names of Allah</string>
+    <string name="rd_cat_tasbih">Tasbih</string>
+
+    <string name="rd_common_retry">Retry</string>
+    <string name="rd_common_loading">Loading…</string>
+    <string name="rd_common_error">Something went wrong</string>
+    <string name="rd_common_empty">Nothing here yet</string>
+</resources>

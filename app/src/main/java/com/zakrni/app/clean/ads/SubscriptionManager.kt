@@ -25,6 +25,7 @@ class SubscriptionManager @Inject constructor(
         // ⚠️ Replace with your real product ID from Google Play Console
         const val MONTHLY_SUB_ID = "zakrni_premium_monthly"
         const val YEARLY_SUB_ID = "zakrni_premium_yearly"
+        private val PREMIUM_PRODUCT_IDS = setOf(MONTHLY_SUB_ID, YEARLY_SUB_ID)
     }
 
     private val prefs: SharedPreferences =
@@ -133,14 +134,17 @@ class SubscriptionManager @Inject constructor(
             if (result.responseCode == BillingClient.BillingResponseCode.OK) {
                 val hasActive = purchases.any { purchase ->
                     purchase.purchaseState == Purchase.PurchaseState.PURCHASED &&
-                        purchase.isAcknowledged
+                        purchase.isAcknowledged &&
+                        isPremiumPurchase(purchase)
                 }
                 updateSubscriptionStatus(hasActive)
                 Log.d(TAG, "✅ Subscription status: ${if (hasActive) "ACTIVE" else "NOT ACTIVE"}")
 
                 // Acknowledge any unacknowledged purchases
                 purchases.filter {
-                    it.purchaseState == Purchase.PurchaseState.PURCHASED && !it.isAcknowledged
+                    it.purchaseState == Purchase.PurchaseState.PURCHASED &&
+                        !it.isAcknowledged &&
+                        isPremiumPurchase(it)
                 }.forEach { purchase ->
                     acknowledgePurchase(purchase)
                 }
@@ -179,7 +183,9 @@ class SubscriptionManager @Inject constructor(
         when (result.responseCode) {
             BillingClient.BillingResponseCode.OK -> {
                 purchases?.forEach { purchase ->
-                    if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
+                    if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED &&
+                        isPremiumPurchase(purchase)
+                    ) {
                         acknowledgePurchase(purchase)
                         updateSubscriptionStatus(true)
                         Log.d(TAG, "✅ Purchase successful!")
@@ -218,6 +224,10 @@ class SubscriptionManager @Inject constructor(
     private fun updateSubscriptionStatus(isSubscribed: Boolean) {
         _isSubscribedState.value = isSubscribed
         prefs.edit().putBoolean(KEY_IS_SUBSCRIBED, isSubscribed).apply()
+    }
+
+    private fun isPremiumPurchase(purchase: Purchase): Boolean {
+        return purchase.products.any { productId -> productId in PREMIUM_PRODUCT_IDS }
     }
 
     fun destroy() {

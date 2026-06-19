@@ -215,6 +215,12 @@
     <string name="layout_localized_123">✅  Support app development</string>
     <string name="layout_localized_124">﴿ Indeed, prayer has been decreed upon the believers at fixed times. ﴾</string>
     <string name="layout_localized_125">📵 No internet connection - some content may not be up to date</string>
+    <string name="surah_tafsir_title_ar">تفسير السورة</string>
+    <string name="surah_tafsir_title_en">Surah tafsir</string>
+    <string name="surah_tafsir_button_ar">التفسير</string>
+    <string name="surah_tafsir_button_en">Tafsir</string>
+    <string name="surah_tafsir_unavailable_ar">التفسير غير متوفر لهذه السورة حالياً.</string>
+    <string name="surah_tafsir_unavailable_en">Tafsir is currently unavailable for this surah.</string>
 
     <string name="welcome_notification_title">Welcome to Zakrni</string>
     <string name="welcome_notification_body">Notifications have been enabled successfully</string>
@@ -246,4 +252,6 @@
     <string name="subscription_yearly_title">Yearly subscription</string>
     <string name="subscription_yearly_with_save_title_format">Yearly subscription (Save %1$d%%)</string>
     <string name="subscription_yearly_unavailable">Yearly subscription — unavailable</string>
+    <string name="native_ad_badge">Sponsored</string>
+    <string name="native_ad_cta_fallback">Learn more</string>
 </resources>

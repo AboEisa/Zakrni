@@ -23,6 +23,10 @@ class AzkarViewModel @Inject constructor(
     private val getAzkarUseCase: GetAzkarUseCase,
     private val getDuasUseCase: GetDuasUseCase
 ) : ViewModel() {
+    companion object {
+        // hisn.json currently has ~300 items; keep headroom to avoid missing sections.
+        private const val HISN_FETCH_LIMIT = 2000
+    }
 
     private val _azkarData = MutableStateFlow<PresentationAzkarResponse?>(null)
     val azkarData: StateFlow<PresentationAzkarResponse?> = _azkarData.asStateFlow()
@@ -77,12 +81,19 @@ class AzkarViewModel @Inject constructor(
     private fun loadHisnAzkar() {
         viewModelScope.launch {
             try {
-                val result = getDuasUseCase.getAllDuas(page = 1, limit = 100)
+                val result = getDuasUseCase.getAllDuas(page = 1, limit = HISN_FETCH_LIMIT)
                 result.onSuccess { response ->
                     // Keep only sections that contain "أذكار" (these were removed from Duas page)
                     // Exclude "أذكار الصباح والمساء" since we already have them separately
                     val azkarSections = response.duas
-                        .filter { it.section.contains("أذكار") && it.section != "أذكار الصباح والمساء" }
+                        .filter { dua ->
+                            val isAzkarSection = dua.section.contains("أذكار") ||
+                                (dua.sectionEnglish?.contains("Azkar", ignoreCase = true) == true)
+                            val isMorningEvening = dua.section == "أذكار الصباح والمساء" ||
+                                (dua.sectionEnglish?.contains("morning", ignoreCase = true) == true &&
+                                    dua.sectionEnglish.contains("evening", ignoreCase = true))
+                            isAzkarSection && !isMorningEvening
+                        }
                         .groupBy { it.section }
                     _hisnAzkarSections.value = azkarSections
                 }

@@ -11,6 +11,7 @@ import com.zakrni.app.R
 import com.zakrni.app.clean.ui.adapters.ReciterAdapter
 import com.zakrni.app.clean.ui.adapters.ReciterItem
 import com.zakrni.app.clean.ui.utils.LocaleHelper
+import com.zakrni.app.clean.ui.utils.ReciterCatalog
 import com.zakrni.app.databinding.BottomSheetReciterSelectionBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
@@ -35,24 +36,14 @@ class ReciterBottomSheetFragment : BottomSheetDialogFragment() {
         }
     }
 
-    // Available reciters with Arabic and English names
-    private val reciters = listOf(
-        ReciterItem("ar.alafasy", "مشاري راشد العفاسي", "Mishary Rashid Alafasy"),
-        ReciterItem("ar.husary", "محمود خليل الحصري", "Mahmoud Khalil Al-Husary"),
-        ReciterItem("ar.sudais", "عبد الرحمن السديس", "Abdul Rahman Al-Sudais"),
-        ReciterItem("ar.ghamadi", "سعد الغامدي", "Saad Al-Ghamadi"),
-        ReciterItem("ar.minshawi", "محمد صديق المنشاوي", "Mohamed Al-Minshawi"),
-        ReciterItem("ar.tablawi", "محمد الطبلاوي", "Muhammad Al-Tablawi"),
-        ReciterItem("ar.abdulsamad", "عبد الباسط عبد الصمد", "Abdul Basit Abdul Samad"),
-        ReciterItem("ar.abdullahbasfar", "عبد الله بصفر", "Abdullah Basfar"),
-        ReciterItem("ar.shaatree", "أبو بكر الشاطري", "Abu Bakr Ash-Shaatree"),
-        ReciterItem("ar.ahmedajamy", "أحمد بن علي العجمي", "Ahmed Al-Ajamy"),
-        ReciterItem("ar.husarymujawwad", "محمود خليل الحصري (المجود)", "Husary (Mujawwad)"),
-        ReciterItem("ar.hudhaify", "علي بن عبد الرحمن الحذيفي", "Ali Al-Hudhaify"),
-        ReciterItem("ar.mahermuaiqly", "ماهر المعيقلي", "Maher Al Muaiqly"),
-        ReciterItem("ar.muhammadayyoub", "محمد أيوب", "Muhammad Ayyoub"),
-        ReciterItem("ar.muhammadjibreel", "محمد جبريل", "Muhammad Jibreel")
-    )
+    // Supported reciters only (single source of truth).
+    private val reciters = ReciterCatalog.supportedReciters.map { reciter ->
+        ReciterItem(
+            identifier = reciter.identifier,
+            nameArabic = reciter.arabicName,
+            nameEnglish = reciter.englishName
+        )
+    }
 
     override fun getTheme(): Int = R.style.ReciterBottomSheetDialogStyle
 

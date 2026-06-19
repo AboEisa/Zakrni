@@ -17,6 +17,10 @@ import javax.inject.Inject
 class DuasViewModel @Inject constructor(
     private val getDuasUseCase: GetDuasUseCase
 ) : ViewModel() {
+    companion object {
+        // Keep enough room to include all local Hisn data in a single request.
+        private const val DUAS_FETCH_LIMIT = 2000
+    }
 
     // Sections state
     private val _sections = MutableStateFlow<List<DomainHisnSection>>(emptyList())
@@ -59,11 +63,15 @@ class DuasViewModel @Inject constructor(
             _error.value = null
 
             try {
-                val result = getDuasUseCase.getAllDuas(page = 1, limit = 500)
+                val result = getDuasUseCase.getAllDuas(page = 1, limit = DUAS_FETCH_LIMIT)
                 result.onSuccess { response ->
                     // Filter out all أذكار sections (shown in Azkar page, not Duas page)
                     val groupedDuas = response.duas
-                        .filter { !it.section.contains("أذكار") }
+                        .filter { dua ->
+                            val isAzkarSection = dua.section.contains("أذكار") ||
+                                (dua.sectionEnglish?.contains("Azkar", ignoreCase = true) == true)
+                            !isAzkarSection
+                        }
                         .groupBy { it.section }
                     _sectionDuasMap.value = groupedDuas
                     

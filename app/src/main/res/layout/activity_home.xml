@@ -326,6 +326,23 @@
             android:layout_marginTop="@dimen/_8sdp"
             app:navGraph="@navigation/nav_graph" />
 
+        <com.zakrni.app.clean.ads.NativeAdContainer
+            android:id="@+id/nativeAdContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+
+        <com.zakrni.app.clean.ads.BannerAdContainer
+            android:id="@+id/bannerAdContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:layout_marginEnd="@dimen/_10sdp"
+            android:layout_marginTop="@dimen/_8sdp"
+            android:layout_marginBottom="@dimen/_6sdp"
+            android:visibility="gone" />
+
     </LinearLayout>
 
     <!-- Full-screen fragment container that overlays everything -->

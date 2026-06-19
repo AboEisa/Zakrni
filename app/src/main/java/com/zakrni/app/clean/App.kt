@@ -23,7 +23,7 @@ class App: Application() {
 
     companion object {
         const val PRAYER_CHANNEL_ID = "PRAYER_TIMES_CHANNEL"
-        const val PRAYER_ALERT_CHANNEL_ID = "PRAYER_ALERT_CHANNEL"
+        const val PRAYER_ALERT_CHANNEL_ID = "PRAYER_ALERT_CHANNEL_V2"
         const val AZKAR_CHANNEL_ID = "AZKAR_REMINDER_CHANNEL"
         const val NOTIFICATION_CHANNEL_ID = "APP_CHANNEL"
     }
@@ -90,18 +90,12 @@ class App: Application() {
                 lightColor = Color.GREEN
                 enableVibration(true)
                 vibrationPattern = longArrayOf(0, 500, 200, 500)
-                // Use default notification sound so Android treats it as urgent
-                // This is REQUIRED for full-screen intent to auto-open the screen
-                setSound(
-                    android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_ALARM),
-                    android.media.AudioAttributes.Builder()
-                        .setUsage(android.media.AudioAttributes.USAGE_ALARM)
-                        .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                        .build()
-                )
+                // Keep notification silent to avoid duplicate audio.
+                // The PrayerAlertActivity plays the adhan sound directly.
+                setSound(null, null)
                 setShowBadge(true)
                 lockscreenVisibility = android.app.Notification.VISIBILITY_PUBLIC
-                setBypassDnd(true)
+                setBypassDnd(false)
             }
 
             // Azkar reminder channel

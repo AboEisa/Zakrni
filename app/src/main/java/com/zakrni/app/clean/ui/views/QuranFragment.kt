@@ -1,7 +1,8 @@
 package com.zakrni.app.clean.ui.views
 
-import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
+import android.text.Layout
 import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
@@ -25,6 +26,8 @@ import com.zakrni.app.clean.domain.models.DomainSurah
 import com.zakrni.app.clean.ui.adapters.QuranAdapter
 import com.zakrni.app.clean.ui.utils.AudioPreferences
 import com.zakrni.app.clean.ui.utils.LocaleHelper
+import com.zakrni.app.clean.ui.utils.SurahTafsirProvider
+import com.zakrni.app.clean.ui.utils.ThemeManager
 import com.zakrni.app.clean.ui.viewmodels.QuranViewModel
 import com.zakrni.app.databinding.FragmentQuranBinding
 import com.google.android.material.snackbar.Snackbar
@@ -32,6 +35,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -44,6 +50,8 @@ class QuranFragment : Fragment() {
     private lateinit var adapter: QuranAdapter
     private var currentSurahNumber: Int = -1
     private var isUserSeeking = false
+    private var playbackUiSyncJob: Job? = null
+    private var lastPlayClickAtMs: Long = 0L
 
     @Inject
     lateinit var audioPreferences: AudioPreferences
@@ -68,6 +76,7 @@ class QuranFragment : Fragment() {
         setupRecyclerView()
         setupClickListeners()
         setupAudioControls()
+        applyMushafTypography()
         setupNotificationCallbacks()
 
         // Load the surah — ViewModel will skip if already loaded/loading
@@ -165,17 +174,14 @@ class QuranFragment : Fragment() {
         binding.autoplayToggle?.visibility = View.GONE
         binding.settingsButton?.visibility = View.GONE
 
-        // Keep repeat active by default for the compact player UI.
-        if (audioPreferences.repeatMode == AudioPreferences.REPEAT_OFF) {
-            audioPreferences.repeatMode = AudioPreferences.REPEAT_ALL
-        }
+        // Repeat control is removed from this screen, so playback should stay single-run.
+        audioPreferences.repeatMode = AudioPreferences.REPEAT_OFF
 
         audioPreferences.selectedReciterName = audioPreferences.getReciterDisplayName(
             audioPreferences.selectedReciter,
             isArabicUi()
         )
         updateReciterNameUI()
-        updateRepeatButtonUI()
         
         // Sync reciter with ViewModel to ensure the displayed reciter is used
         val savedReciter = audioPreferences.selectedReciter
@@ -194,10 +200,16 @@ class QuranFragment : Fragment() {
 
         // Play/Pause button - Professional implementation
         binding.playButton.setOnClickListener {
+            val now = System.currentTimeMillis()
+            if (now - lastPlayClickAtMs < 600L) {
+                return@setOnClickListener
+            }
+            lastPlayClickAtMs = now
+
             android.util.Log.d("QuranFragment", "🔘 Play button clicked, currentSurahNumber=$currentSurahNumber")
             
             // Prevent multiple clicks while loading
-            if (viewModel.isAudioLoading.value) {
+            if (isCurrentSurahLoading()) {
                 Snackbar.make(
                     binding.root,
                     localizedText("جاري التحميل...", "Loading..."),
@@ -232,8 +244,15 @@ class QuranFragment : Fragment() {
                     viewModel.pauseAudio()
                 }
                 isCurrentSurah && !isPlaying -> {
-                    // Paused on this surah, resume it
-                    viewModel.resumeAudio()
+                    // If playback reached the end, start from the beginning instead of resume.
+                    val duration = viewModel.audioDuration.value
+                    val progress = viewModel.audioProgress.value
+                    val reachedEnd = duration > 0 && progress >= duration - 500
+                    if (reachedEnd) {
+                        viewModel.playSurahAudio(currentSurahNumber)
+                    } else {
+                        viewModel.resumeAudio()
+                    }
                 }
                 else -> {
                     // Not playing anything or playing different surah, start this surah
@@ -245,7 +264,7 @@ class QuranFragment : Fragment() {
         // Previous Surah button - Professional navigation
         binding.previousButton.setOnClickListener {
             // Prevent navigation while audio is loading
-            if (viewModel.isAudioLoading.value) {
+            if (isCurrentSurahLoading()) {
                 Snackbar.make(
                     binding.root,
                     localizedText("الرجاء الانتظار...", "Please wait..."),
@@ -268,7 +287,7 @@ class QuranFragment : Fragment() {
         // Next Surah button - Professional navigation
         binding.nextButton.setOnClickListener {
             // Prevent navigation while audio is loading
-            if (viewModel.isAudioLoading.value) {
+            if (isCurrentSurahLoading()) {
                 Snackbar.make(
                     binding.root,
                     localizedText("الرجاء الانتظار...", "Please wait..."),
@@ -288,22 +307,15 @@ class QuranFragment : Fragment() {
             }
         }
 
-        // Repeat button
-        binding.repeatButton.setOnClickListener {
-            val newMode = audioPreferences.cycleRepeatMode()
-            updateRepeatButtonUI()
-            val modeText = when (newMode) {
-                AudioPreferences.REPEAT_OFF -> localizedText("إيقاف التكرار", "Repeat off")
-                AudioPreferences.REPEAT_ONE -> localizedText("تكرار السورة", "Repeat current surah")
-                AudioPreferences.REPEAT_ALL -> localizedText("تكرار الكل", "Repeat all")
-                else -> ""
-            }
-            Snackbar.make(binding.root, modeText, Snackbar.LENGTH_SHORT).show()
-        }
-
         // Reciter selector
         binding.reciterSelector.setOnClickListener {
             showReciterBottomSheet()
+        }
+
+        binding.tafsirButton.setOnClickListener {
+            if (currentSurahNumber in 1..114) {
+                showTafsirBottomSheet(currentSurahNumber)
+            }
         }
 
         // Setup SeekBar listener
@@ -353,13 +365,6 @@ class QuranFragment : Fragment() {
             binding.audioProgress.progress = 0
             binding.currentTime.text = "0:00"
 
-            // Show confirmation message
-            Snackbar.make(
-                binding.root,
-                if (isArabicUi()) "تم اختيار القارئ: $displayName" else "Reciter selected: $displayName",
-                Snackbar.LENGTH_SHORT
-            ).show()
-
             // If was playing, start with new reciter after a brief delay
             if (wasPlaying && currentSurahNumber in 1..114) {
                 lifecycleScope.launch {
@@ -369,6 +374,30 @@ class QuranFragment : Fragment() {
             }
         }
         bottomSheet.show(childFragmentManager, "ReciterBottomSheet")
+    }
+
+    private fun showTafsirBottomSheet(surahNumber: Int) {
+        if (!isAdded || childFragmentManager.isStateSaved) return
+
+        val isArabic = isArabicUi()
+        val title = if (isArabic) {
+            getString(R.string.surah_tafsir_title_ar)
+        } else {
+            getString(R.string.surah_tafsir_title_en)
+        }
+        val tafsirText = SurahTafsirProvider.getTafsirText(requireContext(), surahNumber, isArabic)
+            ?.takeIf { it.isNotBlank() }
+            ?: if (isArabic) {
+                getString(R.string.surah_tafsir_unavailable_ar)
+            } else {
+                getString(R.string.surah_tafsir_unavailable_en)
+            }
+
+        SurahTafsirBottomSheetFragment.newInstance(
+            title = title,
+            tafsirText = tafsirText,
+            isArabic = isArabic
+        ).show(childFragmentManager, "SurahTafsirBottomSheet")
     }
 
     private fun navigateToSurah(surahNumber: Int) {
@@ -421,23 +450,6 @@ class QuranFragment : Fragment() {
         )
         binding.reciterName.text = displayName
         audioPreferences.selectedReciterName = displayName
-    }
-
-    private fun updateRepeatButtonUI() {
-        val mode = audioPreferences.repeatMode
-        val tint = when (mode) {
-            AudioPreferences.REPEAT_OFF -> ContextCompat.getColor(requireContext(), R.color.white)
-            AudioPreferences.REPEAT_ONE -> ContextCompat.getColor(requireContext(), R.color.player_accent)
-            AudioPreferences.REPEAT_ALL -> ContextCompat.getColor(requireContext(), R.color.player_accent)
-            else -> ContextCompat.getColor(requireContext(), R.color.white)
-        }
-        binding.repeatButton.setColorFilter(tint)
-        binding.repeatStatusText?.text = when (mode) {
-            AudioPreferences.REPEAT_OFF -> localizedText("التكرار: إيقاف", "Repeat: Off")
-            AudioPreferences.REPEAT_ONE -> localizedText("التكرار: السورة", "Repeat: Current")
-            AudioPreferences.REPEAT_ALL -> localizedText("التكرار: الكل", "Repeat: All")
-            else -> localizedText("التكرار", "Repeat")
-        }
     }
 
     private fun formatTime(milliseconds: Int): String {
@@ -501,15 +513,6 @@ class QuranFragment : Fragment() {
                     }
                 }
 
-                // Observe non-blocking audio notices (fallback, source switch, etc.)
-                launch {
-                    viewModel.audioNotice.collectLatest { notice ->
-                        if (notice.isNotBlank()) {
-                            Snackbar.make(binding.root, notice, Snackbar.LENGTH_SHORT).show()
-                        }
-                    }
-                }
-
                 // Observe audio playing state
                 launch {
                     viewModel.isPlaying.collectLatest { isPlaying ->
@@ -552,7 +555,11 @@ class QuranFragment : Fragment() {
 
                 launch {
                     viewModel.isAudioLoading.collectLatest { isLoading ->
-                        updateAudioLoadingState(isLoading)
+                        val loadingCurrentSurah =
+                            isLoading &&
+                            viewModel.audioPlayerManager.isCurrentSurah(currentSurahNumber) &&
+                            !viewModel.isPlayingSurah(currentSurahNumber)
+                        updateAudioLoadingState(loadingCurrentSurah)
                     }
                 }
 
@@ -568,6 +575,43 @@ class QuranFragment : Fragment() {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    private fun startPlaybackUiSyncFallback() {
+        playbackUiSyncJob?.cancel()
+        playbackUiSyncJob = viewLifecycleOwner.lifecycleScope.launch {
+            while (isActive && _binding != null) {
+                val isCurrentSurah = viewModel.audioPlayerManager.isCurrentSurah(currentSurahNumber)
+                val isPlayingCurrentSurah =
+                    viewModel.audioPlayerManager.isPlayingSurah(currentSurahNumber) ||
+                        (isCurrentSurah && viewModel.audioPlayerManager.isActuallyPlaying())
+                val isLoadingCurrentSurah =
+                    viewModel.isAudioLoading.value &&
+                        isCurrentSurah &&
+                        !isPlayingCurrentSurah
+
+                updatePlayPauseButton(isPlayingCurrentSurah)
+                updateAudioLoadingState(isLoadingCurrentSurah)
+
+                if (isCurrentSurah) {
+                    val durationMs = viewModel.audioPlayerManager.getDuration()
+                    if (durationMs > 0) {
+                        binding.audioProgress.max = durationMs
+                        binding.totalTime.text = formatTime(durationMs)
+                    }
+
+                    if (!isUserSeeking) {
+                        val positionMs = viewModel.audioPlayerManager.getCurrentPosition()
+                        binding.audioProgress.progress = positionMs
+                        if (!isLoadingCurrentSurah) {
+                            binding.currentTime.text = formatTime(positionMs)
+                        }
+                    }
+                }
+
+                delay(500)
             }
         }
     }
@@ -608,8 +652,24 @@ class QuranFragment : Fragment() {
                 nextButton.isEnabled = true
                 previousButton.alpha = 1.0f
                 nextButton.alpha = 1.0f
+
+                // If loading text remained on screen, restore actual playback position text.
+                if (currentTime.text == localizedText("جاري التحميل...", "Loading...")) {
+                    val position = if (viewModel.currentPlayingSurah.value == currentSurahNumber) {
+                        viewModel.audioProgress.value
+                    } else {
+                        0
+                    }
+                    currentTime.text = formatTime(position)
+                }
             }
         }
+    }
+
+    private fun isCurrentSurahLoading(): Boolean {
+        return viewModel.isAudioLoading.value &&
+            viewModel.audioPlayerManager.isCurrentSurah(currentSurahNumber) &&
+            !viewModel.isPlayingSurah(currentSurahNumber)
     }
 
     private fun updateSurahHeader(surah: DomainSurah) {
@@ -630,6 +690,8 @@ class QuranFragment : Fragment() {
             bismillah.visibility = if (hideBismillah) View.GONE else View.VISIBLE
             dividerBelowBismillah.visibility = if (hideBismillah) View.GONE else View.VISIBLE
         }
+
+        updateTafsirSection(surah.number)
     }
 
     /**
@@ -683,10 +745,10 @@ class QuranFragment : Fragment() {
 
         for ((index, ayah) in verses.withIndex()) {
             // Append verse text
-            builder.append(ayah.text)
+            builder.append(ayah.text.trim())
 
-            // Add verse number marker ﴿١﴾
-            val marker = " \uFD3F${toArabicNumerals(ayah.numberInSurah)}\uFD3E "
+            // Add verse number marker ۝١ (closer to Mushaf style)
+            val marker = " \u06DD${toArabicNumerals(ayah.numberInSurah)}"
             val markerStart = builder.length
             builder.append(marker)
             val markerEnd = builder.length
@@ -698,7 +760,7 @@ class QuranFragment : Fragment() {
                 Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
             )
             builder.setSpan(
-                RelativeSizeSpan(0.75f),
+                RelativeSizeSpan(0.90f),
                 markerStart, markerEnd,
                 Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
             )
@@ -710,6 +772,39 @@ class QuranFragment : Fragment() {
         }
 
         binding.mushafText.text = builder
+        applyMushafTypography()
+    }
+
+    private fun applyMushafTypography() {
+        val (textSizeSp, lineSpacingMultiplier) = when (ThemeManager.getFontSize(requireContext())) {
+            0 -> 20f to 1.03f
+            2 -> 24f to 1.08f
+            else -> 22f to 1.05f
+        }
+
+        binding.mushafText.textSize = textSizeSp
+        binding.mushafText.letterSpacing = 0f
+        binding.mushafText.setLineSpacing(0f, lineSpacingMultiplier)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            binding.mushafText.breakStrategy = Layout.BREAK_STRATEGY_BALANCED
+            binding.mushafText.hyphenationFrequency = Layout.HYPHENATION_FREQUENCY_NONE
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            binding.mushafText.justificationMode = Layout.JUSTIFICATION_MODE_INTER_WORD
+        }
+    }
+
+    private fun updateTafsirSection(surahNumber: Int) {
+        val isArabic = isArabicUi()
+        binding.tafsirButton.text = if (isArabic) {
+            getString(R.string.surah_tafsir_button_ar)
+        } else {
+            getString(R.string.surah_tafsir_button_en)
+        }
+        val hasTafsir = !SurahTafsirProvider.getTafsirText(requireContext(), surahNumber, isArabic)
+            .isNullOrBlank()
+        binding.tafsirButton.alpha = if (hasTafsir) 1f else 0.88f
     }
 
     /**
@@ -728,6 +823,9 @@ class QuranFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
+        playbackUiSyncJob?.cancel()
+        playbackUiSyncJob = null
+
         // Save current playback position (in milliseconds)
         val currentPosition = viewModel.audioProgress.value
         audioPreferences.savePlaybackState(currentSurahNumber, currentPosition)
@@ -736,11 +834,21 @@ class QuranFragment : Fragment() {
         // No need to pause here - user requested background playback
     }
 
+    override fun onResume() {
+        super.onResume()
+        applyMushafTypography()
+        startPlaybackUiSyncFallback()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
+        playbackUiSyncJob?.cancel()
+        playbackUiSyncJob = null
+
         // Clear the keep screen on flag when leaving fragment
         activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         // Audio continues playing in background via AudioPlaybackService
         _binding = null
     }
+
 }

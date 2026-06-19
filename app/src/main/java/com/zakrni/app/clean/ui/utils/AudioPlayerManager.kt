@@ -9,7 +9,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.graphics.BitmapFactory
-import android.media.MediaPlayer
 import android.os.Build
 import android.os.IBinder
 import android.support.v4.media.MediaMetadataCompat
@@ -25,6 +24,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.isActive
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -45,8 +45,9 @@ class AudioPlayerManager @Inject constructor(
         const val ACTION_PLAY_PAUSE = "com.zakrni.app.PLAY_PAUSE"
     }
 
-    private var mediaPlayer: MediaPlayer? = null
-    private var progressJob: Job? = null
+    private var serviceStateTrackingJob: Job? = null
+    private var loadingSafetyJob: Job? = null
+    private var directStateSyncJob: Job? = null
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private var mediaSession: MediaSessionCompat? = null
     private val notificationManager by lazy { 
@@ -57,6 +58,8 @@ class AudioPlayerManager @Inject constructor(
     private var audioService: AudioPlaybackService? = null
     private var isServiceBound = false
     private var pendingPlayRequest: PendingPlayRequest? = null
+    private var playbackCompletionCallback: (() -> Unit)? = null
+    private var playbackErrorCallback: ((String) -> Unit)? = null
     
     private data class PendingPlayRequest(
         val audioUrl: String,
@@ -71,21 +74,31 @@ class AudioPlayerManager @Inject constructor(
         override fun onServiceConnected(name: ComponentName?, binder: IBinder?) {
             val serviceBinder = binder as? AudioPlaybackService.AudioBinder
             audioService = serviceBinder?.getService()
-            isServiceBound = true
-            Log.d("AudioPlayerManager", "✅ Service connected")
-            
-            // Execute pending play request if any
-            pendingPlayRequest?.let { request ->
-                audioService?.let { service ->
-                    setupServiceCallbacks(service, request.onCompletion, request.onError)
-                }
-                pendingPlayRequest = null
+            isServiceBound = audioService != null
+            if (!isServiceBound) {
+                Log.e("AudioPlayerManager", "❌ Service connected with null binder")
+                _isLoading.value = false
+                playbackErrorCallback?.invoke("Audio service unavailable")
+                return
             }
+
+            Log.d("AudioPlayerManager", "✅ Service connected")
+            val service = audioService ?: return
+            val completion = pendingPlayRequest?.onCompletion ?: playbackCompletionCallback ?: {}
+            val error = pendingPlayRequest?.onError ?: playbackErrorCallback ?: {}
+
+            setupServiceCallbacks(service = service, onCompletion = completion, onError = error)
+            startServiceStateTracking(service)
+            startDirectStateSync()
+            pendingPlayRequest = null
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
             audioService = null
             isServiceBound = false
+            serviceStateTrackingJob?.cancel()
+            serviceStateTrackingJob = null
+            _isLoading.value = false
             Log.d("AudioPlayerManager", "❌ Service disconnected")
         }
     }
@@ -157,14 +170,18 @@ class AudioPlayerManager @Inject constructor(
         onError: (String) -> Unit
     ) {
         Log.d("AudioPlayerManager", "🎵 Attempting to play audio via service: $audioUrl")
-        
-        // Stop any existing playback
-        stop()
-        
+
+        // Do not hard-stop manager/service here.
+        // AudioPlaybackService.playAudio() already handles seamless transition.
+        // Forced stop/start creates race conditions that can desync UI state.
+        cancelLoadingSafetyTimeout()
         _isLoading.value = true
+        _isPlaying.value = false
         _currentSurahNumber.value = surahNumber
         currentSurahName = surahName
         currentReciterName = reciterName
+        playbackCompletionCallback = onCompletion
+        playbackErrorCallback = onError
         
         // Store callbacks for later use
         pendingPlayRequest = PendingPlayRequest(audioUrl, surahNumber, surahName, reciterName, onCompletion, onError)
@@ -180,78 +197,96 @@ class AudioPlayerManager @Inject constructor(
         
         // Bind to service to get state updates and callbacks
         bindToService()
+        startDirectStateSync()
         
-        // Start tracking state from service
-        startServiceStateTracking()
+        // Start tracking immediately if service is already bound.
+        activeService()?.let { readyService ->
+            startServiceStateTracking(readyService)
+        }
+        startLoadingSafetyTimeout()
     }
     
-    private fun startServiceStateTracking() {
-        // Track service state updates
-        scope.launch {
-            var retryCount = 0
-            val maxRetries = 30 // 3 seconds max wait
-            
-            while (retryCount < maxRetries) {
-                val service = AudioPlaybackService.getInstance()
-                if (service != null) {
-                    // Sync state from service
-                    scope.launch {
-                        service.isPlaying.collect { playing ->
-                            _isPlaying.value = playing
-                            if (playing) {
-                                _isLoading.value = false
-                            }
+    private fun startServiceStateTracking(readyService: AudioPlaybackService) {
+        serviceStateTrackingJob?.cancel()
+        serviceStateTrackingJob = scope.launch {
+            setupServiceCallbacks(
+                service = readyService,
+                onCompletion = playbackCompletionCallback ?: {},
+                onError = playbackErrorCallback ?: {}
+            )
+            readyService.onNextSurah = onNextSurah
+            readyService.onPreviousSurah = onPreviousSurah
+            Log.d("AudioPlayerManager", "✅ Connected to AudioPlaybackService")
+
+            coroutineScope {
+                launch {
+                    readyService.isPlaying.collect { playing ->
+                        _isPlaying.value = playing
+                        if (playing) {
+                            _isLoading.value = false
+                            cancelLoadingSafetyTimeout()
                         }
                     }
-                    scope.launch {
-                        service.currentProgress.collect { progress ->
-                            _currentProgress.value = progress // Millisecond position from service
-                        }
-                    }
-                    scope.launch {
-                        service.duration.collect { dur ->
-                            _duration.value = dur
-                        }
-                    }
-                    scope.launch {
-                        service.isLoading.collect { loading ->
-                            _isLoading.value = loading
-                        }
-                    }
-                    
-                    // Set callbacks
-                    service.onNextSurah = onNextSurah
-                    service.onPreviousSurah = onPreviousSurah
-                    service.onPlaybackCompleted = {
-                        pendingPlayRequest?.onCompletion?.invoke()
-                    }
-                    
-                    Log.d("AudioPlayerManager", "✅ Connected to AudioPlaybackService")
-                    break
                 }
-                delay(100)
-                retryCount++
-            }
-            
-            if (retryCount >= maxRetries) {
-                Log.e("AudioPlayerManager", "❌ Failed to connect to AudioPlaybackService")
-                _isLoading.value = false
-                pendingPlayRequest?.onError?.invoke("Failed to start audio service")
+                launch {
+                    readyService.currentProgress.collect { progress ->
+                        _currentProgress.value = progress // Millisecond position from service
+                    }
+                }
+                launch {
+                    readyService.duration.collect { dur ->
+                        _duration.value = dur
+                    }
+                }
+                launch {
+                    readyService.currentSurahNumber.collect { surahNumber ->
+                        _currentSurahNumber.value = surahNumber
+                    }
+                }
+                launch {
+                    readyService.isLoading.collect { loading ->
+                        val effectiveLoading = loading && !readyService.isPlaying.value
+                        _isLoading.value = effectiveLoading
+                        if (effectiveLoading) {
+                            startLoadingSafetyTimeout()
+                        } else {
+                            cancelLoadingSafetyTimeout()
+                        }
+                    }
+                }
             }
         }
     }
     
     private fun bindToService() {
-        if (!isServiceBound) {
-            val intent = Intent(context, AudioPlaybackService::class.java)
-            context.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
+        if (isServiceBound && audioService != null) return
+
+        if (isServiceBound && audioService == null) {
+            isServiceBound = false
+        }
+
+        val intent = Intent(context, AudioPlaybackService::class.java)
+        val bound = context.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
+        if (!bound) {
+            Log.w("AudioPlayerManager", "⚠️ Failed to bind AudioPlaybackService")
         }
     }
     
     private fun setupServiceCallbacks(service: AudioPlaybackService, onCompletion: () -> Unit, onError: (String) -> Unit) {
         service.onNextSurah = onNextSurah
         service.onPreviousSurah = onPreviousSurah
-        service.onPlaybackCompleted = onCompletion
+        service.onPlaybackCompleted = {
+            _isLoading.value = false
+            _isPlaying.value = false
+            cancelLoadingSafetyTimeout()
+            onCompletion()
+        }
+        service.onPlaybackError = { error ->
+            _isLoading.value = false
+            _isPlaying.value = false
+            cancelLoadingSafetyTimeout()
+            onError(error)
+        }
     }
 
     // Overload for backward compatibility
@@ -277,10 +312,11 @@ class AudioPlayerManager @Inject constructor(
         Log.d("AudioPlayerManager", "⏸️ pause() called")
         
         // Pause the background service
-        val service = AudioPlaybackService.getInstance()
+        val service = activeService()
         service?.pause()
         
         _isPlaying.value = false
+        _isLoading.value = false
         updateNotification()
         updateMediaSessionState()
     }
@@ -289,10 +325,11 @@ class AudioPlayerManager @Inject constructor(
         Log.d("AudioPlayerManager", "▶️ resume() called")
         
         // Resume the background service
-        val service = AudioPlaybackService.getInstance()
+        val service = activeService()
         service?.resume()
         
-        _isPlaying.value = true
+        _isPlaying.value = service?.isPlaying?.value ?: true
+        _isLoading.value = service?.isLoading?.value == true && !_isPlaying.value
         updateNotification()
         updateMediaSessionState()
     }
@@ -300,6 +337,11 @@ class AudioPlayerManager @Inject constructor(
     fun stop() {
         Log.d("AudioPlayerManager", "⏹️ stop() called")
         hideNotification()
+        serviceStateTrackingJob?.cancel()
+        serviceStateTrackingJob = null
+        directStateSyncJob?.cancel()
+        directStateSyncJob = null
+        cancelLoadingSafetyTimeout()
         
         // Stop the background service
         AudioPlaybackService.stopPlayback(context)
@@ -315,6 +357,8 @@ class AudioPlayerManager @Inject constructor(
         }
         audioService = null
         pendingPlayRequest = null
+        playbackCompletionCallback = null
+        playbackErrorCallback = null
         
         _isPlaying.value = false
         _isLoading.value = false
@@ -323,8 +367,33 @@ class AudioPlayerManager @Inject constructor(
         _duration.value = 0
     }
 
+    private fun startLoadingSafetyTimeout() {
+        loadingSafetyJob?.cancel()
+        loadingSafetyJob = scope.launch {
+            delay(20000)
+            if (_isLoading.value && !_isPlaying.value) {
+                // Avoid false errors if service playback state arrived late.
+                val service = activeService()
+                val servicePlaying = service?.isPlaying?.value == true
+                if (servicePlaying) {
+                    _isPlaying.value = true
+                    _isLoading.value = false
+                    return@launch
+                }
+
+                Log.w("AudioPlayerManager", "⚠️ Audio loading safety timeout reached")
+                _isLoading.value = false
+            }
+        }
+    }
+
+    private fun cancelLoadingSafetyTimeout() {
+        loadingSafetyJob?.cancel()
+        loadingSafetyJob = null
+    }
+
     fun seekTo(position: Int) {
-        val service = AudioPlaybackService.getInstance()
+        val service = activeService()
         service?.seekTo(position)
         Log.d("AudioPlayerManager", "⏭️ Seeked to position: $position")
     }
@@ -333,16 +402,48 @@ class AudioPlayerManager @Inject constructor(
         return _isPlaying.value && _currentSurahNumber.value == surahNumber
     }
 
+    fun isActuallyPlaying(): Boolean {
+        val service = activeService()
+        return service?.isPlaying?.value ?: _isPlaying.value
+    }
+
     fun isCurrentSurah(surahNumber: Int): Boolean {
         return _currentSurahNumber.value == surahNumber
     }
 
     fun getCurrentPosition(): Int {
-        return AudioPlaybackService.getInstance()?.getCurrentPosition() ?: 0
+        return activeService()?.getCurrentPosition() ?: _currentProgress.value
     }
 
     fun getDuration(): Int {
-        return AudioPlaybackService.getInstance()?.getDurationMs() ?: _duration.value
+        return activeService()?.getDurationMs() ?: _duration.value
+    }
+
+    private fun activeService(): AudioPlaybackService? {
+        return audioService ?: AudioPlaybackService.getInstance()
+    }
+
+    private fun startDirectStateSync() {
+        if (directStateSyncJob?.isActive == true) return
+
+        directStateSyncJob = scope.launch {
+            while (isActive) {
+                val service = activeService()
+                if (service != null) {
+                    val playing = service.isPlaying.value
+                    val loading = service.isLoading.value && !playing
+                    _isPlaying.value = playing
+                    _isLoading.value = loading
+                    _currentSurahNumber.value = service.currentSurahNumber.value
+                    _currentProgress.value = service.getCurrentPosition()
+                    _duration.value = service.getDurationMs()
+                    if (playing) {
+                        cancelLoadingSafetyTimeout()
+                    }
+                }
+                delay(350)
+            }
+        }
     }
 
     private fun formatTime(milliseconds: Int): String {
@@ -511,10 +612,9 @@ class AudioPlayerManager @Inject constructor(
     }
 
     fun release() {
-        Log.d("AudioPlayerManager", "🧹 Releasing AudioPlayerManager")
-        stop()
-        mediaSession?.release()
-        scope.cancel()
+        // Keep singleton manager alive for the whole app process.
+        // Releasing/canceling here causes UI desync after reopening Quran screens.
+        Log.d("AudioPlayerManager", "🧹 release() ignored for app-scoped singleton manager")
     }
 
     private fun localizedText(arabic: String, english: String): String {

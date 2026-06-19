@@ -13,7 +13,6 @@ import android.graphics.BitmapFactory
 import android.media.AudioAttributes
 import android.media.AudioFocusRequest
 import android.media.AudioManager
-import android.media.MediaPlayer
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
@@ -23,12 +22,20 @@ import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.media.app.NotificationCompat.MediaStyle
+import androidx.media3.common.C
+import androidx.media3.common.MediaItem
+import androidx.media3.common.PlaybackException
+import androidx.media3.common.Player
+import androidx.media3.common.AudioAttributes as ExoAudioAttributes
+import androidx.media3.exoplayer.ExoPlayer
 import com.zakrni.app.R
 import com.zakrni.app.clean.ui.utils.LocaleHelper
 import com.zakrni.app.clean.ui.views.HomeActivity
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
 
 class AudioPlaybackService : Service(), AudioManager.OnAudioFocusChangeListener {
 
@@ -78,13 +85,19 @@ class AudioPlaybackService : Service(), AudioManager.OnAudioFocusChangeListener 
         }
     }
 
-    private var mediaPlayer: MediaPlayer? = null
+    private var exoPlayer: ExoPlayer? = null
     private var mediaSession: MediaSessionCompat? = null
     private val serviceScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+    private var playJob: Job? = null
     private var progressJob: Job? = null
+    private var loadingTimeoutJob: Job? = null
     private lateinit var audioManager: AudioManager
     private var audioFocusRequest: AudioFocusRequest? = null
     private var hasAudioFocus = false
+    private val playbackSessionCounter = AtomicInteger(0)
+
+    @Volatile
+    private var activePlaybackSessionId: Int = 0
 
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying: StateFlow<Boolean> get() = _isPlaying
@@ -110,6 +123,7 @@ class AudioPlaybackService : Service(), AudioManager.OnAudioFocusChangeListener 
     var onNextSurah: (() -> Unit)? = null
     var onPreviousSurah: (() -> Unit)? = null
     var onPlaybackCompleted: (() -> Unit)? = null
+    var onPlaybackError: ((String) -> Unit)? = null
 
     private val binder = AudioBinder()
 
@@ -235,11 +249,11 @@ class AudioPlaybackService : Service(), AudioManager.OnAudioFocusChangeListener 
             }
             AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> pause()
             AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> {
-                mediaPlayer?.setVolume(0.3f, 0.3f)
+                exoPlayer?.volume = 0.3f
             }
             AudioManager.AUDIOFOCUS_GAIN -> {
-                mediaPlayer?.setVolume(1.0f, 1.0f)
-                if (!_isPlaying.value && mediaPlayer != null) {
+                exoPlayer?.volume = 1.0f
+                if (!_isPlaying.value && exoPlayer != null) {
                     resume()
                 }
             }
@@ -247,75 +261,140 @@ class AudioPlaybackService : Service(), AudioManager.OnAudioFocusChangeListener 
     }
 
     fun playAudio(audioUrl: String, surahName: String, surahNumber: Int, reciterName: String) {
-        serviceScope.launch {
+        val sessionId = playbackSessionCounter.incrementAndGet()
+        activePlaybackSessionId = sessionId
+        playJob?.cancel()
+        playJob = serviceScope.launch {
+            stopPlayerInternal(resetSurah = false)
+            abandonAudioFocus()
+
             _isLoading.value = true
             _currentSurahNumber.value = surahNumber
+            _currentProgress.value = 0
+            _duration.value = 0
             currentSurahName = surahName
             currentReciterName = reciterName
             currentAudioUrl = audioUrl
-
-            stop()
+            startForeground(NOTIFICATION_ID, buildNotification())
 
             if (!requestAudioFocus()) {
-                Log.w(TAG, "Failed to get audio focus")
+                val errorMessage = "Failed to get audio focus"
+                Log.w(TAG, errorMessage)
                 _isLoading.value = false
+                onPlaybackError?.invoke(errorMessage)
+                stopPlayerInternal(resetSurah = false)
+                stopSelf()
                 return@launch
             }
 
             try {
-                mediaPlayer = MediaPlayer().apply {
-                    setAudioAttributes(
-                        AudioAttributes.Builder()
-                            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                            .setUsage(AudioAttributes.USAGE_MEDIA)
-                            .build()
-                    )
-                    setDataSource(audioUrl)
-                    prepareAsync()
+                val terminalCallbackHandled = AtomicBoolean(false)
+                exoPlayer = ExoPlayer.Builder(this@AudioPlaybackService)
+                    .build()
+                    .also { player ->
+                        player.setAudioAttributes(
+                            ExoAudioAttributes.Builder()
+                                .setUsage(C.USAGE_MEDIA)
+                                .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
+                                .build(),
+                            false
+                        )
+                        player.addListener(object : Player.Listener {
+                            override fun onPlaybackStateChanged(state: Int) {
+                                if (!isCurrentPlaybackSession(sessionId)) return
+                                when (state) {
+                                    Player.STATE_BUFFERING -> {
+                                        _isLoading.value = !player.isPlaying
+                                        updateNotification()
+                                    }
 
-                    setOnPreparedListener { mp ->
-                        _duration.value = mp.duration
-                        _isLoading.value = false
-                        mp.start()
-                        _isPlaying.value = true
-                        startProgressTracking()
-                        updateNotification()
-                        updateMediaSessionState(PlaybackStateCompat.STATE_PLAYING)
-                        Log.d(TAG, "Started playing: $surahName")
-                    }
+                                    Player.STATE_READY -> {
+                                        _duration.value = player.duration.toSafeDurationMs()
+                                        _isLoading.value = false
+                                        updateNotification()
+                                    }
 
-                    setOnCompletionListener {
-                        _isPlaying.value = false
-                        _currentProgress.value = _duration.value
-                        stopProgressTracking()
-                        updateMediaSessionState(PlaybackStateCompat.STATE_STOPPED)
-                        onPlaybackCompleted?.invoke()
-                        updateNotification()
-                    }
+                                    Player.STATE_ENDED -> {
+                                        if (!terminalCallbackHandled.compareAndSet(false, true)) return
+                                        cancelLoadingTimeout()
+                                        _isLoading.value = false
+                                        _isPlaying.value = false
+                                        _currentProgress.value = _duration.value
+                                        stopProgressTracking()
+                                        updateMediaSessionState(PlaybackStateCompat.STATE_STOPPED)
+                                        updateNotification()
+                                        onPlaybackCompleted?.invoke()
+                                    }
 
-                    setOnErrorListener { _, what, extra ->
-                        Log.e(TAG, "MediaPlayer Error - What: $what, Extra: $extra")
-                        _isLoading.value = false
-                        _isPlaying.value = false
-                        true
+                                    else -> Unit
+                                }
+                            }
+
+                            override fun onIsPlayingChanged(isPlaying: Boolean) {
+                                if (!isCurrentPlaybackSession(sessionId)) return
+                                _isPlaying.value = isPlaying
+                                if (isPlaying) {
+                                    _isLoading.value = false
+                                    cancelLoadingTimeout()
+                                    startProgressTracking(sessionId)
+                                    updateMediaSessionState(PlaybackStateCompat.STATE_PLAYING)
+                                } else {
+                                    stopProgressTracking()
+                                    if (player.playbackState == Player.STATE_READY) {
+                                        updateMediaSessionState(PlaybackStateCompat.STATE_PAUSED)
+                                    }
+                                }
+                                updateNotification()
+                            }
+
+                            override fun onPlayerError(error: PlaybackException) {
+                                if (!isCurrentPlaybackSession(sessionId)) return
+                                if (!terminalCallbackHandled.compareAndSet(false, true)) return
+                                cancelLoadingTimeout()
+                                val errorMessage =
+                                    "ExoPlayer error (${error.errorCodeName}): ${error.message}"
+                                Log.e(TAG, errorMessage, error)
+                                _isLoading.value = false
+                                _isPlaying.value = false
+                                stopProgressTracking()
+                                releaseCurrentPlayerSafely()
+                                abandonAudioFocus()
+                                updateMediaSessionState(PlaybackStateCompat.STATE_STOPPED)
+                                onPlaybackError?.invoke(errorMessage)
+                            }
+                        })
+                        player.setMediaItem(MediaItem.fromUri(audioUrl))
+                        player.prepare()
+                        player.playWhenReady = true
+                        // Start polling immediately so UI state stays in sync even if
+                        // device/decoder delays the first isPlaying callback.
+                        startProgressTracking(sessionId)
+                        Log.d(TAG, "Started ExoPlayer prepare: $surahName")
+                        startLoadingTimeout(audioUrl, sessionId, terminalCallbackHandled)
                     }
-                }
-                
-                // Start foreground immediately with loading notification
-                startForeground(NOTIFICATION_ID, buildNotification())
-                
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
-                Log.e(TAG, "Failed to initialize MediaPlayer: ${e.message}")
+                cancelLoadingTimeout()
+                val errorMessage = "Failed to initialize ExoPlayer: ${e.message}"
+                Log.e(TAG, errorMessage, e)
                 _isLoading.value = false
+                if (isCurrentPlaybackSession(sessionId)) {
+                    stopPlayerInternal(resetSurah = false)
+                    onPlaybackError?.invoke(errorMessage)
+                    stopSelf()
+                }
             }
         }
     }
 
     fun pause() {
-        mediaPlayer?.let { mp ->
-            if (mp.isPlaying) {
-                mp.pause()
+        exoPlayer?.let { player ->
+            if (player.isPlaying || player.playWhenReady) {
+                player.playWhenReady = false
+                cancelLoadingTimeout()
                 _isPlaying.value = false
+                _isLoading.value = false
                 stopProgressTracking()
                 updateNotification()
                 updateMediaSessionState(PlaybackStateCompat.STATE_PAUSED)
@@ -327,55 +406,143 @@ class AudioPlaybackService : Service(), AudioManager.OnAudioFocusChangeListener 
         if (!hasAudioFocus && !requestAudioFocus()) {
             return
         }
-        
-        mediaPlayer?.let { mp ->
-            if (!mp.isPlaying) {
-                mp.start()
+
+        exoPlayer?.let { player ->
+            try {
+                if (player.playbackState == Player.STATE_ENDED) {
+                    player.seekTo(0)
+                    _currentProgress.value = 0
+                }
+                player.playWhenReady = true
+                _isLoading.value = player.playbackState == Player.STATE_BUFFERING
                 _isPlaying.value = true
-                startProgressTracking()
+                startProgressTracking(activePlaybackSessionId)
                 updateNotification()
                 updateMediaSessionState(PlaybackStateCompat.STATE_PLAYING)
+            } catch (e: Exception) {
+                val errorMessage = "Failed to resume playback: ${e.message}"
+                Log.e(TAG, errorMessage, e)
+                _isLoading.value = false
+                _isPlaying.value = false
+                onPlaybackError?.invoke(errorMessage)
             }
         }
     }
 
     fun stop() {
-        progressJob?.cancel()
-        mediaPlayer?.let { mp ->
-            try {
-                if (mp.isPlaying) mp.stop()
-                mp.release()
-            } catch (e: Exception) {
-                Log.e(TAG, "Error stopping MediaPlayer: ${e.message}")
-            }
-        }
-        mediaPlayer = null
+        activePlaybackSessionId = playbackSessionCounter.incrementAndGet()
+        playJob?.cancel()
+        playJob = null
+        stopPlayerInternal(resetSurah = true)
+        abandonAudioFocus()
+    }
+
+    private fun stopPlayerInternal(resetSurah: Boolean) {
+        cancelLoadingTimeout()
+        stopProgressTracking()
+        releaseCurrentPlayerSafely()
+        _isLoading.value = false
         _isPlaying.value = false
         _currentProgress.value = 0
-        _currentSurahNumber.value = -1
-        abandonAudioFocus()
+        if (resetSurah) {
+            _currentSurahNumber.value = -1
+        }
         updateMediaSessionState(PlaybackStateCompat.STATE_STOPPED)
     }
 
-    fun seekTo(position: Int) {
-        mediaPlayer?.let { mp ->
-            mp.seekTo(position)
-            _currentProgress.value = position
-            updateMediaSessionState(if (_isPlaying.value) PlaybackStateCompat.STATE_PLAYING else PlaybackStateCompat.STATE_PAUSED)
+    private fun releaseCurrentPlayerSafely() {
+        val currentPlayer = exoPlayer ?: return
+        exoPlayer = null
+        try {
+            currentPlayer.playWhenReady = false
+            currentPlayer.stop()
+        } catch (_: Exception) {
+            // Ignore stop errors during teardown.
+        }
+        try {
+            currentPlayer.clearMediaItems()
+        } catch (_: Exception) {
+            // Ignore cleanup errors.
+        }
+        try {
+            currentPlayer.release()
+        } catch (e: Exception) {
+            Log.e(TAG, "Error releasing ExoPlayer: ${e.message}")
         }
     }
 
-    fun getCurrentPosition(): Int = mediaPlayer?.currentPosition ?: 0
-    fun getDurationMs(): Int = mediaPlayer?.duration ?: 0
+    private fun startLoadingTimeout(
+        audioUrl: String,
+        sessionId: Int,
+        terminalCallbackHandled: AtomicBoolean
+    ) {
+        loadingTimeoutJob?.cancel()
+        loadingTimeoutJob = serviceScope.launch {
+            delay(20000)
+            if (!isCurrentPlaybackSession(sessionId)) return@launch
+            if (_isLoading.value && !_isPlaying.value && terminalCallbackHandled.compareAndSet(false, true)) {
+                val errorMessage = "Audio loading timeout for URL: $audioUrl"
+                Log.e(TAG, errorMessage)
+                _isLoading.value = false
+                _isPlaying.value = false
+                stopProgressTracking()
+                releaseCurrentPlayerSafely()
+                abandonAudioFocus()
+                updateMediaSessionState(PlaybackStateCompat.STATE_STOPPED)
+                onPlaybackError?.invoke(errorMessage)
+            }
+        }
+    }
 
-    private fun startProgressTracking() {
+    private fun cancelLoadingTimeout() {
+        loadingTimeoutJob?.cancel()
+        loadingTimeoutJob = null
+    }
+
+    fun seekTo(position: Int) {
+        exoPlayer?.let { player ->
+            player.seekTo(position.toLong())
+            _currentProgress.value = position
+            updateMediaSessionState(
+                if (_isPlaying.value) {
+                    PlaybackStateCompat.STATE_PLAYING
+                } else {
+                    PlaybackStateCompat.STATE_PAUSED
+                }
+            )
+        }
+    }
+
+    fun getCurrentPosition(): Int = exoPlayer?.currentPosition?.toInt() ?: 0
+    fun getDurationMs(): Int = exoPlayer?.duration.toSafeDurationMs()
+
+    private fun startProgressTracking(sessionId: Int) {
         progressJob?.cancel()
         progressJob = serviceScope.launch {
-            while (isActive) {
-                mediaPlayer?.let { mp ->
-                    if (mp.isPlaying && mp.duration > 0) {
-                        _currentProgress.value = mp.currentPosition
+            while (isActive && isCurrentPlaybackSession(sessionId)) {
+                exoPlayer?.let { player ->
+                    val currentlyPlaying = player.isPlaying
+                    if (_isPlaying.value != currentlyPlaying) {
+                        _isPlaying.value = currentlyPlaying
+                        updateMediaSessionState(
+                            if (currentlyPlaying) {
+                                PlaybackStateCompat.STATE_PLAYING
+                            } else {
+                                PlaybackStateCompat.STATE_PAUSED
+                            }
+                        )
+                        updateNotification()
                     }
+                    if (currentlyPlaying && _isLoading.value) {
+                        _isLoading.value = false
+                        cancelLoadingTimeout()
+                        updateNotification()
+                    }
+                    val position = player.currentPosition
+                    if (position >= 0) {
+                        _currentProgress.value = position.toInt()
+                    }
+                    _duration.value = player.duration.toSafeDurationMs()
                 }
                 delay(250) // Update 4x per second for smooth seekbar
             }
@@ -385,6 +552,15 @@ class AudioPlaybackService : Service(), AudioManager.OnAudioFocusChangeListener 
     private fun stopProgressTracking() {
         progressJob?.cancel()
         progressJob = null
+    }
+
+    private fun isCurrentPlaybackSession(sessionId: Int): Boolean {
+        return activePlaybackSessionId == sessionId
+    }
+
+    private fun Long?.toSafeDurationMs(): Int {
+        val value = this ?: 0L
+        return if (value <= 0L || value == C.TIME_UNSET) 0 else value.toInt()
     }
 
     private fun buildNotification(): Notification {
@@ -473,7 +649,7 @@ class AudioPlaybackService : Service(), AudioManager.OnAudioFocusChangeListener 
     }
 
     private fun updateMediaSessionState(state: Int) {
-        val position = mediaPlayer?.currentPosition?.toLong() ?: 0L
+        val position = exoPlayer?.currentPosition ?: 0L
         val playbackState = PlaybackStateCompat.Builder()
             .setState(state, position, 1.0f)
             .setActions(
@@ -535,6 +711,9 @@ class AudioPlaybackService : Service(), AudioManager.OnAudioFocusChangeListener 
     override fun onDestroy() {
         Log.d(TAG, "Service destroyed")
         instance = null
+        playJob?.cancel()
+        playJob = null
+        cancelLoadingTimeout()
         stop()
         progressJob?.cancel()
         serviceScope.cancel()

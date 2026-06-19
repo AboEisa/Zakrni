@@ -6,7 +6,8 @@
 #   http://developer.android.com/guide/developing/tools/proguard.html
 
 # Preserve line number information for debugging stack traces
--keepattributes SourceFile,LineNumberTable
+# Keep reflection/generic metadata required by Gson TypeToken in release builds.
+-keepattributes SourceFile,LineNumberTable,Signature,InnerClasses,EnclosingMethod
 -renamesourcefileattribute SourceFile
 
 # ---- Retrofit / OkHttp / Gson ----
@@ -19,6 +20,13 @@
 -keepclasseswithmembers class * {
     @retrofit2.http.* <methods>;
 }
+# Keep app Retrofit service interfaces and their generic signatures in release.
+-keep interface com.zakrni.app.clean.data.network.** { *; }
+-keepclassmembers,allowshrinking,allowobfuscation interface * {
+    @retrofit2.http.* <methods>;
+}
+# Required for Retrofit suspend functions (Continuation generic type must survive shrinking).
+-keep,allowshrinking,allowobfuscation class kotlin.coroutines.Continuation
 
 # OkHttp
 -dontwarn okhttp3.**
@@ -27,6 +35,7 @@
 
 # Gson
 -keep class com.google.gson.** { *; }
+-keep class * extends com.google.gson.reflect.TypeToken { *; }
 -keep class com.zakrni.app.clean.data.models.** { *; }
 -keep class com.zakrni.app.clean.domain.models.** { *; }
 -keepclassmembers class * {

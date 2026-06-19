@@ -34,8 +34,8 @@ class AudioPreferences(context: Context) {
 
     // Selected reciter
     var selectedReciter: String
-        get() = prefs.getString(KEY_SELECTED_RECITER, "ar.alafasy") ?: "ar.alafasy"
-        set(value) = prefs.edit().putString(KEY_SELECTED_RECITER, value).apply()
+        get() = ReciterCatalog.normalize(prefs.getString(KEY_SELECTED_RECITER, ReciterCatalog.DEFAULT_RECITER_ID))
+        set(value) = prefs.edit().putString(KEY_SELECTED_RECITER, ReciterCatalog.normalize(value)).apply()
 
     var selectedReciterName: String
         get() = prefs.getString(KEY_SELECTED_RECITER_NAME, null)
@@ -97,45 +97,7 @@ class AudioPreferences(context: Context) {
 
     // Get reciter display name from identifier
     fun getReciterDisplayName(identifier: String, isArabic: Boolean = isArabicUi()): String {
-        return if (isArabic) {
-            when (identifier) {
-                "ar.alafasy" -> "مشاري راشد العفاسي"
-                "ar.husary" -> "محمود خليل الحصري"
-                "ar.sudais" -> "عبد الرحمن السديس"
-                "ar.ghamadi" -> "سعد الغامدي"
-                "ar.minshawi" -> "محمد صديق المنشاوي"
-                "ar.tablawi" -> "محمد الطبلاوي"
-                "ar.abdulsamad" -> "عبد الباسط عبد الصمد"
-                "ar.abdullahbasfar" -> "عبد الله بصفر"
-                "ar.shaatree" -> "أبو بكر الشاطري"
-                "ar.ahmedajamy" -> "أحمد بن علي العجمي"
-                "ar.husarymujawwad" -> "محمود خليل الحصري (المجود)"
-                "ar.hudhaify" -> "علي بن عبد الرحمن الحذيفي"
-                "ar.mahermuaiqly" -> "ماهر المعيقلي"
-                "ar.muhammadayyoub" -> "محمد أيوب"
-                "ar.muhammadjibreel" -> "محمد جبريل"
-                else -> "مشاري راشد العفاسي"
-            }
-        } else {
-            when (identifier) {
-                "ar.alafasy" -> "Mishary Rashid Alafasy"
-                "ar.husary" -> "Mahmoud Khalil Al-Husary"
-                "ar.sudais" -> "Abdul Rahman Al-Sudais"
-                "ar.ghamadi" -> "Saad Al-Ghamadi"
-                "ar.minshawi" -> "Mohamed Al-Minshawi"
-                "ar.tablawi" -> "Muhammad Al-Tablawi"
-                "ar.abdulsamad" -> "Abdul Basit Abdul Samad"
-                "ar.abdullahbasfar" -> "Abdullah Basfar"
-                "ar.shaatree" -> "Abu Bakr Ash-Shaatree"
-                "ar.ahmedajamy" -> "Ahmed Al-Ajamy"
-                "ar.husarymujawwad" -> "Husary (Mujawwad)"
-                "ar.hudhaify" -> "Ali Al-Hudhaify"
-                "ar.mahermuaiqly" -> "Maher Al Muaiqly"
-                "ar.muhammadayyoub" -> "Muhammad Ayyoub"
-                "ar.muhammadjibreel" -> "Muhammad Jibreel"
-                else -> "Mishary Rashid Alafasy"
-            }
-        }
+        return ReciterCatalog.getDisplayName(identifier, isArabic)
     }
 
     private fun isArabicUi(): Boolean {

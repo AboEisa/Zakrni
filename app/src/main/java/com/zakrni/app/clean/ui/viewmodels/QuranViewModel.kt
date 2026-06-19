@@ -11,19 +11,19 @@ import com.zakrni.app.clean.domain.models.DomainSurah
 import com.zakrni.app.clean.domain.usecase.GetQuranUseCase
 import com.zakrni.app.clean.ui.utils.AudioPlayerManager
 import com.zakrni.app.clean.ui.utils.AudioPreferences
+import com.zakrni.app.clean.ui.utils.ReciterCatalog
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import java.util.Calendar
 import java.util.Locale
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 
 @HiltViewModel
@@ -48,14 +48,12 @@ class QuranViewModel @Inject constructor(
 
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
-    private val _audioNotice = MutableSharedFlow<String>(extraBufferCapacity = 1)
-    val audioNotice: SharedFlow<String> = _audioNotice.asSharedFlow()
 
     // Audio-related properties
     private val _audioReciters = MutableStateFlow<List<DomainAudioEdition>>(emptyList())
     val audioReciters: StateFlow<List<DomainAudioEdition>> = _audioReciters.asStateFlow()
 
-    private val _selectedReciter = MutableStateFlow("ar.alafasy")
+    private val _selectedReciter = MutableStateFlow(ReciterCatalog.DEFAULT_RECITER_ID)
     val selectedReciter: StateFlow<String> = _selectedReciter.asStateFlow()
 
     // Audio player state flows
@@ -68,6 +66,12 @@ class QuranViewModel @Inject constructor(
     // Audio URL cache for all surahs
     private val audioUrlCache = mutableMapOf<String, String>()
     private val failedUrls = mutableSetOf<String>()
+    private val playbackRequestCounter = AtomicInteger(0)
+
+    private val supportedReciters = ReciterCatalog.supportedReciters
+
+    @Volatile
+    private var activePlaybackRequestId: Int = 0
 
     // Track audio availability for each surah
     private val _audioAvailability = MutableStateFlow<Map<Int, Boolean>>(emptyMap())
@@ -247,8 +251,12 @@ class QuranViewModel @Inject constructor(
 
     init {
         // Sync reciter from saved preferences
-        _selectedReciter.value = audioPreferences.selectedReciter
-        Log.d("QuranViewModel", "🎤 Initialized with reciter: ${audioPreferences.selectedReciter}")
+        val normalizedSavedReciter = normalizeReciterIdentifier(audioPreferences.selectedReciter)
+        _selectedReciter.value = normalizedSavedReciter
+        if (normalizedSavedReciter != audioPreferences.selectedReciter) {
+            audioPreferences.selectedReciter = normalizedSavedReciter
+        }
+        Log.d("QuranViewModel", "🎤 Initialized with reciter: $normalizedSavedReciter")
         
         loadAllSurahs()
         loadAudioReciters()
@@ -394,13 +402,12 @@ class QuranViewModel @Inject constructor(
             return
         }
 
-        // Stop any currently playing audio first if it's a different surah
-        if (currentPlayingSurah.value != surahNumber) {
-            Log.d("QuranViewModel", "⏹️ Stopping current audio (was surah ${currentPlayingSurah.value})")
-            audioPlayerManager.stop()
-        }
+        val requestId = beginNewPlaybackRequest()
+        // Keep URL failures scoped to the active playback attempt.
+        // Network glitches should not permanently block future play attempts.
+        failedUrls.clear()
 
-        val selectedReciterIdentifier = _selectedReciter.value ?: "ar.alafasy"
+        val selectedReciterIdentifier = normalizeReciterIdentifier(_selectedReciter.value)
         val cacheKey = "${surahNumber}_${selectedReciterIdentifier}"
         Log.d("QuranViewModel", "🔍 Looking for cached URL with key: $cacheKey, reciter: $selectedReciterIdentifier")
 
@@ -408,21 +415,24 @@ class QuranViewModel @Inject constructor(
         audioUrlCache[cacheKey]?.let { cachedUrl ->
             if (!failedUrls.contains(cachedUrl)) {
                 Log.d("QuranViewModel", "✅ Found cached URL: $cachedUrl")
-                playAudioFromUrl(cachedUrl, surahNumber)
+                playAudioFromUrl(cachedUrl, surahNumber, requestId)
                 return
             }
         }
 
         Log.d("QuranViewModel", "🔄 No cached URL found, trying fallback URLs...")
         // Try multiple audio sources for the surah
-        playAudioWithFallback(surahNumber)
+        playAudioWithFallback(surahNumber, requestId)
     }
 
-    private fun playAudioFromUrl(audioUrl: String, surahNumber: Int) {
+    private fun playAudioFromUrl(audioUrl: String, surahNumber: Int, requestId: Int) {
+        if (!isActivePlaybackRequest(requestId)) return
+
         // Get surah name and reciter name for notification
         val surahName = getSurahName(surahNumber) ?: getLocalizedSurahFallback(surahNumber)
         val reciterName = getAvailableReciters().find { it.first == _selectedReciter.value }?.second
             ?: getLocalizedDefaultReciterName()
+        val callbackHandled = AtomicBoolean(false)
         
         // Set surah info for notification
         audioPlayerManager.setSurahInfo(surahName, reciterName)
@@ -433,25 +443,31 @@ class QuranViewModel @Inject constructor(
             surahName = surahName,
             reciterName = reciterName,
             onCompletion = {
+                if (!isActivePlaybackRequest(requestId)) return@playAudio
+                if (!callbackHandled.compareAndSet(false, true)) return@playAudio
                 // Remove from auto-played set when completed
                 autoPlayedSurahs.remove(surahNumber)
             },
             onError = { error ->
+                if (!isActivePlaybackRequest(requestId)) return@playAudio
+                if (!callbackHandled.compareAndSet(false, true)) return@playAudio
                 failedUrls.add(audioUrl)
                 markSurahAudioUnavailable(surahNumber)
 
                 // Remove from cache if it fails
-                val selectedReciter = _selectedReciter.value ?: "ar.alafasy"
+                val selectedReciter = normalizeReciterIdentifier(_selectedReciter.value)
                 val cacheKey = "${surahNumber}_${selectedReciter}"
                 audioUrlCache.remove(cacheKey)
 
                 // Try next URL
-                playAudioWithFallback(surahNumber)
+                playAudioWithFallback(surahNumber, requestId)
             }
         )
     }
 
-    private fun playAudioWithFallback(surahNumber: Int) {
+    private fun playAudioWithFallback(surahNumber: Int, requestId: Int) {
+        if (!isActivePlaybackRequest(requestId)) return
+
         val fallbackUrls = buildComprehensiveAudioUrls(surahNumber)
         val availableUrls = fallbackUrls.filter { !failedUrls.contains(it) }
         
@@ -459,132 +475,47 @@ class QuranViewModel @Inject constructor(
 
         if (availableUrls.isEmpty()) {
             Log.e("QuranViewModel", "❌ No available URLs for surah $surahNumber")
-            val reciterName = getAvailableReciters().find { it.first == _selectedReciter.value }?.second
-                ?: getLocalizedGenericReciterName()
-            _error.value = if (isArabicAppLanguage()) {
-                "الصوت غير متوفر لهذه السورة مع $reciterName. جرّب قارئ آخر."
-            } else {
-                "Audio is unavailable for this surah with $reciterName. Try another reciter."
-            }
             markSurahAudioUnavailable(surahNumber)
             return
         }
 
         Log.d("QuranViewModel", "▶️ Trying first URL: ${availableUrls.first()}")
-        tryUrls(availableUrls, surahNumber, 0)
+        tryUrls(availableUrls, surahNumber, 0, requestId)
     }
 
-    // Comprehensive audio URL builder for all 114 surahs - Updated with more reliable sources
+    // Build robust URL candidates for all 114 surahs.
     private fun buildComprehensiveAudioUrls(surahNumber: Int): List<String> {
-        val formattedNumber = String.format("%03d", surahNumber)
-        val selectedReciter = _selectedReciter.value ?: "ar.alafasy"
+        // Force ASCII digits for URL paths regardless of app/device locale.
+        val formattedNumber = String.format(Locale.US, "%03d", surahNumber)
+        val selectedReciter = normalizeReciterIdentifier(_selectedReciter.value)
+        val reciter = ReciterCatalog.getById(selectedReciter) ?: return emptyList()
 
-        val urls = when (selectedReciter) {
-            "ar.alafasy" -> listOf(
-                "https://server8.mp3quran.net/afs/$formattedNumber.mp3",
-                "https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/$surahNumber.mp3",
-                "https://download.quranicaudio.com/quran/mishaari_raashid_al_3afaasee/$formattedNumber.mp3",
-                "https://verses.quran.com/Alafasy/mp3/complete/$formattedNumber.mp3",
-                "https://everyayah.com/data/Alafasy_128kbps/$formattedNumber.mp3"
-            )
-            "ar.husary" -> listOf(
-                "https://server6.mp3quran.net/husary/$formattedNumber.mp3",
-                "https://cdn.islamic.network/quran/audio-surah/128/ar.husary/$surahNumber.mp3",
-                "https://download.quranicaudio.com/quran/mahmood_khaleel_al_husaree/$formattedNumber.mp3",
-                "https://server13.mp3quran.net/husr/$formattedNumber.mp3",
-                "https://everyayah.com/data/Husary_128kbps/$formattedNumber.mp3"
-            )
-            "ar.sudais" -> listOf(
-                "https://server11.mp3quran.net/sds/$formattedNumber.mp3",
-                "https://cdn.islamic.network/quran/audio-surah/128/ar.abdurrahmaansudais/$surahNumber.mp3",
-                "https://download.quranicaudio.com/quran/abdurrahmaan_as_sudays/$formattedNumber.mp3",
-                "https://server12.mp3quran.net/sud/$formattedNumber.mp3",
-                "https://everyayah.com/data/Sudais_128kbps/$formattedNumber.mp3"
-            )
-            "ar.ghamadi" -> listOf(
-                "https://server7.mp3quran.net/s_gmd/$formattedNumber.mp3",
-                "https://cdn.islamic.network/quran/audio-surah/128/ar.saaboralghaamidi/$surahNumber.mp3",
-                "https://download.quranicaudio.com/quran/sa3d_al_ghaamidi/complete/$formattedNumber.mp3",
-                "https://server11.mp3quran.net/sds/$formattedNumber.mp3",
-                "https://everyayah.com/data/Ghamadi_40kbps/$formattedNumber.mp3"
-            )
-            "ar.minshawi" -> listOf(
-                "https://server10.mp3quran.net/minsh/$formattedNumber.mp3",
-                "https://cdn.islamic.network/quran/audio-surah/128/ar.minshawi/$surahNumber.mp3",
-                "https://download.quranicaudio.com/quran/muhammad_siddeeq_al-minshaawee/complete/$formattedNumber.mp3",
-                "https://server6.mp3quran.net/minsh/$formattedNumber.mp3",
-                "https://everyayah.com/data/Minshawy_Murattal_128kbps/$formattedNumber.mp3"
-            )
-            "ar.tablawi" -> listOf(
-                "https://server9.mp3quran.net/tblawi/$formattedNumber.mp3",
-                "https://download.quranicaudio.com/quran/muhammad_tablawi/$formattedNumber.mp3",
-                "https://server6.mp3quran.net/tablawi/$formattedNumber.mp3",
-                // Fallback to another reliable reciter
-                "https://server8.mp3quran.net/afs/$formattedNumber.mp3"
-            )
-            "ar.abdulsamad" -> listOf(
-                "https://server7.mp3quran.net/basit/$formattedNumber.mp3",
-                "https://cdn.islamic.network/quran/audio-surah/128/ar.abdulbasitmurattal/$surahNumber.mp3",
-                "https://download.quranicaudio.com/quran/abdul_baasit_murattal/$formattedNumber.mp3",
-                "https://server13.mp3quran.net/basit_mjwd/$formattedNumber.mp3",
-                "https://everyayah.com/data/Abdul_Basit_Murattal_192kbps/$formattedNumber.mp3"
-            )
-            "ar.abdullahbasfar" -> listOf(
-                "https://server6.mp3quran.net/bsfr/$formattedNumber.mp3",
-                "https://cdn.islamic.network/quran/audio-surah/128/ar.abdullahbasfar/$surahNumber.mp3",
-                "https://server8.mp3quran.net/afs/$formattedNumber.mp3"
-            )
-            "ar.shaatree" -> listOf(
-                "https://server11.mp3quran.net/shatri/$formattedNumber.mp3",
-                "https://server8.mp3quran.net/afs/$formattedNumber.mp3"
-            )
-            "ar.ahmedajamy" -> listOf(
-                "https://server10.mp3quran.net/ajm/$formattedNumber.mp3",
-                "https://server8.mp3quran.net/afs/$formattedNumber.mp3"
-            )
-            "ar.husarymujawwad" -> listOf(
-                "https://server13.mp3quran.net/husr/Almusshaf-Al-Mojawwad/$formattedNumber.mp3",
-                "https://server6.mp3quran.net/husary/$formattedNumber.mp3"
-            )
-            "ar.hudhaify" -> listOf(
-                "https://server9.mp3quran.net/hthfi/$formattedNumber.mp3",
-                "https://server8.mp3quran.net/afs/$formattedNumber.mp3"
-            )
-            "ar.mahermuaiqly" -> listOf(
-                "https://server12.mp3quran.net/maher/$formattedNumber.mp3",
-                "https://server8.mp3quran.net/afs/$formattedNumber.mp3"
-            )
-            "ar.muhammadayyoub" -> listOf(
-                "https://server8.mp3quran.net/ayyub/$formattedNumber.mp3",
-                "https://server8.mp3quran.net/afs/$formattedNumber.mp3"
-            )
-            "ar.muhammadjibreel" -> listOf(
-                "https://server8.mp3quran.net/jbrl/$formattedNumber.mp3",
-                "https://server8.mp3quran.net/afs/$formattedNumber.mp3"
-            )
-            else -> listOf(
-                // Default fallback to multiple reliable sources
-                "https://server8.mp3quran.net/afs/$formattedNumber.mp3",
-                "https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/$surahNumber.mp3",
-                "https://server7.mp3quran.net/basit/$formattedNumber.mp3",
-                "https://server11.mp3quran.net/sds/$formattedNumber.mp3"
-            )
+        val urls = mutableListOf<String>()
+
+        urls += "${reciter.primaryServer}$formattedNumber.mp3"
+        reciter.cloudEdition?.let { edition ->
+            urls += "https://cdn.islamic.network/quran/audio-surah/128/$edition/$surahNumber.mp3"
         }
-        
-        Log.d("QuranViewModel", "🔗 Built ${urls.size} URLs for surah $surahNumber with reciter $selectedReciter")
-        return urls
+
+        // Only fallback within the same selected reciter identity.
+        reciter.backupServers.forEach { base ->
+            urls += "$base$formattedNumber.mp3"
+        }
+
+        val distinctUrls = urls.distinct()
+
+        Log.d("QuranViewModel", "🔗 Built ${distinctUrls.size} URLs for surah $surahNumber with reciter $selectedReciter")
+        return distinctUrls
     }
 
-    private fun tryUrls(urls: List<String>, surahNumber: Int, index: Int) {
+    private fun tryUrls(urls: List<String>, surahNumber: Int, index: Int, requestId: Int) {
+        if (!isActivePlaybackRequest(requestId)) {
+            Log.d("QuranViewModel", "⏭️ Ignoring stale playback callback for request $requestId")
+            return
+        }
+
         if (index >= urls.size) {
             Log.e("QuranViewModel", "❌ All ${urls.size} URLs failed for surah $surahNumber")
-            val reciterName = getAvailableReciters().find { it.first == _selectedReciter.value }?.second
-                ?: getLocalizedGenericReciterName()
-            _error.value = if (isArabicAppLanguage()) {
-                "الصوت غير متوفر لهذه السورة مع $reciterName. جرّب قارئ آخر أو تحقق من الاتصال بالإنترنت."
-            } else {
-                "Audio is unavailable for this surah with $reciterName. Try another reciter or check your internet connection."
-            }
             markSurahAudioUnavailable(surahNumber)
             return
         }
@@ -596,6 +527,7 @@ class QuranViewModel @Inject constructor(
         val surahName = getSurahName(surahNumber) ?: getLocalizedSurahFallback(surahNumber)
         val reciterName = getAvailableReciters().find { it.first == _selectedReciter.value }?.second
             ?: getLocalizedDefaultReciterName()
+        val callbackHandled = AtomicBoolean(false)
         
         audioPlayerManager.playAudio(
             audioUrl = url,
@@ -603,17 +535,10 @@ class QuranViewModel @Inject constructor(
             surahName = surahName,
             reciterName = reciterName,
             onCompletion = {
-                if (index > 0) {
-                    _audioNotice.tryEmit(
-                        if (isArabicAppLanguage()) {
-                            "تم تشغيل التلاوة من مصدر بديل لهذا القارئ"
-                        } else {
-                            "Recitation is playing from a backup source for this reciter"
-                        }
-                    )
-                }
+                if (!isActivePlaybackRequest(requestId)) return@playAudio
+                if (!callbackHandled.compareAndSet(false, true)) return@playAudio
                 // Cache successful URL
-                val selectedReciter = _selectedReciter.value ?: "ar.alafasy"
+                val selectedReciter = normalizeReciterIdentifier(_selectedReciter.value)
                 val cacheKey = "${surahNumber}_${selectedReciter}"
                 audioUrlCache[cacheKey] = url
                 markSurahAudioAvailable(surahNumber)
@@ -621,19 +546,12 @@ class QuranViewModel @Inject constructor(
                 autoPlayedSurahs.remove(surahNumber)
             },
             onError = { error ->
+                if (!isActivePlaybackRequest(requestId)) return@playAudio
+                if (!callbackHandled.compareAndSet(false, true)) return@playAudio
                 Log.w("QuranViewModel", "⚠️ URL failed: $url - Error: $error")
-                if (index == 0 && urls.size > 1) {
-                    _audioNotice.tryEmit(
-                        if (isArabicAppLanguage()) {
-                            "تعذر تشغيل المصدر الأساسي، جارٍ التحويل لمصدر بديل"
-                        } else {
-                            "Primary source failed, switching to a backup source"
-                        }
-                    )
-                }
                 failedUrls.add(url)
                 // Try next URL
-                tryUrls(urls, surahNumber, index + 1)
+                tryUrls(urls, surahNumber, index + 1, requestId)
             }
         )
     }
@@ -653,42 +571,9 @@ class QuranViewModel @Inject constructor(
 
     // Get all available reciters with locale-aware display names
     fun getAvailableReciters(): List<Pair<String, String>> {
-        return if (isArabicAppLanguage()) {
-            listOf(
-                "ar.alafasy" to "مشاري العفاسي",
-                "ar.husary" to "محمود خليل الحصري",
-                "ar.sudais" to "عبد الرحمن السديس",
-                "ar.ghamadi" to "سعد الغامدي",
-                "ar.minshawi" to "محمد صديق المنشاوي",
-                "ar.tablawi" to "محمد الطبلاوي",
-                "ar.abdulsamad" to "عبد الباسط عبد الصمد",
-                "ar.abdullahbasfar" to "عبد الله بصفر",
-                "ar.shaatree" to "أبو بكر الشاطري",
-                "ar.ahmedajamy" to "أحمد بن علي العجمي",
-                "ar.husarymujawwad" to "محمود خليل الحصري (المجود)",
-                "ar.hudhaify" to "علي بن عبد الرحمن الحذيفي",
-                "ar.mahermuaiqly" to "ماهر المعيقلي",
-                "ar.muhammadayyoub" to "محمد أيوب",
-                "ar.muhammadjibreel" to "محمد جبريل"
-            )
-        } else {
-            listOf(
-                "ar.alafasy" to "Mishary Alafasy",
-                "ar.husary" to "Mahmoud Al-Husary",
-                "ar.sudais" to "Abdul Rahman Al-Sudais",
-                "ar.ghamadi" to "Saad Al-Ghamdi",
-                "ar.minshawi" to "Mohamed Al-Minshawi",
-                "ar.tablawi" to "Muhammad Al-Tablawi",
-                "ar.abdulsamad" to "Abdul Basit Abdul Samad",
-                "ar.abdullahbasfar" to "Abdullah Basfar",
-                "ar.shaatree" to "Abu Bakr Ash-Shaatree",
-                "ar.ahmedajamy" to "Ahmed Al-Ajamy",
-                "ar.husarymujawwad" to "Husary (Mujawwad)",
-                "ar.hudhaify" to "Ali Al-Hudhaify",
-                "ar.mahermuaiqly" to "Maher Al Muaiqly",
-                "ar.muhammadayyoub" to "Muhammad Ayyoub",
-                "ar.muhammadjibreel" to "Muhammad Jibreel"
-            )
+        val isArabic = isArabicAppLanguage()
+        return supportedReciters.map { reciter ->
+            reciter.identifier to if (isArabic) reciter.arabicName else reciter.englishName
         }
     }
 
@@ -704,7 +589,7 @@ class QuranViewModel @Inject constructor(
     fun preloadSurahAudio(surahNumber: Int) {
         if (surahNumber !in 1..114) return
 
-        val selectedReciter = _selectedReciter.value ?: "ar.alafasy"
+        val selectedReciter = normalizeReciterIdentifier(_selectedReciter.value)
         val cacheKey = "${surahNumber}_${selectedReciter}"
 
         // If not already cached, preload the first URL
@@ -754,7 +639,8 @@ class QuranViewModel @Inject constructor(
             "https://server7.mp3quran.net/basit/001.mp3"
         )
 
-        tryUrls(testUrls, 1, 0)
+        val requestId = beginNewPlaybackRequest()
+        tryUrls(testUrls, 1, 0, requestId)
     }
 
     // Get audio duration if available
@@ -776,6 +662,7 @@ class QuranViewModel @Inject constructor(
     }
 
     fun stopAudio() {
+        invalidatePlaybackRequests()
         audioPlayerManager.stop()
     }
 
@@ -784,19 +671,22 @@ class QuranViewModel @Inject constructor(
      * Clears cache and prepares for new reciter audio
      */
     fun setReciter(reciterIdentifier: String) {
-        val oldReciter = _selectedReciter.value
+        val oldReciter = normalizeReciterIdentifier(_selectedReciter.value)
+        val normalizedReciter = normalizeReciterIdentifier(reciterIdentifier)
         
         // Skip if same reciter selected
-        if (oldReciter == reciterIdentifier) {
+        if (oldReciter == normalizedReciter) {
             return
         }
         
-        Log.d("QuranViewModel", "🔄 Changing reciter from $oldReciter to $reciterIdentifier")
+        Log.d("QuranViewModel", "🔄 Changing reciter from $oldReciter to $normalizedReciter")
         
         // Stop any currently playing audio and reset loading state
+        invalidatePlaybackRequests()
         audioPlayerManager.stop()
         
-        _selectedReciter.value = reciterIdentifier
+        _selectedReciter.value = normalizedReciter
+        audioPreferences.selectedReciter = normalizedReciter
 
         // Clear cache when reciter changes to force reload with new reciter
         audioUrlCache.clear()
@@ -804,13 +694,14 @@ class QuranViewModel @Inject constructor(
         autoPlayedSurahs.clear()
         initializeAudioAvailability()
         
-        Log.d("QuranViewModel", "✅ Reciter changed successfully to $reciterIdentifier")
+        Log.d("QuranViewModel", "✅ Reciter changed successfully to $normalizedReciter")
     }
     
     /**
      * Reset loading state - useful for recovering from stuck states
      */
     fun resetLoadingState() {
+        invalidatePlaybackRequests()
         audioPlayerManager.stop()
     }
     
@@ -818,14 +709,14 @@ class QuranViewModel @Inject constructor(
      * Get the currently selected reciter identifier
      */
     fun getCurrentReciter(): String {
-        return _selectedReciter.value ?: "ar.alafasy"
+        return normalizeReciterIdentifier(_selectedReciter.value)
     }
     
     /**
      * Get the display name for the currently selected reciter
      */
     fun getCurrentReciterName(): String {
-        return getAvailableReciters().find { it.first == _selectedReciter.value }?.second ?: "Mishary Rashid Alafasy"
+        return ReciterCatalog.getDisplayName(_selectedReciter.value, isArabicAppLanguage())
     }
 
     fun isPlayingSurah(surahNumber: Int): Boolean {
@@ -860,6 +751,7 @@ class QuranViewModel @Inject constructor(
     }
 
     fun clearAudioCache() {
+        invalidatePlaybackRequests()
         audioUrlCache.clear()
         failedUrls.clear()
         autoPlayedSurahs.clear()
@@ -867,12 +759,12 @@ class QuranViewModel @Inject constructor(
     }
 
     fun retryFailedAudio(surahNumber: Int) {
-        val selectedReciter = _selectedReciter.value ?: "ar.alafasy"
+        val selectedReciter = normalizeReciterIdentifier(_selectedReciter.value)
         val cacheKey = "${surahNumber}_${selectedReciter}"
 
         // Remove from failed URLs and cache
         val urlsToRetry = failedUrls.filter { url ->
-            url.contains(String.format("%03d", surahNumber))
+            url.contains(String.format(Locale.US, "%03d", surahNumber))
         }
         failedUrls.removeAll(urlsToRetry.toSet())
         audioUrlCache.remove(cacheKey)
@@ -883,7 +775,7 @@ class QuranViewModel @Inject constructor(
     // Get audio system status for all surahs
     fun getAudioSystemStatus(): String {
         val availableCount = _audioAvailability.value.values.count { it }
-        val currentReciterName = getAvailableReciters().find { it.first == _selectedReciter.value }?.second ?: "Unknown"
+        val currentReciterName = ReciterCatalog.getDisplayName(_selectedReciter.value, isArabicAppLanguage())
 
         return """
             Audio System Status:
@@ -1213,7 +1105,7 @@ class QuranViewModel @Inject constructor(
     }
 
     private fun getLocalizedDefaultReciterName(): String {
-        return if (isArabicAppLanguage()) "مشاري العفاسي" else "Mishary Alafasy"
+        return ReciterCatalog.getDisplayName(ReciterCatalog.DEFAULT_RECITER_ID, isArabicAppLanguage())
     }
 
     private fun getLocalizedGenericReciterName(): String {
@@ -1282,9 +1174,29 @@ class QuranViewModel @Inject constructor(
 
     override fun onCleared() {
         super.onCleared()
-        audioPlayerManager.release()
+        invalidatePlaybackRequests()
+        // AudioPlayerManager is app-scoped singleton; releasing it here breaks
+        // playback state tracking after reopening Quran screens.
         audioUrlCache.clear()
         failedUrls.clear()
         autoPlayedSurahs.clear()
+    }
+
+    private fun beginNewPlaybackRequest(): Int {
+        val requestId = playbackRequestCounter.incrementAndGet()
+        activePlaybackRequestId = requestId
+        return requestId
+    }
+
+    private fun isActivePlaybackRequest(requestId: Int): Boolean {
+        return activePlaybackRequestId == requestId
+    }
+
+    private fun invalidatePlaybackRequests() {
+        activePlaybackRequestId = playbackRequestCounter.incrementAndGet()
+    }
+
+    private fun normalizeReciterIdentifier(identifier: String?): String {
+        return ReciterCatalog.normalize(identifier)
     }
 }

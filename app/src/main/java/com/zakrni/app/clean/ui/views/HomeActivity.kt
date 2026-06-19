@@ -78,6 +78,8 @@ class HomeActivity : AppCompatActivity() {
     // Navigation counter for interstitial ads
     private var navigationCount = 0
     private val INTERSTITIAL_EVERY_N_NAVIGATIONS = 3
+    private var hasTrackedInitialDestination = false
+    private var lastTrackedDestinationId: Int? = null
 
     // Fast swipe gesture detector
     private lateinit var gestureDetector: GestureDetector
@@ -165,6 +167,8 @@ class HomeActivity : AppCompatActivity() {
         checkLocationPermissions()
         setupSettingsButton()
         checkFullScreenIntentPermission()
+        setupBannerAd()
+        observeSubscriptionStateForAds()
 
     }
 
@@ -691,8 +695,10 @@ class HomeActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         adManager.whenReady {
-            adManager.loadInterstitialAd()
+            adManager.preloadAllAdTypes()
+            adManager.showAppOpenIfAvailable(this)
         }
+        _binding?.bannerAdContainer?.resumeAd()
         if (isAutoSwipeEnabled && !isUserInteracting) {
             startAutoSwipe()
         }
@@ -700,7 +706,40 @@ class HomeActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
+        _binding?.bannerAdContainer?.pauseAd()
         stopAutoSwipe()
+    }
+
+    private fun setupBannerAd() {
+        adManager.whenReady {
+            val currentBinding = _binding ?: return@whenReady
+            currentBinding.bannerAdContainer?.loadAd(adManager)
+        }
+    }
+
+    private fun setupNativeAd() {
+        adManager.whenReady {
+            val currentBinding = _binding ?: return@whenReady
+            currentBinding.nativeAdContainer?.loadAd(adManager)
+        }
+    }
+
+    private fun observeSubscriptionStateForAds() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                subscriptionManager.isSubscribedState.collect { isSubscribed ->
+                    val currentBinding = _binding ?: return@collect
+                    if (isSubscribed) {
+                        currentBinding.bannerAdContainer?.hideAd()
+                        currentBinding.nativeAdContainer?.destroyAd()
+                        currentBinding.nativeAdContainer?.visibility = View.GONE
+                    } else {
+                        currentBinding.bannerAdContainer?.loadAd(adManager)
+                        currentBinding.nativeAdContainer?.loadAd(adManager)
+                    }
+                }
+            }
+        }
     }
 
     private fun setupNetworkObserver() {
@@ -887,11 +926,12 @@ class HomeActivity : AppCompatActivity() {
         selectNavItem(R.id.nav_all_categories)
 
         navController.addOnDestinationChangedListener { _, destination, arguments ->
+            val shouldShowNavigationAd = shouldShowInterstitialForNavigation(destination.id)
+
             if (fullScreenFragments.containsKey(destination.id)) {
-                // Show interstitial ad every N navigations before opening screen
-                navigationCount++
-                if (navigationCount % INTERSTITIAL_EVERY_N_NAVIGATIONS == 0 && adManager.shouldShowAds()) {
-                    adManager.showInterstitialAd(this) {
+                // Full-screen destinations: show navigation ad first, then open destination.
+                if (shouldShowNavigationAd) {
+                    adManager.showNavigationAd(this) {
                         showFullScreenFragment(destination.id, arguments)
                     }
                 } else {
@@ -899,8 +939,27 @@ class HomeActivity : AppCompatActivity() {
                 }
             } else {
                 hideFullScreenFragment()
+                // Non full-screen destinations: destination already changed, show navigation ad on top.
+                if (shouldShowNavigationAd) {
+                    adManager.showNavigationAd(this)
+                }
             }
         }
+    }
+
+    private fun shouldShowInterstitialForNavigation(destinationId: Int): Boolean {
+        if (lastTrackedDestinationId == destinationId) return false
+
+        lastTrackedDestinationId = destinationId
+
+        // Skip the first destination to avoid showing an ad on cold app start.
+        if (!hasTrackedInitialDestination) {
+            hasTrackedInitialDestination = true
+            return false
+        }
+
+        navigationCount++
+        return navigationCount % INTERSTITIAL_EVERY_N_NAVIGATIONS == 0 && adManager.shouldShowAds()
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -1062,6 +1121,8 @@ class HomeActivity : AppCompatActivity() {
             b.dotsContainer.animate().setListener(null).cancel()
             b.mainContentContainer.animate().setListener(null).cancel()
             b.fullscreenFragmentContainer.animate().setListener(null).cancel()
+            b.bannerAdContainer?.destroyAd()
+            b.nativeAdContainer?.destroyAd()
         }
         super.onDestroy()
         stopAutoSwipe()

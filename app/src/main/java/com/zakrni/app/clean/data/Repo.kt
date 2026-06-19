@@ -2,6 +2,8 @@ package com.zakrni.app.clean.data
 
 import android.content.Context
 import com.google.gson.Gson
+import com.google.gson.JsonParser
+import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
 import com.zakrni.app.clean.data.local.CacheManager
 import com.zakrni.app.clean.data.local.ILocalDataSource
@@ -47,12 +49,10 @@ class Repo @Inject constructor(
         localHisnDuas?.let { return it }
 
         val json = readAssetTextOrNull("hisn.json") ?: return emptyList()
-        val type = object : TypeToken<LinkedHashMap<String, HisnJsonSection>>() {}.type
-        val sectionsMap: LinkedHashMap<String, HisnJsonSection> = gson.fromJson(json, type)
-        val englishSectionsMap: LinkedHashMap<String, HisnJsonSection> =
-            readAssetTextOrNull("hisn_en.json")
-                ?.let { gson.fromJson(it, type) }
-                ?: linkedMapOf()
+        val sectionsMap = parseHisnSections(json)
+        val englishSectionsMap = readAssetTextOrNull("hisn_en.json")
+            ?.let { parseHisnSections(it) }
+            ?: linkedMapOf()
 
         var idCounter = 1
         val allDuas = mutableListOf<DomainHisnDua>()
@@ -79,21 +79,70 @@ class Repo @Inject constructor(
         return allDuas
     }
 
+    private fun parseHisnSections(json: String): LinkedHashMap<String, HisnJsonSection> {
+        return try {
+            val root = JsonParser().parse(json).asJsonObject
+            val output = linkedMapOf<String, HisnJsonSection>()
+            for (entry in root.entrySet()) {
+                val sectionName = entry.key
+                val sectionObj = entry.value.asJsonObject
+                val text = mutableListOf<String>()
+                val textArray = sectionObj.getAsJsonArray("text")
+                if (textArray != null) {
+                    for (element in textArray) {
+                        if (!element.isJsonNull) {
+                            text += element.asString
+                        }
+                    }
+                }
+                val footnote = mutableListOf<String>()
+                val footnoteArray = sectionObj.getAsJsonArray("footnote")
+                if (footnoteArray != null) {
+                    for (element in footnoteArray) {
+                        if (!element.isJsonNull) {
+                            footnote += element.asString
+                        }
+                    }
+                }
+                val sectionEnglish = sectionObj.get("section_en")
+                    ?.takeIf { !it.isJsonNull }
+                    ?.asString
+
+                output[sectionName] = HisnJsonSection(
+                    section_en = sectionEnglish,
+                    text = text,
+                    footnote = footnote.ifEmpty { null }
+                )
+            }
+            output
+        } catch (_: Exception) {
+            linkedMapOf()
+        }
+    }
+
     // Helper class matching hisn.json structure
     private data class HisnJsonSection(
+        @SerializedName("section_en")
         val section_en: String? = null,
+        @SerializedName("text")
         val text: List<String> = emptyList(),
+        @SerializedName("footnote")
         val footnote: List<String>? = null
     )
 
     private data class EnglishAzkarAsset(
+        @SerializedName("title")
         val title: String = "",
+        @SerializedName("content")
         val content: List<EnglishAzkarItem> = emptyList()
     )
 
     private data class EnglishAzkarItem(
+        @SerializedName("zekr")
         val zekr: String = "",
+        @SerializedName("repeat")
         val repeat: Int = 1,
+        @SerializedName("bless")
         val bless: String = ""
     )
 

@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.kapt")
+    id("org.jetbrains.kotlin.plugin.compose")
     id("com.google.dagger.hilt.android")
     id("androidx.navigation.safeargs.kotlin")
 }
@@ -14,8 +15,8 @@ android {
         applicationId = "com.zakrni.app"
         minSdk = 24
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 3
+        versionName = "1.0.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         
@@ -40,12 +41,10 @@ android {
             isDebuggable = true
         }
         release {
-            isMinifyEnabled = true
-            isShrinkResources = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+            // Keep release runtime behavior aligned with debug.
+            isMinifyEnabled = false
+            isShrinkResources = false
+            isDebuggable = false
             signingConfig = signingConfigs.getByName("release")
         }
     }
@@ -62,6 +61,7 @@ android {
     buildFeatures {
         viewBinding = true
         buildConfig = true
+        compose = true
     }
 
     packaging {
@@ -143,11 +143,48 @@ dependencies {
     implementation("androidx.media:media:1.7.0")
 
     // Google AdMob
-    implementation("com.google.android.gms:play-services-ads:23.6.0")
+    implementation("com.google.android.gms:play-services-ads:24.0.0")
 
     // WorkManager for periodic azkar reminders
     implementation("androidx.work:work-runtime-ktx:2.9.0")
 
     // Google Play Billing (for subscriptions)
     implementation("com.android.billingclient:billing-ktx:7.1.1")
+
+    // ---------------- Jetpack Compose (UI rewrite) ----------------
+    val composeBom = platform("androidx.compose:compose-bom:2024.10.01")
+    implementation(composeBom)
+    androidTestImplementation(composeBom)
+
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.ui:ui-graphics")
+    implementation("androidx.compose.ui:ui-tooling-preview")
+    debugImplementation("androidx.compose.ui:ui-tooling")
+    implementation("androidx.compose.foundation:foundation")
+    implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.material:material-icons-extended")
+    implementation("androidx.compose.animation:animation")
+
+    implementation("androidx.activity:activity-compose:1.9.0")
+    implementation("androidx.navigation:navigation-compose:2.8.3")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.6")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.6")
+
+    // Image loading (Compose) — will replace Glide
+    implementation("io.coil-kt:coil-compose:2.7.0")
+
+    // Lottie animations (Compose)
+    implementation("com.airbnb.android:lottie-compose:6.4.0")
+
+    // Runtime permissions in Compose
+    implementation("com.google.accompanist:accompanist-permissions:0.36.0")
+
+    // Home-screen widgets (Compose / Glance)
+    implementation("androidx.glance:glance-appwidget:1.1.0")
+    implementation("androidx.glance:glance-material3:1.1.0")
+
+    // Compose UI tests
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
 }

@@ -1,11 +1,15 @@
 package com.zakrni.app.clean.service
 
+import android.app.ActivityOptions
+import android.app.BackgroundServiceStartNotAllowedException
+import android.app.ForegroundServiceStartNotAllowedException
 import android.app.Notification
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import android.widget.RemoteViews
@@ -74,7 +78,15 @@ class PrayerNotificationService : Service() {
                 putExtra(EXTRA_PRAYER_TIME, prayerTime)
                 putExtra(EXTRA_REMAINING_SECONDS, remainingSeconds)
             }
-            context.startForegroundService(intent)
+            try {
+                context.startForegroundService(intent)
+            } catch (e: ForegroundServiceStartNotAllowedException) {
+                Log.w(TAG, "Foreground service start blocked for prayer countdown", e)
+            } catch (e: BackgroundServiceStartNotAllowedException) {
+                Log.w(TAG, "Background service start blocked for prayer countdown", e)
+            } catch (e: IllegalStateException) {
+                Log.w(TAG, "Service start blocked by system state for prayer countdown", e)
+            }
         }
 
         fun stopService(context: Context) {
@@ -250,9 +262,9 @@ class PrayerNotificationService : Service() {
                     delay(1000)
                 }
 
-                // When countdown reaches 0, transition to next prayer
-                // NOTE: Don't show prayer alert here — the PrayerAlarmReceiver 
-                // (via setAlarmClock) handles the alert to avoid duplicates
+                // When countdown reaches 0, transition to next prayer.
+                // Don't show prayer alert here — PrayerAlarmReceiver handles it
+                // from the scheduled exact prayer alarm to avoid duplicates.
                 if (!isServiceDestroyed) {
                     updatePersistentNotification(prayerName, prayerNameArabic, prayerTime, "00:00")
 
@@ -368,12 +380,7 @@ class PrayerNotificationService : Service() {
                         Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS
             }
 
-            val fullScreenPendingIntent = PendingIntent.getActivity(
-                context,
-                PRAYER_ALERT_NOTIFICATION_ID,
-                fullScreenIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
+            val fullScreenPendingIntent = createFullScreenPendingIntent(context, fullScreenIntent)
 
             // Try direct launch as fallback
             try {
@@ -391,7 +398,7 @@ class PrayerNotificationService : Service() {
                 )
                 .setContentText(getString(R.string.notification_prayer_alert_body))
                 .setSmallIcon(R.drawable.ic_dua)
-                .setCategory(android.app.Notification.CATEGORY_ALARM)
+                .setCategory(android.app.Notification.CATEGORY_REMINDER)
                 .setVisibility(android.app.Notification.VISIBILITY_PUBLIC)
                 .setAutoCancel(true)
                 .setFullScreenIntent(fullScreenPendingIntent, true)
@@ -412,6 +419,34 @@ class PrayerNotificationService : Service() {
         prayerNameArabic: String
     ): String {
         return if (LocaleHelper.isArabic(context)) prayerNameArabic else prayerName
+    }
+
+    private fun createFullScreenPendingIntent(
+        context: Context,
+        intent: Intent
+    ): PendingIntent {
+        val flags = PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            val options = ActivityOptions.makeBasic().apply {
+                setPendingIntentCreatorBackgroundActivityStartMode(
+                    ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOWED
+                )
+            }
+            PendingIntent.getActivity(
+                context,
+                PRAYER_ALERT_NOTIFICATION_ID,
+                intent,
+                flags,
+                options.toBundle()
+            )
+        } else {
+            PendingIntent.getActivity(
+                context,
+                PRAYER_ALERT_NOTIFICATION_ID,
+                intent,
+                flags
+            )
+        }
     }
 
     // Clean shutdown method

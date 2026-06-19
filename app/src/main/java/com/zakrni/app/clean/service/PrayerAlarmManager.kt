@@ -8,6 +8,8 @@ import android.content.Intent
 import android.os.Build
 import android.provider.Settings
 import android.util.Log
+import com.zakrni.app.clean.ui.views.HomeActivity
+import com.zakrni.app.clean.ui.views.PrayerAlertActivity
 import com.zakrni.app.clean.ui.models.PresentationTimings
 import com.zakrni.app.clean.ui.utils.NetworkManager
 import com.zakrni.app.clean.ui.utils.PrayerStorageManager
@@ -43,6 +45,9 @@ class PrayerAlarmManager @Inject constructor(
 
         // Request codes for automatic next prayer scheduling
         const val AUTO_SCHEDULE_REQUEST_CODE = 3001
+
+        // Offset used for internal prayer sync broadcasts.
+        private const val PRAYER_SYNC_REQUEST_CODE_OFFSET = 5000
     }
 
     /**
@@ -55,14 +60,14 @@ class PrayerAlarmManager @Inject constructor(
             // Save prayer times for later use (always save regardless of notification setting)
             prayerStorageManager.savePrayerTimes(timings)
 
+            // Always clear existing alarms first to prevent stale/wrong-time triggers.
+            cancelAllAlarms()
+
             // Check if prayer notifications are enabled
             if (!com.zakrni.app.clean.ui.utils.ThemeManager.isPrayerNotificationsEnabled(context)) {
                 Log.d(TAG, "⚠️ Prayer notifications disabled — skipping alarm scheduling")
                 return
             }
-
-            // Cancel previous alarms first
-            cancelAllAlarms()
 
             val prayers = listOf(
                 Triple("Fajr", "الفجر", timings.Fajr) to Pair(FAJR_REQUEST_CODE, FAJR_COUNTDOWN_REQUEST_CODE),
@@ -173,39 +178,70 @@ class PrayerAlarmManager @Inject constructor(
         requestCode: Int
     ): Boolean {
         return try {
-            val intent = Intent(context, PrayerAlarmReceiver::class.java).apply {
+            val formattedPrayerTime = formatTime(timeInMillis)
+            val alertIntent = Intent(context, PrayerAlarmReceiver::class.java).apply {
                 action = PrayerAlarmReceiver.ACTION_PRAYER_ALERT
                 putExtra(PrayerAlarmReceiver.EXTRA_PRAYER_NAME, name)
                 putExtra(PrayerAlarmReceiver.EXTRA_PRAYER_NAME_ARABIC, nameArabic)
+                putExtra(PrayerAlarmReceiver.EXTRA_PRAYER_TIME, formattedPrayerTime)
+                putExtra(PrayerAlarmReceiver.EXTRA_SCHEDULED_TRIGGER_AT_MS, timeInMillis)
             }
-
-            val pendingIntent = PendingIntent.getBroadcast(
+            val alertPendingIntent = PendingIntent.getBroadcast(
                 context,
                 requestCode,
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                alertIntent,
+                PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
 
-            // Use setAlarmClock for prayer alerts - this guarantees:
-            // 1. Device will wake up from doze
-            // 2. App gets BAL (Background Activity Launch) exemption
-            // 3. Full-screen intent will work reliably
-            val showIntent = PendingIntent.getActivity(
-                context,
-                requestCode + 1000,
-                Intent(context, com.zakrni.app.clean.ui.views.HomeActivity::class.java),
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            // Use regular exact alarm so prayer alerts don't appear as alarm-clock entries.
+            scheduleExactAlarm(timeInMillis, alertPendingIntent)
+
+            // Companion sync broadcast to refresh countdown service/next prayer state.
+            schedulePrayerAlertSync(
+                name = name,
+                nameArabic = nameArabic,
+                syncTriggerTimeInMillis = timeInMillis + 1_000L,
+                expectedPrayerTimeInMillis = timeInMillis,
+                requestCode = requestCode + PRAYER_SYNC_REQUEST_CODE_OFFSET
             )
-            alarmManager.setAlarmClock(
-                AlarmManager.AlarmClockInfo(timeInMillis, showIntent),
-                pendingIntent
-            )
-            Log.d(TAG, "🔔 Prayer alert scheduled (AlarmClock) for $name at ${formatTime(timeInMillis)}")
+
+            Log.d(TAG, "🔔 Prayer alert broadcast scheduled for $name at $formattedPrayerTime")
             true
         } catch (e: Exception) {
             Log.e(TAG, "❌ Failed to schedule prayer alert for $name", e)
             false
         }
+    }
+
+    private fun schedulePrayerAlertSync(
+        name: String,
+        nameArabic: String,
+        syncTriggerTimeInMillis: Long,
+        expectedPrayerTimeInMillis: Long,
+        requestCode: Int
+    ) {
+        val syncIntent = Intent(context, PrayerAlarmReceiver::class.java).apply {
+            action = PrayerAlarmReceiver.ACTION_PRAYER_ALERT_SYNC
+            putExtra(PrayerAlarmReceiver.EXTRA_PRAYER_NAME, name)
+            putExtra(PrayerAlarmReceiver.EXTRA_PRAYER_NAME_ARABIC, nameArabic)
+            putExtra(
+                PrayerAlarmReceiver.EXTRA_SCHEDULED_TRIGGER_AT_MS,
+                expectedPrayerTimeInMillis
+            )
+        }
+
+        val syncPendingIntent = PendingIntent.getBroadcast(
+            context,
+            requestCode,
+            syncIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        scheduleExactAlarm(syncTriggerTimeInMillis, syncPendingIntent)
+        Log.d(
+            TAG,
+            "🔁 Prayer alert sync scheduled for $name at ${formatTime(syncTriggerTimeInMillis)}"
+        )
     }
 
     /**
@@ -332,31 +368,98 @@ class PrayerAlarmManager @Inject constructor(
      * Cancel all scheduled prayer alarms
      */
     fun cancelAllAlarms() {
-        val requestCodes = listOf(
+        val prayerRequestCodes = listOf(
             FAJR_REQUEST_CODE, DHUHR_REQUEST_CODE, ASR_REQUEST_CODE,
             MAGHRIB_REQUEST_CODE, ISHA_REQUEST_CODE,
+            // Tomorrow's prayer code
+            FAJR_REQUEST_CODE + 100
+        )
+
+        val countdownRequestCodes = listOf(
             FAJR_COUNTDOWN_REQUEST_CODE, DHUHR_COUNTDOWN_REQUEST_CODE,
             ASR_COUNTDOWN_REQUEST_CODE, MAGHRIB_COUNTDOWN_REQUEST_CODE,
             ISHA_COUNTDOWN_REQUEST_CODE,
-            // Tomorrow's codes
-            FAJR_REQUEST_CODE + 100, FAJR_COUNTDOWN_REQUEST_CODE + 100,
-            // Auto schedule code
-            AUTO_SCHEDULE_REQUEST_CODE
+            // Tomorrow's countdown code
+            FAJR_COUNTDOWN_REQUEST_CODE + 100
         )
 
-        requestCodes.forEach { requestCode ->
+        prayerRequestCodes.forEach { requestCode ->
             try {
-                val intent = Intent(context, PrayerAlarmReceiver::class.java)
-                val pendingIntent = PendingIntent.getBroadcast(
+                val prayerIntent = Intent(context, PrayerAlarmReceiver::class.java).apply {
+                    action = PrayerAlarmReceiver.ACTION_PRAYER_ALERT
+                }
+                val prayerPendingIntent = PendingIntent.getBroadcast(
                     context,
                     requestCode,
-                    intent,
+                    prayerIntent,
+                    PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
+                )
+                prayerPendingIntent?.let { alarmManager.cancel(it) }
+
+                // Clean up legacy direct-activity alarms from previous versions.
+                val alertActivityPendingIntent = PendingIntent.getActivity(
+                    context,
+                    requestCode,
+                    Intent(context, PrayerAlertActivity::class.java),
+                    PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
+                )
+                alertActivityPendingIntent?.let { alarmManager.cancel(it) }
+
+                // Clean up legacy AlarmClock show intent.
+                val showIntentPendingIntent = PendingIntent.getActivity(
+                    context,
+                    requestCode + 1000,
+                    Intent(context, HomeActivity::class.java),
+                    PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
+                )
+                showIntentPendingIntent?.let { alarmManager.cancel(it) }
+
+                // Cancel sync broadcast alarm.
+                val syncIntent = Intent(context, PrayerAlarmReceiver::class.java).apply {
+                    action = PrayerAlarmReceiver.ACTION_PRAYER_ALERT_SYNC
+                }
+                val syncPendingIntent = PendingIntent.getBroadcast(
+                    context,
+                    requestCode + PRAYER_SYNC_REQUEST_CODE_OFFSET,
+                    syncIntent,
                     PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                 )
-                alarmManager.cancel(pendingIntent)
+                alarmManager.cancel(syncPendingIntent)
             } catch (e: Exception) {
-                Log.e(TAG, "Error cancelling alarm with request code: $requestCode", e)
+                Log.e(TAG, "Error cancelling prayer alarm with request code: $requestCode", e)
             }
+        }
+
+        countdownRequestCodes.forEach { requestCode ->
+            try {
+                val countdownIntent = Intent(context, PrayerAlarmReceiver::class.java).apply {
+                    action = PrayerAlarmReceiver.ACTION_COUNTDOWN_NOTIFICATION
+                }
+                val countdownPendingIntent = PendingIntent.getBroadcast(
+                    context,
+                    requestCode,
+                    countdownIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+                alarmManager.cancel(countdownPendingIntent)
+            } catch (e: Exception) {
+                Log.e(TAG, "Error cancelling countdown alarm with request code: $requestCode", e)
+            }
+        }
+
+        try {
+            val autoIntent = Intent(context, PrayerAlarmReceiver::class.java).apply {
+                action = PrayerAlarmReceiver.ACTION_AUTO_RESCHEDULE
+            }
+            val autoPendingIntent = PendingIntent.getBroadcast(
+                context,
+                AUTO_SCHEDULE_REQUEST_CODE,
+                autoIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+            alarmManager.cancel(autoPendingIntent)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error cancelling auto schedule alarm", e)
         }
 
         Log.d(TAG, "🗑️ Cancelled all prayer alarms")
