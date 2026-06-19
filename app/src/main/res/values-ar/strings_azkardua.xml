@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- شاشات الأذكار / الأدعية (Compose) -->
+    <string name="azd_azkar_title">الأذكار</string>
+    <string name="azd_dua_title">الأدعية</string>
+
+    <string name="azd_section_morning">أذكار الصباح</string>
+    <string name="azd_section_evening">أذكار المساء</string>
+
+    <string name="azd_count_once">مرة واحدة</string>
+    <string name="azd_count_times">%1$d مرات</string>
+
+    <string name="azd_loading_error">فشل في تحميل البيانات</string>
+    <string name="azd_retry">إعادة المحاولة</string>
+
+    <string name="azd_empty_azkar">لا توجد أذكار متاحة</string>
+    <string name="azd_empty_dua">لا توجد أدعية متاحة</string>
+</resources>
