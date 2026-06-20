@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
@@ -97,9 +98,9 @@ fun ZakrniTheme(
         SideEffect {
             val window = (view.context as? Activity)?.window ?: return@SideEffect
             @Suppress("DEPRECATION")
-            window.statusBarColor = colorScheme.background.toArgb()
+            window.statusBarColor = (if (darkTheme) Color(0xFF081512) else Color(0xFFA9D6CC)).toArgb()
             @Suppress("DEPRECATION")
-            window.navigationBarColor = colorScheme.background.toArgb()
+            window.navigationBarColor = (if (darkTheme) Color(0xFF06100E) else Color(0xFFB4DCD1)).toArgb()
             val insets = WindowCompat.getInsetsController(window, view)
             insets.isAppearanceLightStatusBars = !darkTheme
             insets.isAppearanceLightNavigationBars = !darkTheme
@@ -116,13 +117,11 @@ fun ZakrniTheme(
             typography = ZakrniTypography,
             shapes = ZakrniShapes,
         ) {
-            // Gradient backdrop + haze source: glass surfaces blur whatever is behind them.
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .background(glassBackgroundBrush(darkTheme))
-                    .haze(state = hazeState),
-            ) {
+            // Rich, colourful backdrop (the "wallpaper") that the frosted glass blurs — iOS-style.
+            Box(Modifier.fillMaxSize().haze(state = hazeState)) {
+                Box(Modifier.fillMaxSize().background(glassBackgroundBrush(darkTheme)))
+                Box(Modifier.fillMaxSize().background(glassBlobTop(darkTheme)))
+                Box(Modifier.fillMaxSize().background(glassBlobBottom(darkTheme)))
                 content()
             }
         }
@@ -139,15 +138,27 @@ fun Modifier.glassChild(shape: Shape): Modifier {
     return this.clip(shape).hazeChild(state = state)
 }
 
-/** Vertical gradient backdrop behind the whole app — the base of the glassmorphism look. */
+/** Rich base gradient — the "wallpaper" the frosted glass blurs. */
 fun glassBackgroundBrush(dark: Boolean): Brush = Brush.linearGradient(
-    if (dark) listOf(Color(0xFF0C1A18), Color(0xFF132723), Color(0xFF0B1714))
-    else listOf(Color(0xFFBFE0DA), Color(0xFFE6F1EC), Color(0xFFC7E6DC)),
+    if (dark) listOf(Color(0xFF081512), Color(0xFF0D201A), Color(0xFF06100E))
+    else listOf(Color(0xFFA9D6CC), Color(0xFFCFE9E1), Color(0xFFB4DCD1)),
+)
+
+/** Warm gold glow (top-right) seen blurred through the glass — the colour you see in iOS glass. */
+fun glassBlobTop(dark: Boolean): Brush = Brush.radialGradient(
+    colors = listOf(BrandGold.copy(alpha = if (dark) 0.34f else 0.26f), Color.Transparent),
+    center = Offset(950f, 280f), radius = 780f,
+)
+
+/** Emerald glow (bottom-left) seen blurred through the glass. */
+fun glassBlobBottom(dark: Boolean): Brush = Brush.radialGradient(
+    colors = listOf(Color(0xFF1E9E86).copy(alpha = if (dark) 0.42f else 0.28f), Color.Transparent),
+    center = Offset(130f, 1850f), radius = 900f,
 )
 
 /** Translucent frosted surface color for glass cards/bars over [glassBackgroundBrush]. */
 val androidx.compose.material3.ColorScheme.glassSurface: Color
-    get() = if (surface.luminanceIsDark()) surface.copy(alpha = 0.34f) else Color.White.copy(alpha = 0.30f)
+    get() = if (surface.luminanceIsDark()) surface.copy(alpha = 0.36f) else Color.White.copy(alpha = 0.34f)
 
 val androidx.compose.material3.ColorScheme.glassBorder: Color
     get() = Color.White.copy(alpha = 0.45f)
