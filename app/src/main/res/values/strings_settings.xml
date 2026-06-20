@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- ============ Settings screen ============ -->
+    <string name="set_title">Settings</string>
+
+    <!-- Section headers -->
+    <string name="set_section_general">General</string>
+    <string name="set_section_appearance">Appearance</string>
+    <string name="set_section_notifications">Notifications</string>
+    <string name="set_section_audio">Audio</string>
+    <string name="set_section_about">About</string>
+
+    <!-- Language -->
+    <string name="set_language">Language</string>
+    <string name="set_language_subtitle">Choose the app language</string>
+    <string name="set_language_arabic">العربية</string>
+    <string name="set_language_english">English</string>
+
+    <!-- Dark mode -->
+    <string name="set_dark_mode">Dark mode</string>
+    <string name="set_dark_mode_subtitle">Use a darker theme</string>
+
+    <!-- Font size -->
+    <string name="set_font_size">Font size</string>
+    <string name="set_font_size_subtitle">Adjust reading text size</string>
+    <string name="set_font_small">Small</string>
+    <string name="set_font_medium">Medium</string>
+    <string name="set_font_large">Large</string>
+
+    <!-- Notifications -->
+    <string name="set_prayer_notifications">Prayer reminders</string>
+    <string name="set_prayer_notifications_subtitle">Get notified at prayer times</string>
+    <string name="set_azkar_reminders">Azkar reminders</string>
+    <string name="set_azkar_reminders_subtitle">Daily azkar notifications</string>
+
+    <!-- Audio -->
+    <string name="set_auto_play">Auto play audio</string>
+    <string name="set_auto_play_subtitle">Play recitation automatically</string>
+
+    <!-- Premium card -->
+    <string name="set_premium_title">Zakrni Premium</string>
+    <string name="set_premium_subtitle">Remove ads and unlock cosmetics</string>
+    <string name="set_premium_cta">Upgrade</string>
+    <string name="set_premium_active">Premium active</string>
+
+    <!-- About -->
+    <string name="set_about_version">Version</string>
+    <string name="set_about_rate">Rate the app</string>
+    <string name="set_about_share">Share app</string>
+
+    <!-- ============ Paywall screen ============ -->
+    <string name="set_paywall_title">Zakrni Premium</string>
+    <string name="set_paywall_hero_title">Unlock the full experience</string>
+    <string name="set_paywall_hero_subtitle">All worship content stays free, forever. Premium just removes ads and adds a few extras.</string>
+
+    <!-- Feature comparison -->
+    <string name="set_compare_free">Free</string>
+    <string name="set_compare_premium">Premium</string>
+    <string name="set_feature_all_content">All Quran, Azkar &amp; Duas</string>
+    <string name="set_feature_prayer_times">Prayer times &amp; Qibla</string>
+    <string name="set_feature_no_ads">No advertisements</string>
+    <string name="set_feature_themes">Premium themes &amp; cosmetics</string>
+    <string name="set_feature_support">Support development</string>
+
+    <!-- Plans -->
+    <string name="set_plan_monthly">Monthly</string>
+    <string name="set_plan_yearly">Yearly</string>
+    <string name="set_plan_lifetime">Lifetime</string>
+    <string name="set_plan_monthly_period">/ month</string>
+    <string name="set_plan_yearly_period">/ year</string>
+    <string name="set_plan_lifetime_period">one-time</string>
+    <string name="set_plan_save_format">Save %1$d%%</string>
+    <string name="set_plan_best_value">Best value</string>
+    <string name="set_plan_unavailable">Unavailable</string>
+    <string name="set_plan_subscribe">Subscribe</string>
+    <string name="set_plan_buy">Purchase</string>
+
+    <!-- States -->
+    <string name="set_paywall_loading">Loading plans…</string>
+    <string name="set_paywall_unavailable_title">Plans coming soon</string>
+    <string name="set_paywall_unavailable_message">Subscription plans aren\'t available right now. Please check back later.</string>
+    <string name="set_paywall_retry">Retry</string>
+    <string name="set_paywall_already_premium_title">You\'re Premium</string>
+    <string name="set_paywall_already_premium_message">Thank you for supporting Zakrni. Ads are removed and all extras are unlocked.</string>
+
+    <!-- Restore + legal -->
+    <string name="set_restore_purchases">Restore purchases</string>
+    <string name="set_restore_done">Purchases restored</string>
+    <string name="set_terms">Terms of Service</string>
+    <string name="set_privacy">Privacy Policy</string>
+    <string name="set_legal_separator">·</string>
+
+</resources>

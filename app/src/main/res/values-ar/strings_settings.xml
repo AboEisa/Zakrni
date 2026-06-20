@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- ============ شاشة الإعدادات ============ -->
+    <string name="set_title">الإعدادات</string>
+
+    <!-- عناوين الأقسام -->
+    <string name="set_section_general">عام</string>
+    <string name="set_section_appearance">المظهر</string>
+    <string name="set_section_notifications">الإشعارات</string>
+    <string name="set_section_audio">الصوت</string>
+    <string name="set_section_about">حول التطبيق</string>
+
+    <!-- اللغة -->
+    <string name="set_language">اللغة</string>
+    <string name="set_language_subtitle">اختر لغة التطبيق</string>
+    <string name="set_language_arabic">العربية</string>
+    <string name="set_language_english">English</string>
+
+    <!-- الوضع الداكن -->
+    <string name="set_dark_mode">الوضع الداكن</string>
+    <string name="set_dark_mode_subtitle">استخدام مظهر داكن</string>
+
+    <!-- حجم الخط -->
+    <string name="set_font_size">حجم الخط</string>
+    <string name="set_font_size_subtitle">ضبط حجم نص القراءة</string>
+    <string name="set_font_small">صغير</string>
+    <string name="set_font_medium">متوسط</string>
+    <string name="set_font_large">كبير</string>
+
+    <!-- الإشعارات -->
+    <string name="set_prayer_notifications">تنبيهات الصلاة</string>
+    <string name="set_prayer_notifications_subtitle">إشعارك عند أوقات الصلاة</string>
+    <string name="set_azkar_reminders">تذكير الأذكار</string>
+    <string name="set_azkar_reminders_subtitle">إشعارات الأذكار اليومية</string>
+
+    <!-- الصوت -->
+    <string name="set_auto_play">تشغيل الصوت تلقائياً</string>
+    <string name="set_auto_play_subtitle">تشغيل التلاوة تلقائياً</string>
+
+    <!-- بطاقة بريميوم -->
+    <string name="set_premium_title">ذكرني بريميوم</string>
+    <string name="set_premium_subtitle">إزالة الإعلانات وفتح الميزات التجميلية</string>
+    <string name="set_premium_cta">الترقية</string>
+    <string name="set_premium_active">بريميوم مفعّل</string>
+
+    <!-- حول -->
+    <string name="set_about_version">الإصدار</string>
+    <string name="set_about_rate">قيّم التطبيق</string>
+    <string name="set_about_share">مشاركة التطبيق</string>
+
+    <!-- ============ شاشة الاشتراك ============ -->
+    <string name="set_paywall_title">ذكرني بريميوم</string>
+    <string name="set_paywall_hero_title">افتح التجربة الكاملة</string>
+    <string name="set_paywall_hero_subtitle">يبقى كل محتوى العبادة مجانياً للأبد. بريميوم يزيل الإعلانات ويضيف بعض الإضافات فقط.</string>
+
+    <!-- مقارنة الميزات -->
+    <string name="set_compare_free">مجاني</string>
+    <string name="set_compare_premium">بريميوم</string>
+    <string name="set_feature_all_content">كل القرآن والأذكار والأدعية</string>
+    <string name="set_feature_prayer_times">أوقات الصلاة والقبلة</string>
+    <string name="set_feature_no_ads">بدون إعلانات</string>
+    <string name="set_feature_themes">سمات وميزات تجميلية مميزة</string>
+    <string name="set_feature_support">دعم التطوير</string>
+
+    <!-- الباقات -->
+    <string name="set_plan_monthly">شهري</string>
+    <string name="set_plan_yearly">سنوي</string>
+    <string name="set_plan_lifetime">مدى الحياة</string>
+    <string name="set_plan_monthly_period">/ شهرياً</string>
+    <string name="set_plan_yearly_period">/ سنوياً</string>
+    <string name="set_plan_lifetime_period">دفعة واحدة</string>
+    <string name="set_plan_save_format">وفّر %1$d%%</string>
+    <string name="set_plan_best_value">الأفضل قيمة</string>
+    <string name="set_plan_unavailable">غير متاح</string>
+    <string name="set_plan_subscribe">اشترك</string>
+    <string name="set_plan_buy">شراء</string>
+
+    <!-- الحالات -->
+    <string name="set_paywall_loading">جارٍ تحميل الباقات…</string>
+    <string name="set_paywall_unavailable_title">الباقات قريباً</string>
+    <string name="set_paywall_unavailable_message">باقات الاشتراك غير متاحة حالياً. يرجى المحاولة لاحقاً.</string>
+    <string name="set_paywall_retry">إعادة المحاولة</string>
+    <string name="set_paywall_already_premium_title">أنت مشترك في بريميوم</string>
+    <string name="set_paywall_already_premium_message">شكراً لدعمك ذكرني. تمت إزالة الإعلانات وفتح كل الإضافات.</string>
+
+    <!-- الاستعادة والقانوني -->
+    <string name="set_restore_purchases">استعادة المشتريات</string>
+    <string name="set_restore_done">تمت استعادة المشتريات</string>
+    <string name="set_terms">شروط الخدمة</string>
+    <string name="set_privacy">سياسة الخصوصية</string>
+    <string name="set_legal_separator">·</string>
+
+</resources>

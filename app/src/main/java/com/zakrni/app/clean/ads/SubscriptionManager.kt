@@ -25,7 +25,12 @@ class SubscriptionManager @Inject constructor(
         // ⚠️ Replace with your real product ID from Google Play Console
         const val MONTHLY_SUB_ID = "zakrni_premium_monthly"
         const val YEARLY_SUB_ID = "zakrni_premium_yearly"
-        private val PREMIUM_PRODUCT_IDS = setOf(MONTHLY_SUB_ID, YEARLY_SUB_ID)
+
+        // One-time (INAPP) lifetime purchase — must be created as a managed
+        // (non-consumable) in-app product in Play Console.
+        const val LIFETIME_INAPP_ID = "zakrni_premium_lifetime"
+
+        private val PREMIUM_PRODUCT_IDS = setOf(MONTHLY_SUB_ID, YEARLY_SUB_ID, LIFETIME_INAPP_ID)
     }
 
     private val prefs: SharedPreferences =
@@ -37,9 +42,17 @@ class SubscriptionManager @Inject constructor(
     private val _subscriptionProducts = MutableStateFlow<List<ProductDetails>>(emptyList())
     val subscriptionProducts: StateFlow<List<ProductDetails>> get() = _subscriptionProducts
 
+    /** One-time INAPP products (currently the lifetime purchase). */
+    private val _inAppProducts = MutableStateFlow<List<ProductDetails>>(emptyList())
+    val inAppProducts: StateFlow<List<ProductDetails>> get() = _inAppProducts
+
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     private var billingClient: BillingClient? = null
+
+    // Independent entitlement sources, combined in recomputeEntitlement().
+    private var hasActiveSubscription: Boolean = false
+    private var hasLifetimePurchase: Boolean = false
 
     fun isSubscribed(): Boolean = _isSubscribedState.value
 
@@ -61,7 +74,9 @@ class SubscriptionManager @Inject constructor(
                 if (result.responseCode == BillingClient.BillingResponseCode.OK) {
                     Log.d(TAG, "✅ Billing client connected")
                     querySubscriptionProducts()
+                    queryInAppProducts()
                     checkExistingSubscriptions()
+                    checkExistingInAppPurchases()
                 } else {
                     Log.w(TAG, "❌ Billing setup failed: ${result.debugMessage}")
                 }
@@ -110,12 +125,57 @@ class SubscriptionManager @Inject constructor(
     }
 
     /**
-     * Force refresh subscription products (called from dialog retry)
+     * Query the one-time (INAPP) products — currently the lifetime purchase.
+     */
+    private fun queryInAppProducts() {
+        val productList = listOf(
+            QueryProductDetailsParams.Product.newBuilder()
+                .setProductId(LIFETIME_INAPP_ID)
+                .setProductType(BillingClient.ProductType.INAPP)
+                .build()
+        )
+
+        val params = QueryProductDetailsParams.newBuilder()
+            .setProductList(productList)
+            .build()
+
+        billingClient?.queryProductDetailsAsync(params) { result, productDetailsList ->
+            if (result.responseCode == BillingClient.BillingResponseCode.OK) {
+                _inAppProducts.value = productDetailsList
+                Log.d(TAG, "✅ Found ${productDetailsList.size} in-app products")
+                productDetailsList.forEach { product ->
+                    Log.d(TAG, "  - ${product.productId}: ${product.name}")
+                }
+            } else {
+                Log.w(TAG, "❌ Failed to query in-app products: ${result.debugMessage}")
+            }
+        }
+    }
+
+    /**
+     * Force refresh subscription + in-app products (called from dialog/paywall retry)
      */
     fun refreshProducts() {
-        Log.d(TAG, "🔄 Refreshing subscription products...")
+        Log.d(TAG, "🔄 Refreshing products...")
         if (billingClient?.isReady == true) {
             querySubscriptionProducts()
+            queryInAppProducts()
+        } else {
+            Log.d(TAG, "⚠️ Billing client not ready, reconnecting...")
+            connectBillingClient()
+        }
+    }
+
+    /**
+     * Re-query Google Play for purchases the user already owns (subscriptions and
+     * the one-time lifetime purchase) and update [isSubscribedState] accordingly.
+     * Acknowledges any pending-but-unacknowledged premium purchases.
+     */
+    fun restorePurchases() {
+        Log.d(TAG, "🔄 Restoring purchases...")
+        if (billingClient?.isReady == true) {
+            checkExistingSubscriptions()
+            checkExistingInAppPurchases()
         } else {
             Log.d(TAG, "⚠️ Billing client not ready, reconnecting...")
             connectBillingClient()
@@ -137,10 +197,42 @@ class SubscriptionManager @Inject constructor(
                         purchase.isAcknowledged &&
                         isPremiumPurchase(purchase)
                 }
-                updateSubscriptionStatus(hasActive)
+                hasActiveSubscription = hasActive
+                recomputeEntitlement()
                 Log.d(TAG, "✅ Subscription status: ${if (hasActive) "ACTIVE" else "NOT ACTIVE"}")
 
                 // Acknowledge any unacknowledged purchases
+                purchases.filter {
+                    it.purchaseState == Purchase.PurchaseState.PURCHASED &&
+                        !it.isAcknowledged &&
+                        isPremiumPurchase(it)
+                }.forEach { purchase ->
+                    acknowledgePurchase(purchase)
+                }
+            }
+        }
+    }
+
+    /**
+     * Check if user owns the one-time lifetime purchase.
+     */
+    private fun checkExistingInAppPurchases() {
+        billingClient?.queryPurchasesAsync(
+            QueryPurchasesParams.newBuilder()
+                .setProductType(BillingClient.ProductType.INAPP)
+                .build()
+        ) { result, purchases ->
+            if (result.responseCode == BillingClient.BillingResponseCode.OK) {
+                val hasLifetime = purchases.any { purchase ->
+                    purchase.purchaseState == Purchase.PurchaseState.PURCHASED &&
+                        purchase.isAcknowledged &&
+                        isPremiumPurchase(purchase)
+                }
+                hasLifetimePurchase = hasLifetime
+                recomputeEntitlement()
+                Log.d(TAG, "✅ Lifetime status: ${if (hasLifetime) "OWNED" else "NOT OWNED"}")
+
+                // Acknowledge any unacknowledged lifetime purchases
                 purchases.filter {
                     it.purchaseState == Purchase.PurchaseState.PURCHASED &&
                         !it.isAcknowledged &&
@@ -177,6 +269,24 @@ class SubscriptionManager @Inject constructor(
     }
 
     /**
+     * Launch the one-time (INAPP) purchase flow for the lifetime product.
+     * INAPP products have no offer token.
+     */
+    fun launchInAppPurchaseFlow(activity: Activity, productDetails: ProductDetails) {
+        val productDetailsParamsList = listOf(
+            BillingFlowParams.ProductDetailsParams.newBuilder()
+                .setProductDetails(productDetails)
+                .build()
+        )
+
+        val billingFlowParams = BillingFlowParams.newBuilder()
+            .setProductDetailsParamsList(productDetailsParamsList)
+            .build()
+
+        billingClient?.launchBillingFlow(activity, billingFlowParams)
+    }
+
+    /**
      * Called when a purchase is updated (new purchase or status change)
      */
     override fun onPurchasesUpdated(result: BillingResult, purchases: MutableList<Purchase>?) {
@@ -187,7 +297,7 @@ class SubscriptionManager @Inject constructor(
                         isPremiumPurchase(purchase)
                     ) {
                         acknowledgePurchase(purchase)
-                        updateSubscriptionStatus(true)
+                        markPurchaseEntitlement(purchase)
                         Log.d(TAG, "✅ Purchase successful!")
                     }
                 }
@@ -214,14 +324,27 @@ class SubscriptionManager @Inject constructor(
         billingClient?.acknowledgePurchase(params) { result ->
             if (result.responseCode == BillingClient.BillingResponseCode.OK) {
                 Log.d(TAG, "✅ Purchase acknowledged")
-                updateSubscriptionStatus(true)
+                markPurchaseEntitlement(purchase)
             } else {
                 Log.w(TAG, "❌ Failed to acknowledge: ${result.debugMessage}")
             }
         }
     }
 
-    private fun updateSubscriptionStatus(isSubscribed: Boolean) {
+    /** Flip the right entitlement flag based on which premium product was purchased. */
+    private fun markPurchaseEntitlement(purchase: Purchase) {
+        if (purchase.products.contains(LIFETIME_INAPP_ID)) {
+            hasLifetimePurchase = true
+        }
+        if (purchase.products.any { it == MONTHLY_SUB_ID || it == YEARLY_SUB_ID }) {
+            hasActiveSubscription = true
+        }
+        recomputeEntitlement()
+    }
+
+    /** Combine subscription + lifetime ownership into the single premium flag. */
+    private fun recomputeEntitlement() {
+        val isSubscribed = hasActiveSubscription || hasLifetimePurchase
         _isSubscribedState.value = isSubscribed
         prefs.edit().putBoolean(KEY_IS_SUBSCRIBED, isSubscribed).apply()
     }
