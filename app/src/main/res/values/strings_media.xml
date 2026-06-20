@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Strings for the Compose Media (video) screens. Names prefixed media_.
+     (default = English) -->
+<resources>
+    <!-- Hub -->
+    <string name="media_hub_title">Media</string>
+    <string name="media_hub_subtitle">Lectures, recitations, videos and sermons</string>
+    <string name="media_cat_lectures">Lectures &amp; Talks</string>
+    <string name="media_cat_quran">Quran Recitations</string>
+    <string name="media_cat_videos">Islamic Videos</string>
+    <string name="media_cat_sermons">Friday Sermons</string>
+
+    <!-- List screen titles -->
+    <string name="media_list_lectures">Lectures &amp; Talks</string>
+    <string name="media_list_quran">Recitations &amp; Audio Lessons</string>
+    <string name="media_list_videos">Islamic Videos</string>
+    <string name="media_list_sermons">Friday Sermons</string>
+    <string name="media_list_default">All Media</string>
+
+    <!-- Search hints -->
+    <string name="media_search_lectures">Search for a lecture or sermon…</string>
+    <string name="media_search_quran">Search for a recitation or lesson…</string>
+    <string name="media_search_videos">Search for an Islamic video…</string>
+    <string name="media_search_sermons">Search for a Friday sermon…</string>
+    <string name="media_search_default">Search…</string>
+
+    <!-- States -->
+    <string name="media_empty_title">No videos available</string>
+    <string name="media_empty_search">No results found</string>
+    <string name="media_error_title">Failed to load videos</string>
+    <string name="media_retry">Retry</string>
+
+    <!-- Detail -->
+    <string name="media_play">Play on YouTube</string>
+    <string name="media_views">%1$s views</string>
+    <string name="media_description_title">Description</string>
+    <string name="media_back">Back</string>
+    <string name="media_search">Search</string>
+</resources>

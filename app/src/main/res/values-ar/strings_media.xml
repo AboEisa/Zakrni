@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- النصوص العربية لشاشات الوسائط (Compose) -->
+<resources>
+    <!-- Hub -->
+    <string name="media_hub_title">الوسائط</string>
+    <string name="media_hub_subtitle">محاضرات وتلاوات وفيديوهات وخطب</string>
+    <string name="media_cat_lectures">الخطب والمحاضرات</string>
+    <string name="media_cat_quran">تلاوات قرآنية</string>
+    <string name="media_cat_videos">فيديوهات إسلامية</string>
+    <string name="media_cat_sermons">خطب الجمعة</string>
+
+    <!-- List screen titles -->
+    <string name="media_list_lectures">الخطب والمحاضرات</string>
+    <string name="media_list_quran">التلاوات والدروس الصوتية</string>
+    <string name="media_list_videos">الفيديوهات الإسلامية</string>
+    <string name="media_list_sermons">خطب الجمعة</string>
+    <string name="media_list_default">كل الوسائط</string>
+
+    <!-- Search hints -->
+    <string name="media_search_lectures">ابحث عن خطبة أو محاضرة…</string>
+    <string name="media_search_quran">ابحث عن تلاوة أو درس…</string>
+    <string name="media_search_videos">ابحث عن فيديو إسلامي…</string>
+    <string name="media_search_sermons">ابحث عن خطبة جمعة…</string>
+    <string name="media_search_default">ابحث…</string>
+
+    <!-- States -->
+    <string name="media_empty_title">لا توجد فيديوهات متاحة</string>
+    <string name="media_empty_search">لا توجد نتائج للبحث</string>
+    <string name="media_error_title">حدث خطأ في تحميل الفيديوهات</string>
+    <string name="media_retry">إعادة المحاولة</string>
+
+    <!-- Detail -->
+    <string name="media_play">شغّل على يوتيوب</string>
+    <string name="media_views">%1$s مشاهدة</string>
+    <string name="media_description_title">الوصف</string>
+    <string name="media_back">رجوع</string>
+    <string name="media_search">بحث</string>
+</resources>
