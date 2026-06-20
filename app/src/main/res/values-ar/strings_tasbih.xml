@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Tasbih (digital dhikr counter) — Compose redesign. Prefix: tsb_ -->
+    <string name="tsb_title">المسبحة</string>
+    <string name="tsb_of">%1$d من %2$d</string>
+    <string name="tsb_tap_hint">اضغط للعدّ</string>
+    <string name="tsb_completed">مكتمل</string>
+
+    <!-- Default dhikrs -->
+    <string name="tsb_default_subhanallah">سبحان الله</string>
+    <string name="tsb_default_alhamdulillah">الحمد لله</string>
+    <string name="tsb_default_allahuakbar">الله أكبر</string>
+    <string name="tsb_default_la_ilaha">لا إله إلا الله</string>
+
+    <!-- Actions -->
+    <string name="tsb_reset">إعادة تعيين</string>
+    <string name="tsb_reset_confirm_title">إعادة تعيين العداد؟</string>
+    <string name="tsb_reset_confirm_message">سيؤدي هذا إلى إعادة عدد الذِّكر الحالي إلى الصفر.</string>
+    <string name="tsb_reset_all">إعادة تعيين الكل</string>
+    <string name="tsb_add">إضافة ذِكر</string>
+    <string name="tsb_delete">حذف</string>
+    <string name="tsb_cancel">إلغاء</string>
+    <string name="tsb_confirm">تأكيد</string>
+
+    <!-- Add dhikr dialog -->
+    <string name="tsb_add_title">إضافة ذِكر جديد</string>
+    <string name="tsb_add_subtitle">أضف ذِكرًا جديدًا وحدد العدد المستهدف.</string>
+    <string name="tsb_add_text_label">نص الذِّكر</string>
+    <string name="tsb_add_count_label">العدد المستهدف</string>
+    <string name="tsb_add_count_helper">الحد المسموح من ١ إلى ١٠٠٠٠</string>
+    <string name="tsb_error_text_empty">اكتب نص الذِّكر أولًا</string>
+    <string name="tsb_error_text_long">النص طويل (الحد الأقصى ١٢٠ حرفًا)</string>
+    <string name="tsb_error_count">العدد لازم يكون بين ١ و ١٠٠٠٠</string>
+
+    <!-- Feedback / a11y -->
+    <string name="tsb_added">تمت الإضافة بنجاح</string>
+    <string name="tsb_well_done">ما شاء الله! تم إكمال %1$s</string>
+    <string name="tsb_cd_counter">عداد الذِّكر، %1$d من %2$d. اضغط للعدّ.</string>
+    <string name="tsb_cd_select_dhikr">اختر ذِكر %1$s</string>
+    <string name="tsb_cd_delete_dhikr">حذف الذِّكر المخصص %1$s</string>
+</resources>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Tasbih (digital dhikr counter) — Compose redesign. Prefix: tsb_ -->
+    <string name="tsb_title">Tasbih</string>
+    <string name="tsb_of">%1$d of %2$d</string>
+    <string name="tsb_tap_hint">Tap to count</string>
+    <string name="tsb_completed">Completed</string>
+
+    <!-- Default dhikrs -->
+    <string name="tsb_default_subhanallah">Subhan Allah</string>
+    <string name="tsb_default_alhamdulillah">Alhamdulillah</string>
+    <string name="tsb_default_allahuakbar">Allahu Akbar</string>
+    <string name="tsb_default_la_ilaha">La ilaha illa Allah</string>
+
+    <!-- Actions -->
+    <string name="tsb_reset">Reset</string>
+    <string name="tsb_reset_confirm_title">Reset counter?</string>
+    <string name="tsb_reset_confirm_message">This resets the current dhikr count to zero.</string>
+    <string name="tsb_reset_all">Reset all</string>
+    <string name="tsb_add">Add dhikr</string>
+    <string name="tsb_delete">Delete</string>
+    <string name="tsb_cancel">Cancel</string>
+    <string name="tsb_confirm">Confirm</string>
+
+    <!-- Add dhikr dialog -->
+    <string name="tsb_add_title">Add new dhikr</string>
+    <string name="tsb_add_subtitle">Add a new dhikr and set its target count.</string>
+    <string name="tsb_add_text_label">Dhikr text</string>
+    <string name="tsb_add_count_label">Target count</string>
+    <string name="tsb_add_count_helper">Allowed range: 1 to 10000</string>
+    <string name="tsb_error_text_empty">Please enter a dhikr text</string>
+    <string name="tsb_error_text_long">Text is too long (max 120 characters)</string>
+    <string name="tsb_error_count">Count must be between 1 and 10000</string>
+
+    <!-- Feedback / a11y -->
+    <string name="tsb_added">Added successfully</string>
+    <string name="tsb_well_done">Well done! Completed %1$s</string>
+    <string name="tsb_cd_counter">Dhikr counter, %1$d of %2$d. Tap to count.</string>
+    <string name="tsb_cd_select_dhikr">Select dhikr %1$s</string>
+    <string name="tsb_cd_delete_dhikr">Delete custom dhikr %1$s</string>
+</resources>
