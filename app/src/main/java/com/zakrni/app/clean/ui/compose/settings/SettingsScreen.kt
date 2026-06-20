@@ -1,5 +1,9 @@
 package com.zakrni.app.clean.ui.compose.settings
 
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -127,9 +131,29 @@ fun SettingsScreen(onBack: () -> Unit, onOpenPaywall: () -> Unit) {
             // About
             ZSectionHeader(stringResource(R.string.set_section_about))
             ZCard {
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Row(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(stringResource(R.string.set_about_version), style = MaterialTheme.typography.bodyLarge)
                     Text(BuildConfig.VERSION_NAME, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                ActionRow(stringResource(R.string.set_about_rate)) {
+                    try {
+                        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=${context.packageName}")))
+                    } catch (e: Exception) {
+                        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=${context.packageName}")))
+                    }
+                }
+                ActionRow(stringResource(R.string.set_about_share)) {
+                    context.startActivity(
+                        Intent.createChooser(
+                            Intent(Intent.ACTION_SEND).setType("text/plain")
+                                .putExtra(Intent.EXTRA_TEXT, "https://play.google.com/store/apps/details?id=${context.packageName}"),
+                            null,
+                        ),
+                    )
+                }
+                ActionRow(stringResource(R.string.set_restore_purchases)) {
+                    subscriptionManager.restorePurchases()
+                    Toast.makeText(context, R.string.set_restore_done, Toast.LENGTH_SHORT).show()
                 }
             }
             Column(modifier = Modifier.padding(bottom = 24.dp)) {}
@@ -145,6 +169,16 @@ private fun SwitchRow(title: String, subtitle: String, checked: Boolean, onCheck
             Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         Switch(checked = checked, onCheckedChange = onCheckedChange)
+    }
+}
+
+@Composable
+private fun ActionRow(label: String, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).padding(vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(label, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
     }
 }
 
