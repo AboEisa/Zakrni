@@ -4,9 +4,9 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.CreationExtras
+import com.zakrni.app.clean.ui.utils.DhikrItem
 import com.zakrni.app.clean.ui.utils.LocaleHelper
 import com.zakrni.app.clean.ui.utils.TasbehPreferences
-import com.zakrni.app.clean.ui.views.TasbehFragment.DhikrItem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

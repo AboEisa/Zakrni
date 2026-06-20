@@ -30,7 +30,7 @@ import androidx.media3.common.AudioAttributes as ExoAudioAttributes
 import androidx.media3.exoplayer.ExoPlayer
 import com.zakrni.app.R
 import com.zakrni.app.clean.ui.utils.LocaleHelper
-import com.zakrni.app.clean.ui.views.HomeActivity
+import com.zakrni.app.clean.ui.compose.MainComposeActivity
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -564,7 +564,7 @@ class AudioPlaybackService : Service(), AudioManager.OnAudioFocusChangeListener 
     }
 
     private fun buildNotification(): Notification {
-        val intent = Intent(this, HomeActivity::class.java).apply {
+        val intent = Intent(this, MainComposeActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
         }
         val pendingIntent = PendingIntent.getActivity(

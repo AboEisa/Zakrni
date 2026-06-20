@@ -8,7 +8,7 @@ import android.content.Intent
 import android.os.Build
 import android.provider.Settings
 import android.util.Log
-import com.zakrni.app.clean.ui.views.HomeActivity
+import com.zakrni.app.clean.ui.compose.MainComposeActivity
 import com.zakrni.app.clean.ui.views.PrayerAlertActivity
 import com.zakrni.app.clean.ui.models.PresentationTimings
 import com.zakrni.app.clean.ui.utils.NetworkManager
@@ -409,7 +409,7 @@ class PrayerAlarmManager @Inject constructor(
                 val showIntentPendingIntent = PendingIntent.getActivity(
                     context,
                     requestCode + 1000,
-                    Intent(context, HomeActivity::class.java),
+                    Intent(context, MainComposeActivity::class.java),
                     PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
                 )
                 showIntentPendingIntent?.let { alarmManager.cancel(it) }

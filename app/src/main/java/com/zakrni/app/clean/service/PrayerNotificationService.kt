@@ -21,7 +21,7 @@ import com.zakrni.app.clean.ui.utils.LocaleHelper
 import com.zakrni.app.clean.ui.utils.NetworkManager
 import com.zakrni.app.clean.ui.utils.PrayerStorageManager
 import com.zakrni.app.clean.ui.utils.PrayerTimeUtils
-import com.zakrni.app.clean.ui.views.HomeActivity
+import com.zakrni.app.clean.ui.compose.MainComposeActivity
 import com.zakrni.app.clean.ui.views.PrayerAlertActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
@@ -216,7 +216,7 @@ class PrayerNotificationService : Service() {
         val pendingIntent = PendingIntent.getActivity(
             context,
             0,
-            Intent(context, HomeActivity::class.java),
+            Intent(context, MainComposeActivity::class.java),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
@@ -323,7 +323,7 @@ class PrayerNotificationService : Service() {
             val context = contextRef?.get() ?: this
 
             val pendingIntent = PendingIntent.getActivity(
-                context, 0, Intent(context, HomeActivity::class.java),
+                context, 0, Intent(context, MainComposeActivity::class.java),
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
 

@@ -88,14 +88,6 @@
         </receiver>
 
         <activity
-            android:name=".clean.ui.views.SplashActivity"
-            android:exported="false"
-            android:configChanges="orientation|screenSize|keyboardHidden|screenLayout" />
-        <activity
-            android:name=".clean.ui.views.HomeActivity"
-            android:exported="false"
-            android:configChanges="orientation|screenSize|keyboardHidden|screenLayout" />
-        <activity
             android:name=".clean.ui.views.PrayerAlertActivity"
             android:exported="true"
             android:theme="@style/Theme.PrayerAlert"
@@ -105,11 +97,6 @@
             android:excludeFromRecents="true"
             android:taskAffinity=""
             android:configChanges="orientation|screenSize|keyboardHidden|screenLayout" />
-        <activity
-            android:name=".clean.ui.views.MainActivity"
-            android:exported="false"
-            android:configChanges="orientation|screenSize|keyboardHidden|screenLayout" />
-
         <!-- Compose host (redesign) — the app launcher. -->
         <activity
             android:name=".clean.ui.compose.MainComposeActivity"

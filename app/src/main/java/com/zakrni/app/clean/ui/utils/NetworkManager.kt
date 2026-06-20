@@ -12,7 +12,7 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.zakrni.app.R
 import com.zakrni.app.clean.App
-import com.zakrni.app.clean.ui.views.HomeActivity
+import com.zakrni.app.clean.ui.compose.MainComposeActivity
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
@@ -111,7 +111,7 @@ class NetworkManager @Inject constructor(
 
     // 🚀 Show offline notification
     private fun showOfflineNotification() {
-        val intent = Intent(context, HomeActivity::class.java).apply {
+        val intent = Intent(context, MainComposeActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
 
@@ -162,7 +162,7 @@ class NetworkManager @Inject constructor(
 
     // 🚀 Show back online notification
     private fun showBackOnlineNotification() {
-        val intent = Intent(context, HomeActivity::class.java).apply {
+        val intent = Intent(context, MainComposeActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
 

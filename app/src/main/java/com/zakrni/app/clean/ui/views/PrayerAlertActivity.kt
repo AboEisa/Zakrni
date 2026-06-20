@@ -260,7 +260,7 @@ class PrayerAlertActivity : AppCompatActivity() {
             btnOpenApp.setOnClickListener {
                 stopAlert()
                 // Open main app
-                val intent = Intent(this@PrayerAlertActivity, HomeActivity::class.java).apply {
+                val intent = Intent(this@PrayerAlertActivity, com.zakrni.app.clean.ui.compose.MainComposeActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
                 }
                 startActivity(intent)

@@ -11,7 +11,7 @@ import com.zakrni.app.R
 import com.zakrni.app.clean.App
 import com.zakrni.app.clean.ui.utils.LocaleHelper
 import com.zakrni.app.clean.ui.utils.ThemeManager
-import com.zakrni.app.clean.ui.views.HomeActivity
+import com.zakrni.app.clean.ui.compose.MainComposeActivity
 import java.util.concurrent.TimeUnit
 
 /**
@@ -90,7 +90,7 @@ class AzkarReminderWorker(
         val isArabic = LocaleHelper.isArabic(context)
 
         // Intent to open app when notification is tapped
-        val intent = Intent(context, HomeActivity::class.java).apply {
+        val intent = Intent(context, MainComposeActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
         val pendingIntent = PendingIntent.getActivity(

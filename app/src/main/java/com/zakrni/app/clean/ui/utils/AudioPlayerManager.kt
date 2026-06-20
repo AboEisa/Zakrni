@@ -18,7 +18,7 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.media.app.NotificationCompat.MediaStyle
 import com.zakrni.app.clean.service.AudioPlaybackService
-import com.zakrni.app.clean.ui.views.MainActivity
+import com.zakrni.app.clean.ui.compose.MainComposeActivity
 import com.zakrni.app.R
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
@@ -473,7 +473,7 @@ class AudioPlayerManager @Inject constructor(
 
     private fun buildNotification(): Notification {
         // Intent to open the app
-        val contentIntent = Intent(context, MainActivity::class.java).apply {
+        val contentIntent = Intent(context, MainComposeActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
         val contentPendingIntent = PendingIntent.getActivity(

@@ -21,7 +21,7 @@ import com.zakrni.app.clean.ui.utils.LocaleHelper
 import com.zakrni.app.clean.ui.utils.PrayerStorageManager
 import com.zakrni.app.clean.ui.utils.PrayerTimeUtils
 import com.zakrni.app.clean.ui.utils.ThemeManager
-import com.zakrni.app.clean.ui.views.HomeActivity
+import com.zakrni.app.clean.ui.compose.MainComposeActivity
 import com.zakrni.app.clean.ui.views.PrayerAlertActivity
 import javax.inject.Inject
 import dagger.hilt.android.AndroidEntryPoint
@@ -402,7 +402,7 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
         try {
             val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-            val intent = Intent(context, HomeActivity::class.java).apply {
+            val intent = Intent(context, MainComposeActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
             }
 
