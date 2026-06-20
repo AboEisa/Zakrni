@@ -177,6 +177,9 @@ dependencies {
     // Lottie animations (Compose)
     implementation("com.airbnb.android:lottie-compose:6.4.0")
 
+    // Real GPU backdrop-blur for the glassmorphism look (Android 12+; graceful fallback below)
+    implementation("dev.chrisbanes.haze:haze:1.2.1")
+
     // Runtime permissions in Compose
     implementation("com.google.accompanist:accompanist-permissions:0.36.0")
 

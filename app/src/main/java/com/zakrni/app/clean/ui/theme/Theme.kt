@@ -15,8 +15,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import dev.chrisbanes.haze.HazeState
+import dev.chrisbanes.haze.haze
+import dev.chrisbanes.haze.hazeChild
 
 private val LightColors = lightColorScheme(
     primary = LightPrimary,
@@ -99,29 +106,51 @@ fun ZakrniTheme(
         }
     }
 
-    CompositionLocalProvider(LocalSpacing provides Spacing()) {
+    val hazeState = remember { HazeState() }
+    CompositionLocalProvider(
+        LocalSpacing provides Spacing(),
+        LocalHazeState provides hazeState,
+    ) {
         MaterialTheme(
             colorScheme = colorScheme,
             typography = ZakrniTypography,
             shapes = ZakrniShapes,
         ) {
-            // Soft gradient backdrop so translucent "glass" surfaces read well everywhere.
-            Box(Modifier.fillMaxSize().background(glassBackgroundBrush(darkTheme))) {
+            // Gradient backdrop + haze source: glass surfaces blur whatever is behind them.
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .background(glassBackgroundBrush(darkTheme))
+                    .haze(state = hazeState),
+            ) {
                 content()
             }
         }
     }
 }
 
+/** App-wide [HazeState] so shared glass surfaces (cards, bars, sheets) can blur content behind them. */
+val LocalHazeState = compositionLocalOf<HazeState?> { null }
+
+/** Apply real GPU backdrop-blur to a glass surface when a [HazeState] is available. */
+@Composable
+fun Modifier.glassChild(shape: Shape): Modifier {
+    val state = LocalHazeState.current ?: return this
+    return this.clip(shape).hazeChild(state = state)
+}
+
 /** Vertical gradient backdrop behind the whole app — the base of the glassmorphism look. */
-fun glassBackgroundBrush(dark: Boolean): Brush = Brush.verticalGradient(
-    if (dark) listOf(Color(0xFF0E1311), Color(0xFF15201B), Color(0xFF0F1714))
-    else listOf(Color(0xFFFDFBF4), Color(0xFFEDF4EE), Color(0xFFE4EFE8)),
+fun glassBackgroundBrush(dark: Boolean): Brush = Brush.linearGradient(
+    if (dark) listOf(Color(0xFF0C1A18), Color(0xFF132723), Color(0xFF0B1714))
+    else listOf(Color(0xFFBFE0DA), Color(0xFFE6F1EC), Color(0xFFC7E6DC)),
 )
 
 /** Translucent frosted surface color for glass cards/bars over [glassBackgroundBrush]. */
 val androidx.compose.material3.ColorScheme.glassSurface: Color
-    get() = surface.copy(alpha = 0.60f)
+    get() = if (surface.luminanceIsDark()) surface.copy(alpha = 0.34f) else Color.White.copy(alpha = 0.30f)
 
 val androidx.compose.material3.ColorScheme.glassBorder: Color
-    get() = onSurface.copy(alpha = 0.10f)
+    get() = Color.White.copy(alpha = 0.45f)
+
+private fun Color.luminanceIsDark(): Boolean =
+    (0.299f * red + 0.587f * green + 0.114f * blue) < 0.5f

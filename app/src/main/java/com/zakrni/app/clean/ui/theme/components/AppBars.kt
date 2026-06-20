@@ -31,12 +31,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.zakrni.app.clean.ui.theme.BrandGold
 import com.zakrni.app.clean.ui.theme.BrandTeal
+import com.zakrni.app.clean.ui.theme.glassChild
 
 /** Center-aligned brand top bar. Back arrow auto-mirrors in RTL. */
 @Composable
@@ -99,11 +101,11 @@ fun ZBottomBar(
     modifier: Modifier = Modifier,
 ) {
     Surface(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth().glassChild(RoundedCornerShape(28.dp)),
         shape = RoundedCornerShape(28.dp),
-        color = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.92f),
+        color = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.55f),
         shadowElevation = 8.dp,
-        border = BorderStroke(1.dp, BrandGold.copy(alpha = 0.22f)),
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.30f)),
     ) {
         BoxWithConstraints(
             modifier = Modifier

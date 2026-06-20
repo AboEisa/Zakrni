@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.zakrni.app.clean.ui.theme.glassBorder
+import com.zakrni.app.clean.ui.theme.glassChild
 import com.zakrni.app.clean.ui.theme.glassSurface
 
 /**
@@ -47,7 +48,7 @@ fun ZCard(
     } else Modifier
 
     Surface(
-        modifier = modifier.scale(scale).then(clickModifier),
+        modifier = modifier.scale(scale).then(clickModifier).glassChild(shape),
         shape = shape,
         color = color,
         contentColor = contentColor,
