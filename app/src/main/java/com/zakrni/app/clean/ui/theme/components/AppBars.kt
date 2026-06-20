@@ -36,9 +36,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.zakrni.app.clean.ui.theme.BrandGold
-import com.zakrni.app.clean.ui.theme.BrandTeal
-import com.zakrni.app.clean.ui.theme.glassChild
+import com.zakrni.app.clean.ui.theme.glassSurface
 
 /** Center-aligned brand top bar. Back arrow auto-mirrors in RTL. */
 @Composable
@@ -101,11 +99,11 @@ fun ZBottomBar(
     modifier: Modifier = Modifier,
 ) {
     Surface(
-        modifier = modifier.fillMaxWidth().glassChild(RoundedCornerShape(28.dp)),
+        modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(28.dp),
-        color = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.55f),
-        shadowElevation = 8.dp,
-        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.30f)),
+        color = MaterialTheme.colorScheme.glassSurface,
+        shadowElevation = 6.dp,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
     ) {
         BoxWithConstraints(
             modifier = Modifier
@@ -127,13 +125,13 @@ fun ZBottomBar(
                     .width(itemWidth)
                     .fillMaxHeight()
                     .padding(5.dp)
-                    .background(BrandGold, RoundedCornerShape(18.dp)),
+                    .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(18.dp)),
             )
 
             Row(modifier = Modifier.fillMaxSize()) {
                 items.forEachIndexed { index, item ->
                     val selected = index == selectedIndex
-                    val tint = if (selected) BrandTeal else MaterialTheme.colorScheme.onTertiary.copy(alpha = 0.72f)
+                    val tint = if (selected) Color.White else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                     val iconSize by animateDpAsState(
                         targetValue = if (selected) 24.dp else 20.dp,
                         animationSpec = spring(dampingRatio = 0.55f, stiffness = 400f),
