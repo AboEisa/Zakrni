@@ -34,4 +34,16 @@
     <string name="qrn_tafsir_title">تفسير السورة</string>
     <string name="qrn_tafsir_unavailable">التفسير غير متوفر لهذه السورة.</string>
     <string name="qrn_close">إغلاق</string>
+
+    <!-- خيارات الآية -->
+    <string name="qrn_ayah_options_title">خيارات الآية</string>
+    <string name="qrn_ayah_listen">استمع لهذه الآية</string>
+    <string name="qrn_ayah_tafsir">التفسير</string>
+    <string name="qrn_ayah_copy">نسخ</string>
+    <string name="qrn_ayah_share">مشاركة</string>
+    <string name="qrn_ayah_copied">تم نسخ الآية</string>
+
+    <!-- وضع القراءة -->
+    <string name="qrn_mushaf_mode">وضع المصحف</string>
+    <string name="qrn_list_mode">وضع القائمة</string>
 </resources>

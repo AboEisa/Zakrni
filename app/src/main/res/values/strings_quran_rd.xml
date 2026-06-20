@@ -34,4 +34,16 @@
     <string name="qrn_tafsir_title">Surah Tafsir</string>
     <string name="qrn_tafsir_unavailable">Tafsir is not available for this surah.</string>
     <string name="qrn_close">Close</string>
+
+    <!-- Ayah long-press options -->
+    <string name="qrn_ayah_options_title">Ayah options</string>
+    <string name="qrn_ayah_listen">Listen to this ayah</string>
+    <string name="qrn_ayah_tafsir">Tafsir</string>
+    <string name="qrn_ayah_copy">Copy</string>
+    <string name="qrn_ayah_share">Share</string>
+    <string name="qrn_ayah_copied">Ayah copied</string>
+
+    <!-- Reading mode -->
+    <string name="qrn_mushaf_mode">Mushaf view</string>
+    <string name="qrn_list_mode">List view</string>
 </resources>

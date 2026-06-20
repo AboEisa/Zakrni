@@ -1,5 +1,9 @@
 package com.zakrni.app.clean.ui.compose
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -85,6 +89,18 @@ fun ZakrniApp() {
             navController = navController,
             startDestination = Routes.HOME,
             modifier = Modifier.fillMaxSize().padding(innerPadding),
+            enterTransition = {
+                slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Start, tween(320)) + fadeIn(tween(320))
+            },
+            exitTransition = {
+                slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Start, tween(320)) + fadeOut(tween(320))
+            },
+            popEnterTransition = {
+                slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.End, tween(320)) + fadeIn(tween(320))
+            },
+            popExitTransition = {
+                slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.End, tween(320)) + fadeOut(tween(320))
+            },
         ) {
             // Landing + main tabs
             homeGraph(navController, onOpen = open)

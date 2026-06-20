@@ -4,6 +4,7 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -34,6 +35,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.zakrni.app.clean.ui.theme.BrandGold
+import com.zakrni.app.clean.ui.theme.BrandTeal
 
 /** Center-aligned brand top bar. Back arrow auto-mirrors in RTL. */
 @Composable
@@ -114,28 +116,34 @@ fun ZBottomBar(
                 label = "nav-indicator",
             )
 
+            // Solid gold pill that visibly slides under the selected tab.
             Box(
                 modifier = Modifier
                     .offset(x = indicatorOffset)
                     .width(itemWidth)
                     .fillMaxHeight()
-                    .padding(4.dp)
-                    .background(BrandGold.copy(alpha = 0.30f), RoundedCornerShape(20.dp)),
+                    .padding(5.dp)
+                    .background(BrandGold, RoundedCornerShape(18.dp)),
             )
 
             Row(modifier = Modifier.fillMaxSize()) {
                 items.forEachIndexed { index, item ->
                     val selected = index == selectedIndex
-                    val tint = if (selected) BrandGold else MaterialTheme.colorScheme.onTertiary
+                    val tint = if (selected) BrandTeal else MaterialTheme.colorScheme.onTertiary.copy(alpha = 0.72f)
+                    val iconSize by animateDpAsState(
+                        targetValue = if (selected) 24.dp else 20.dp,
+                        animationSpec = spring(dampingRatio = 0.55f, stiffness = 400f),
+                        label = "nav-icon-size",
+                    )
                     Column(
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxHeight()
-                            .clickable(indication = null, interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }) { onSelect(index) },
+                            .clickable(indication = null, interactionSource = remember { MutableInteractionSource() }) { onSelect(index) },
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center,
                     ) {
-                        Icon(item.icon, contentDescription = item.label, tint = tint, modifier = Modifier.size(20.dp))
+                        Icon(item.icon, contentDescription = item.label, tint = tint, modifier = Modifier.size(iconSize))
                         Text(
                             text = item.label,
                             style = MaterialTheme.typography.labelSmall,

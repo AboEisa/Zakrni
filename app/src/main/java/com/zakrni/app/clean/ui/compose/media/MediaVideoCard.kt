@@ -22,7 +22,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -62,8 +61,6 @@ fun MediaVideoCard(
                     .build(),
                 contentDescription = video.title,
                 contentScale = ContentScale.Crop,
-                placeholder = painterResource(R.drawable.placeholder_video),
-                error = painterResource(R.drawable.placeholder_video),
                 modifier = Modifier.fillMaxWidth().aspectRatio(16f / 9f),
             )
             // Play overlay

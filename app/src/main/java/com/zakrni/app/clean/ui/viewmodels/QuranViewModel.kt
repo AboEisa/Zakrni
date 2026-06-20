@@ -425,6 +425,30 @@ class QuranViewModel @Inject constructor(
         playAudioWithFallback(surahNumber, requestId)
     }
 
+    /**
+     * Play a SINGLE ayah by its global (1..6236) ayah number, using the current reciter
+     * via the islamic.network per-ayah CDN. Used by the ayah long-press "Listen" option.
+     */
+    fun playAyahAudio(globalAyahNumber: Int, surahNumber: Int) {
+        if (globalAyahNumber <= 0) return
+        beginNewPlaybackRequest()
+        failedUrls.clear()
+        val edition = normalizeReciterIdentifier(_selectedReciter.value).ifBlank { "ar.alafasy" }
+        val url = "https://cdn.islamic.network/quran/audio/128/$edition/$globalAyahNumber.mp3"
+        val surahName = getSurahName(surahNumber) ?: getLocalizedSurahFallback(surahNumber)
+        val reciterName = getAvailableReciters().find { it.first == _selectedReciter.value }?.second
+            ?: getLocalizedDefaultReciterName()
+        audioPlayerManager.setSurahInfo(surahName, reciterName)
+        audioPlayerManager.playAudio(
+            audioUrl = url,
+            surahNumber = surahNumber,
+            surahName = surahName,
+            reciterName = reciterName,
+            onCompletion = { },
+            onError = { e -> _error.value = e },
+        )
+    }
+
     private fun playAudioFromUrl(audioUrl: String, surahNumber: Int, requestId: Int) {
         if (!isActivePlaybackRequest(requestId)) return
 

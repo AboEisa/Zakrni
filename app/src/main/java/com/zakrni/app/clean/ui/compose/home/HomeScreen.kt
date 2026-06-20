@@ -108,9 +108,9 @@ fun HomeScreen(
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 10.dp, bottom = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         fullSpan { GreetingHeader() }
         fullSpan { NextPrayerCard(onOpenPrayer = { onOpen("prayer") }) }
@@ -139,7 +139,7 @@ private fun GreetingHeader() {
     Column(modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp)) {
         Text(
             text = stringResource(R.string.home_greeting),
-            style = MaterialTheme.typography.headlineMedium,
+            style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.onBackground,
         )
         Text(

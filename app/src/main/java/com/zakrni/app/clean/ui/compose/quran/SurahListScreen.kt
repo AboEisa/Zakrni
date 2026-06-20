@@ -284,11 +284,24 @@ private fun SurahListShimmer() {
 private fun filterSurahs(surahs: List<DomainSurah>, query: String): List<DomainSurah> {
     val trimmed = query.trim()
     if (trimmed.isEmpty()) return surahs
-    val needle = trimmed.lowercase()
+    val needle = normalizeForSearch(trimmed)
+    // Match Arabic-Indic digits typed for the number too.
+    val asNumber = trimmed.map { ch -> if (ch in '٠'..'٩') ('0' + (ch - '٠')) else ch }.joinToString("")
     return surahs.filter { surah ->
-        surah.number.toString() == trimmed ||
-            surah.name.lowercase().contains(needle) ||
-            surah.englishName.lowercase().contains(needle) ||
-            surah.englishNameTranslation.lowercase().contains(needle)
+        surah.number.toString() == asNumber ||
+            normalizeForSearch(surah.name).contains(needle) ||
+            normalizeForSearch(surah.englishName).contains(needle) ||
+            normalizeForSearch(surah.englishNameTranslation).contains(needle)
     }
 }
+
+private val arabicDiacritics = "[ً-ْٰـ]".toRegex()
+
+/** Lowercase + strip Arabic tashkeel/tatweel and unify alef/hamza/ya/ta-marbuta so search is forgiving. */
+private fun normalizeForSearch(input: String): String =
+    input.lowercase()
+        .replace(arabicDiacritics, "")
+        .replace('أ', 'ا').replace('إ', 'ا').replace('آ', 'ا')
+        .replace('ى', 'ي').replace('ئ', 'ي')
+        .replace('ؤ', 'و').replace('ة', 'ه')
+        .trim()
