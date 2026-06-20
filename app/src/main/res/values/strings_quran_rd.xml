@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Quran screens (Compose redesign) -->
+
+    <!-- Surah list -->
+    <string name="qrn_list_title">The Holy Quran</string>
+    <string name="qrn_search_hint">Search for a surah…</string>
+    <string name="qrn_search_clear">Clear search</string>
+    <string name="qrn_meccan">Meccan</string>
+    <string name="qrn_medinan">Medinan</string>
+    <string name="qrn_verses_count">%1$d verses</string>
+    <string name="qrn_empty_title">No surahs found</string>
+    <string name="qrn_empty_search">No surah matches your search</string>
+    <string name="qrn_retry">Retry</string>
+    <string name="qrn_loading_error">Something went wrong while loading the Quran</string>
+
+    <!-- Reader -->
+    <string name="qrn_bismillah">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</string>
+    <string name="qrn_reader_empty">No verses available for this surah</string>
+
+    <!-- Audio player bar -->
+    <string name="qrn_play">Play</string>
+    <string name="qrn_pause">Pause</string>
+    <string name="qrn_stop">Stop</string>
+    <string name="qrn_reciter">Reciter</string>
+    <string name="qrn_audio_loading">Loading audio…</string>
+
+    <!-- Reciter picker -->
+    <string name="qrn_reciter_picker_title">Choose a reciter</string>
+    <string name="qrn_reciter_selected">Selected</string>
+
+    <!-- Tafsir -->
+    <string name="qrn_tafsir">Tafsir</string>
+    <string name="qrn_tafsir_title">Surah Tafsir</string>
+    <string name="qrn_tafsir_unavailable">Tafsir is not available for this surah.</string>
+    <string name="qrn_close">Close</string>
+</resources>
