@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Content lists (Hadith + Names of Allah) Compose screens -->
+    <string name="content_hadith_title">Hadith</string>
+    <string name="content_hadith_error">Failed to load hadiths</string>
+    <string name="content_hadith_empty">No hadiths available</string>
+    <string name="content_hadith_number">Hadith %1$s</string>
+
+    <string name="content_allah_names_title">Names of Allah</string>
+    <string name="content_allah_names_error">Failed to load the Names of Allah</string>
+    <string name="content_allah_names_empty">No names available</string>
+
+    <string name="content_back">Back</string>
+    <string name="content_retry">Retry</string>
+</resources>

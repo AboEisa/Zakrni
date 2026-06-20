@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- شاشات المحتوى (الأحاديث + أسماء الله الحسنى) -->
+    <string name="content_hadith_title">الأحاديث</string>
+    <string name="content_hadith_error">تعذّر تحميل الأحاديث</string>
+    <string name="content_hadith_empty">لا توجد أحاديث متاحة</string>
+    <string name="content_hadith_number">حديث %1$s</string>
+
+    <string name="content_allah_names_title">أسماء الله الحسنى</string>
+    <string name="content_allah_names_error">تعذّر تحميل أسماء الله الحسنى</string>
+    <string name="content_allah_names_empty">لا توجد أسماء متاحة</string>
+
+    <string name="content_back">رجوع</string>
+    <string name="content_retry">إعادة المحاولة</string>
+</resources>
