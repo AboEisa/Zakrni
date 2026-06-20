@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Home landing -->
+    <string name="home_greeting">Peace be upon you</string>
+    <string name="home_next_prayer">Next prayer</string>
+    <string name="home_remaining">remaining</string>
+    <string name="home_prayer_unavailable">Prayer times not available yet</string>
+    <string name="home_prayer_open">Open prayer times</string>
+    <string name="home_daily_ayah">Verse of the day</string>
+    <string name="home_quick_actions">Sections</string>
+
+    <!-- Quick action labels -->
+    <string name="home_action_quran">Quran</string>
+    <string name="home_action_azkar">Azkar</string>
+    <string name="home_action_dua">Supplications</string>
+    <string name="home_action_hadith">Hadith</string>
+    <string name="home_action_allah_names">Names of Allah</string>
+    <string name="home_action_tasbih">Tasbih</string>
+    <string name="home_action_qibla">Qibla</string>
+    <string name="home_action_hijri">Hijri Calendar</string>
+    <string name="home_action_tracker">Tracker</string>
+    <string name="home_action_prayer">Prayer Times</string>
+    <string name="home_action_media">Media</string>
+
+    <!-- Splash -->
+    <string name="home_app_name">Zakrni</string>
+    <string name="home_app_tagline">Your companion in remembrance</string>
+
+    <!-- Onboarding -->
+    <string name="home_onb_skip">Skip</string>
+    <string name="home_onb_next">Next</string>
+    <string name="home_onb_start">Get Started</string>
+    <string name="home_onb_title_1">Welcome to Zakrni</string>
+    <string name="home_onb_body_1">Your daily companion for prayer, remembrance, and reflection — all in one place.</string>
+    <string name="home_onb_title_2">Never miss a prayer</string>
+    <string name="home_onb_body_2">Accurate prayer times with a live countdown so you are always ready.</string>
+    <string name="home_onb_title_3">Stay close to the Quran</string>
+    <string name="home_onb_body_3">A verse each day, azkar, supplications, and more to keep your heart connected.</string>
+</resources>
