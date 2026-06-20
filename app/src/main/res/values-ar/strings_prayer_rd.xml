@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- مواقيت الصلاة (إعادة تصميم Compose) — البادئة prn_ -->
+    <string name="prn_title">أوقات الصلاة</string>
+    <string name="prn_all_title">جميع المواقيت</string>
+
+    <!-- بطاقة الصلاة القادمة -->
+    <string name="prn_next_prayer">الصلاة القادمة</string>
+    <string name="prn_time_for_prayer">حان وقت %1$s</string>
+    <string name="prn_remaining">متبقّي</string>
+    <string name="prn_view_all">عرض جميع المواقيت</string>
+    <string name="prn_detecting_location">جاري تحديد الموقع…</string>
+
+    <!-- أسماء الصلوات -->
+    <string name="prn_fajr">الفجر</string>
+    <string name="prn_sunrise">الشروق</string>
+    <string name="prn_dhuhr">الظهر</string>
+    <string name="prn_asr">العصر</string>
+    <string name="prn_maghrib">المغرب</string>
+    <string name="prn_isha">العشاء</string>
+
+    <!-- التسميات -->
+    <string name="prn_now_label">الآن</string>
+    <string name="prn_next_label">التالية</string>
+
+    <!-- الأذونات / الحالات -->
+    <string name="prn_location_permission_title">يلزم الوصول إلى الموقع</string>
+    <string name="prn_location_permission_message">يستخدم ذكرني موقعك لحساب أوقات الصلاة بدقة في مكانك.</string>
+    <string name="prn_grant_permission">منح الإذن</string>
+    <string name="prn_open_settings">فتح الإعدادات</string>
+    <string name="prn_retry">إعادة المحاولة</string>
+    <string name="prn_loading">جاري تحميل أوقات الصلاة…</string>
+
+    <!-- أوصاف المحتوى -->
+    <string name="prn_cd_back">رجوع</string>
+    <string name="prn_cd_location">الموقع</string>
+</resources>
