@@ -2,6 +2,12 @@
 <!-- عربي — strings للريديزاين (Compose) -->
 <resources>
     <string name="rd_categories_title">الأقسام</string>
+    <string name="rd_nav_home">الرئيسية</string>
+    <string name="rd_nav_quran">القرآن</string>
+    <string name="rd_cat_qibla">القبلة</string>
+    <string name="rd_cat_hijri">التقويم الهجري</string>
+    <string name="rd_cat_tracker">متابعة العبادات</string>
+    <string name="rd_cat_settings">الإعدادات</string>
     <string name="rd_cat_quran">القرآن الكريم</string>
     <string name="rd_cat_azkar">الأذكار</string>
     <string name="rd_cat_dua">الأدعية</string>

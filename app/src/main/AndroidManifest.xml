@@ -107,19 +107,19 @@
             android:configChanges="orientation|screenSize|keyboardHidden|screenLayout" />
         <activity
             android:name=".clean.ui.views.MainActivity"
+            android:exported="false"
+            android:configChanges="orientation|screenSize|keyboardHidden|screenLayout" />
+
+        <!-- Compose host (redesign) — the app launcher. -->
+        <activity
+            android:name=".clean.ui.compose.MainComposeActivity"
             android:exported="true"
-            android:configChanges="orientation|screenSize|keyboardHidden|screenLayout">
+            android:configChanges="orientation|screenSize|keyboardHidden|screenLayout|uiMode|locale|layoutDirection">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <!-- New Compose host (redesign). Not the launcher yet; switched once migration completes. -->
-        <activity
-            android:name=".clean.ui.compose.MainComposeActivity"
-            android:exported="false"
-            android:configChanges="orientation|screenSize|keyboardHidden|screenLayout|uiMode|locale|layoutDirection" />
 
         <!-- Home-screen widget (Glance): next prayer + countdown + daily ayah -->
         <receiver

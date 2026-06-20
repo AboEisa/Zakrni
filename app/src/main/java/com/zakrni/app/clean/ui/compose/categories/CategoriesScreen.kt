@@ -18,6 +18,12 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Explore
+import androidx.compose.material.icons.filled.LocalFireDepartment
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -40,21 +47,6 @@ import com.zakrni.app.clean.ui.theme.components.ZCard
 import com.zakrni.app.clean.ui.theme.components.ZTopBar
 import kotlinx.coroutines.delay
 
-private data class CategoryUi(
-    @StringRes val title: Int,
-    @DrawableRes val icon: Int,
-    val route: String,
-)
-
-private val categories = listOf(
-    CategoryUi(R.string.rd_cat_quran, R.drawable.ic_quran, CategoryRoutes.QURAN),
-    CategoryUi(R.string.rd_cat_azkar, R.drawable.ic_azkar, CategoryRoutes.AZKAR),
-    CategoryUi(R.string.rd_cat_dua, R.drawable.ic_dua, CategoryRoutes.DUA),
-    CategoryUi(R.string.rd_cat_hadith, R.drawable.ic_hadith, CategoryRoutes.HADITH),
-    CategoryUi(R.string.rd_cat_allah_names, R.drawable.ic_allah_names, CategoryRoutes.ALLAH_NAMES),
-    CategoryUi(R.string.rd_cat_tasbih, R.drawable.ic_tasbeh, CategoryRoutes.TASBIH),
-)
-
 /** Routes opened from the categories hub. */
 object CategoryRoutes {
     const val QURAN = "quran_list"
@@ -63,7 +55,31 @@ object CategoryRoutes {
     const val HADITH = "hadith"
     const val ALLAH_NAMES = "allah_names"
     const val TASBIH = "tasbih"
+    const val QIBLA = "qibla"
+    const val HIJRI = "hijri"
+    const val TRACKER = "tracker"
+    const val SETTINGS = "settings"
 }
+
+private data class CategoryUi(
+    @StringRes val title: Int,
+    val route: String,
+    @DrawableRes val icon: Int? = null,
+    val iconVector: ImageVector? = null,
+)
+
+private val categories = listOf(
+    CategoryUi(R.string.rd_cat_quran, CategoryRoutes.QURAN, icon = R.drawable.ic_quran),
+    CategoryUi(R.string.rd_cat_azkar, CategoryRoutes.AZKAR, icon = R.drawable.ic_azkar),
+    CategoryUi(R.string.rd_cat_dua, CategoryRoutes.DUA, icon = R.drawable.ic_dua),
+    CategoryUi(R.string.rd_cat_hadith, CategoryRoutes.HADITH, icon = R.drawable.ic_hadith),
+    CategoryUi(R.string.rd_cat_allah_names, CategoryRoutes.ALLAH_NAMES, icon = R.drawable.ic_allah_names),
+    CategoryUi(R.string.rd_cat_tasbih, CategoryRoutes.TASBIH, icon = R.drawable.ic_tasbeh),
+    CategoryUi(R.string.rd_cat_qibla, CategoryRoutes.QIBLA, iconVector = Icons.Filled.Explore),
+    CategoryUi(R.string.rd_cat_hijri, CategoryRoutes.HIJRI, iconVector = Icons.Filled.CalendarMonth),
+    CategoryUi(R.string.rd_cat_tracker, CategoryRoutes.TRACKER, iconVector = Icons.Filled.LocalFireDepartment),
+    CategoryUi(R.string.rd_cat_settings, CategoryRoutes.SETTINGS, iconVector = Icons.Filled.Settings),
+)
 
 @Composable
 fun CategoriesScreen(
@@ -90,7 +106,7 @@ fun CategoriesScreen(
 private fun CategoryTile(item: CategoryUi, index: Int, onClick: () -> Unit) {
     var visible by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
-        delay(index * 60L)
+        delay(index * 55L)
         visible = true
     }
     val alpha by animateFloatAsState(if (visible) 1f else 0f, tween(350), label = "tile-alpha")
@@ -115,11 +131,19 @@ private fun CategoryTile(item: CategoryUi, index: Int, onClick: () -> Unit) {
                     .background(BrandGold.copy(alpha = 0.14f), CircleShape),
                 contentAlignment = Alignment.Center,
             ) {
-                Image(
-                    painter = painterResource(item.icon),
-                    contentDescription = null,
-                    modifier = Modifier.size(38.dp),
-                )
+                when {
+                    item.icon != null -> Image(
+                        painter = painterResource(item.icon),
+                        contentDescription = null,
+                        modifier = Modifier.size(38.dp),
+                    )
+                    item.iconVector != null -> Icon(
+                        imageVector = item.iconVector,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(34.dp),
+                    )
+                }
             }
             Text(
                 text = stringResource(item.title),
