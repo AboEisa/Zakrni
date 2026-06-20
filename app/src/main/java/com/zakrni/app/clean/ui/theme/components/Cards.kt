@@ -1,6 +1,7 @@
 package com.zakrni.app.clean.ui.theme.components
 
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -18,6 +19,8 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.zakrni.app.clean.ui.theme.glassBorder
+import com.zakrni.app.clean.ui.theme.glassSurface
 
 /**
  * Standard brand surface card. When [onClick] is supplied it gets a press-scale micro-interaction.
@@ -27,11 +30,12 @@ fun ZCard(
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
     shape: Shape = RoundedCornerShape(20.dp),
-    color: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.surface,
+    color: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.glassSurface,
     contentColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.onSurface,
     tonalElevation: Dp = 0.dp,
-    shadowElevation: Dp = 3.dp,
+    shadowElevation: Dp = 2.dp,
     contentPadding: Dp = 16.dp,
+    border: BorderStroke? = BorderStroke(1.dp, MaterialTheme.colorScheme.glassBorder),
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val interaction = remember { MutableInteractionSource() }
@@ -49,6 +53,7 @@ fun ZCard(
         contentColor = contentColor,
         tonalElevation = tonalElevation,
         shadowElevation = shadowElevation,
+        border = border,
     ) {
         Column(modifier = Modifier.padding(contentPadding), content = content)
     }

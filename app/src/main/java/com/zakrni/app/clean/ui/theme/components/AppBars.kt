@@ -2,6 +2,7 @@ package com.zakrni.app.clean.ui.theme.components
 
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -100,8 +101,9 @@ fun ZBottomBar(
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(28.dp),
-        color = MaterialTheme.colorScheme.tertiary,
+        color = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.92f),
         shadowElevation = 8.dp,
+        border = BorderStroke(1.dp, BrandGold.copy(alpha = 0.22f)),
     ) {
         BoxWithConstraints(
             modifier = Modifier

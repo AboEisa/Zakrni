@@ -1,13 +1,19 @@
 package com.zakrni.app.clean.ui.theme
 
 import android.app.Activity
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
@@ -98,7 +104,24 @@ fun ZakrniTheme(
             colorScheme = colorScheme,
             typography = ZakrniTypography,
             shapes = ZakrniShapes,
-            content = content,
-        )
+        ) {
+            // Soft gradient backdrop so translucent "glass" surfaces read well everywhere.
+            Box(Modifier.fillMaxSize().background(glassBackgroundBrush(darkTheme))) {
+                content()
+            }
+        }
     }
 }
+
+/** Vertical gradient backdrop behind the whole app — the base of the glassmorphism look. */
+fun glassBackgroundBrush(dark: Boolean): Brush = Brush.verticalGradient(
+    if (dark) listOf(Color(0xFF0E1311), Color(0xFF15201B), Color(0xFF0F1714))
+    else listOf(Color(0xFFFDFBF4), Color(0xFFEDF4EE), Color(0xFFE4EFE8)),
+)
+
+/** Translucent frosted surface color for glass cards/bars over [glassBackgroundBrush]. */
+val androidx.compose.material3.ColorScheme.glassSurface: Color
+    get() = surface.copy(alpha = 0.60f)
+
+val androidx.compose.material3.ColorScheme.glassBorder: Color
+    get() = onSurface.copy(alpha = 0.10f)
