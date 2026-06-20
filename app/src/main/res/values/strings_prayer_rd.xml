@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Prayer Times (Compose redesign) — names prefixed prn_ -->
+    <string name="prn_title">Prayer Times</string>
+    <string name="prn_all_title">All Prayer Times</string>
+
+    <!-- Next-prayer hero card -->
+    <string name="prn_next_prayer">Next prayer</string>
+    <string name="prn_time_for_prayer">Time for %1$s</string>
+    <string name="prn_remaining">remaining</string>
+    <string name="prn_view_all">View all prayer times</string>
+    <string name="prn_detecting_location">Detecting location…</string>
+
+    <!-- Prayer names -->
+    <string name="prn_fajr">Fajr</string>
+    <string name="prn_sunrise">Sunrise</string>
+    <string name="prn_dhuhr">Dhuhr</string>
+    <string name="prn_asr">Asr</string>
+    <string name="prn_maghrib">Maghrib</string>
+    <string name="prn_isha">Isha</string>
+
+    <!-- Labels -->
+    <string name="prn_now_label">Now</string>
+    <string name="prn_next_label">Next</string>
+
+    <!-- Permission / states -->
+    <string name="prn_location_permission_title">Location access needed</string>
+    <string name="prn_location_permission_message">Zakrni uses your location to calculate accurate prayer times for where you are.</string>
+    <string name="prn_grant_permission">Grant permission</string>
+    <string name="prn_open_settings">Open settings</string>
+    <string name="prn_retry">Retry</string>
+    <string name="prn_loading">Loading prayer times…</string>
+
+    <!-- Content descriptions -->
+    <string name="prn_cd_back">Back</string>
+    <string name="prn_cd_location">Location</string>
+</resources>
