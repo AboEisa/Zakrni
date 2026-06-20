@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Worship streaks / habit tracker feature. All names prefixed tracker_. -->
+    <string name="tracker_title">Worship Tracker</string>
+    <string name="tracker_today_prayers">Today\'s Prayers</string>
+    <string name="tracker_prayer_fajr">Fajr</string>
+    <string name="tracker_prayer_dhuhr">Dhuhr</string>
+    <string name="tracker_prayer_asr">Asr</string>
+    <string name="tracker_prayer_maghrib">Maghrib</string>
+    <string name="tracker_prayer_isha">Isha</string>
+
+    <string name="tracker_streak_title">Current Streak</string>
+    <string name="tracker_streak_days">%1$d days</string>
+    <string name="tracker_streak_one_day">1 day</string>
+    <string name="tracker_streak_zero">No streak yet</string>
+
+    <string name="tracker_today_progress">%1$d of 5 prayers</string>
+
+    <!-- Motivational lines, picked by today's progress -->
+    <string name="tracker_motivation_start">Begin your day with Fajr.</string>
+    <string name="tracker_motivation_progress">Keep going — you are on your way.</string>
+    <string name="tracker_motivation_almost">Almost there, one prayer left.</string>
+    <string name="tracker_motivation_complete">All five complete. May Allah accept it.</string>
+    <string name="tracker_streak_encourage">Don\'t break the chain!</string>
+
+    <string name="tracker_heatmap_title">Last 5 Weeks</string>
+    <string name="tracker_heatmap_summary">%1$d complete days</string>
+    <string name="tracker_heatmap_legend_less">Less</string>
+    <string name="tracker_heatmap_legend_more">More</string>
+
+    <string name="tracker_dhikr_title">Daily Dhikr</string>
+    <string name="tracker_dhikr_count">%1$d</string>
+    <string name="tracker_dhikr_add">Tasbeeh</string>
+    <string name="tracker_dhikr_reset">Reset</string>
+
+    <string name="tracker_cd_prayer_checked">Prayed</string>
+    <string name="tracker_cd_prayer_unchecked">Not prayed</string>
+    <string name="tracker_cd_progress_ring">Today\'s prayer progress</string>
+</resources>

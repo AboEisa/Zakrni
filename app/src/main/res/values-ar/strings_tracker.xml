@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- متتبع العبادات / سلسلة المداومة. جميع الأسماء تبدأ بـ tracker_. -->
+    <string name="tracker_title">متتبع العبادات</string>
+    <string name="tracker_today_prayers">صلوات اليوم</string>
+    <string name="tracker_prayer_fajr">الفجر</string>
+    <string name="tracker_prayer_dhuhr">الظهر</string>
+    <string name="tracker_prayer_asr">العصر</string>
+    <string name="tracker_prayer_maghrib">المغرب</string>
+    <string name="tracker_prayer_isha">العشاء</string>
+
+    <string name="tracker_streak_title">سلسلة المداومة</string>
+    <string name="tracker_streak_days">%1$d يوماً</string>
+    <string name="tracker_streak_one_day">يوم واحد</string>
+    <string name="tracker_streak_zero">لا توجد سلسلة بعد</string>
+
+    <string name="tracker_today_progress">%1$d من 5 صلوات</string>
+
+    <!-- عبارات تحفيزية تُختار حسب تقدم اليوم -->
+    <string name="tracker_motivation_start">ابدأ يومك بصلاة الفجر.</string>
+    <string name="tracker_motivation_progress">واصل، أنت على الطريق.</string>
+    <string name="tracker_motivation_almost">اقتربت، بقيت صلاة واحدة.</string>
+    <string name="tracker_motivation_complete">أتممت الخمس، تقبّل الله منك.</string>
+    <string name="tracker_streak_encourage">لا تقطع السلسلة!</string>
+
+    <string name="tracker_heatmap_title">آخر 5 أسابيع</string>
+    <string name="tracker_heatmap_summary">%1$d يوماً مكتملاً</string>
+    <string name="tracker_heatmap_legend_less">أقل</string>
+    <string name="tracker_heatmap_legend_more">أكثر</string>
+
+    <string name="tracker_dhikr_title">ذكر اليوم</string>
+    <string name="tracker_dhikr_count">%1$d</string>
+    <string name="tracker_dhikr_add">تسبيح</string>
+    <string name="tracker_dhikr_reset">تصفير</string>
+
+    <string name="tracker_cd_prayer_checked">صُلّيت</string>
+    <string name="tracker_cd_prayer_unchecked">لم تُصلَّ</string>
+    <string name="tracker_cd_progress_ring">تقدم صلوات اليوم</string>
+</resources>
