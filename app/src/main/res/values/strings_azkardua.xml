@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Azkar / Dua Compose screens -->
+    <string name="azd_azkar_title">Azkar</string>
+    <string name="azd_dua_title">Supplications</string>
+
+    <string name="azd_section_morning">Morning adhkar</string>
+    <string name="azd_section_evening">Evening adhkar</string>
+
+    <string name="azd_count_once">1 time</string>
+    <string name="azd_count_times">%1$d times</string>
+
+    <string name="azd_loading_error">Failed to load data</string>
+    <string name="azd_retry">Retry</string>
+
+    <string name="azd_empty_azkar">No azkar available</string>
+    <string name="azd_empty_dua">No supplications available</string>
+</resources>
