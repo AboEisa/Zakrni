@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
@@ -33,8 +34,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zakrni.app.R
 import com.zakrni.app.clean.ui.theme.BrandGold
+import com.zakrni.app.clean.ui.theme.components.AppearStyle
 import com.zakrni.app.clean.ui.theme.components.LoadingState
 import com.zakrni.app.clean.ui.theme.components.ZCard
+import com.zakrni.app.clean.ui.theme.components.appear
 import com.zakrni.app.clean.ui.theme.components.ZTopBar
 import com.zakrni.app.clean.ui.utils.PrayerTimeUtils
 import com.zakrni.app.clean.ui.viewmodels.PrayerTimesViewModel
@@ -81,10 +84,12 @@ fun AllPrayerTimesScreen(
                         locationName = locationName,
                     )
                 }
-                items(rows, key = { it.key }) { row ->
+                itemsIndexed(rows, key = { _, it -> it.key }) { index, row ->
                     val isCurrent = row.isPrayer && row.key == currentPrayer?.name
                     val isNext = row.isPrayer && row.key == nextPrayer?.name
-                    AllPrayerRow(row = row, isCurrent = isCurrent, isNext = isNext)
+                    Box(modifier = Modifier.appear(AppearStyle.FadeScale, (index % 8) * 45)) {
+                        AllPrayerRow(row = row, isCurrent = isCurrent, isNext = isNext)
+                    }
                 }
             }
         }

@@ -132,6 +132,7 @@ fun ArticleListScreen(
                         MediaVideoCard(
                             video = video,
                             onClick = { onOpenVideo(video.videoId) },
+                            modifier = Modifier.animateItem(),
                         )
                     }
                 }

@@ -30,6 +30,8 @@ import com.zakrni.app.R
 import com.zakrni.app.clean.domain.models.DomainHisnDua
 import com.zakrni.app.clean.ui.theme.components.EmptyState
 import com.zakrni.app.clean.ui.theme.components.ErrorState
+import com.zakrni.app.clean.ui.theme.components.AppearStyle
+import com.zakrni.app.clean.ui.theme.components.appear
 import com.zakrni.app.clean.ui.theme.components.ExpandableSection
 import com.zakrni.app.clean.ui.theme.components.LoadingState
 import com.zakrni.app.clean.ui.theme.components.ZTopBar
@@ -95,6 +97,7 @@ fun DuaScreen(
                 ) {
                     items(sections, key = { it.key }) { section ->
                         ExpandableSection(
+                            modifier = Modifier.appear(AppearStyle.FadeUp),
                             title = section.title,
                             expanded = expandedSections.contains(section.sectionKey),
                             onToggle = { viewModel.toggleSection(section.sectionKey) },

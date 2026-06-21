@@ -23,9 +23,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zakrni.app.R
 import com.zakrni.app.clean.domain.models.DomainHisnDua
 import com.zakrni.app.clean.ui.models.PresentationAzkar
+import com.zakrni.app.clean.ui.theme.components.AppearStyle
 import com.zakrni.app.clean.ui.theme.components.EmptyState
 import com.zakrni.app.clean.ui.theme.components.ErrorState
 import com.zakrni.app.clean.ui.theme.components.ExpandableSection
+import com.zakrni.app.clean.ui.theme.components.appear
 import com.zakrni.app.clean.ui.theme.components.LoadingState
 import com.zakrni.app.clean.ui.theme.components.ZTopBar
 import com.zakrni.app.clean.ui.utils.AzkarType
@@ -98,6 +100,7 @@ fun AzkarScreen(
                                 expandedHisnSections.contains(section.sectionKey)
                         }
                         ExpandableSection(
+                            modifier = Modifier.appear(AppearStyle.FadeSlideStart),
                             title = section.title,
                             expanded = expanded,
                             onToggle = {

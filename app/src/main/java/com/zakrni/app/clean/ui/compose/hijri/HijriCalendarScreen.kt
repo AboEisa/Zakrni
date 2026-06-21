@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -50,10 +51,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.zakrni.app.R
 import com.zakrni.app.clean.ui.theme.BrandGold
+import com.zakrni.app.clean.ui.theme.components.AppearStyle
 import com.zakrni.app.clean.ui.theme.components.EmptyState
 import com.zakrni.app.clean.ui.theme.components.ZCard
 import com.zakrni.app.clean.ui.theme.components.ZSectionHeader
 import com.zakrni.app.clean.ui.theme.components.ZTopBar
+import com.zakrni.app.clean.ui.theme.components.appear
 import java.util.Calendar
 
 /** A single cell in the month grid. [hijriDay] == 0 marks a leading/trailing blank. */
@@ -288,7 +291,11 @@ private fun EventsSection(month: Int) {
             )
         } else {
             LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                items(events) { event -> EventRow(event) }
+                itemsIndexed(events) { index, event ->
+                    Box(modifier = Modifier.appear(AppearStyle.FadeUp, (index % 8) * 45)) {
+                        EventRow(event)
+                    }
+                }
             }
         }
     }
