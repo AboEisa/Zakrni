@@ -103,9 +103,10 @@ internal val categories = listOf(
 fun CategoriesScreen(
     onOpenCategory: (route: String) -> Unit,
     modifier: Modifier = Modifier,
+    onBack: (() -> Unit)? = null,
 ) {
     Column(modifier = modifier.fillMaxSize()) {
-        ZTopBar(title = stringResource(R.string.rd_categories_title))
+        ZTopBar(title = stringResource(R.string.rd_categories_title), onBack = onBack)
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             contentPadding = PaddingValues(16.dp),

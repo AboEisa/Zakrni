@@ -108,7 +108,7 @@ fun ZakrniApp() {
             quranGraph(navController)
             mediaGraph(navController)
             composable(Routes.CATEGORIES) {
-                CategoriesScreen(onOpenCategory = open)
+                CategoriesScreen(onOpenCategory = open, onBack = { navController.popBackStack() })
             }
 
             // Content + tools + features
