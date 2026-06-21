@@ -43,6 +43,16 @@
     <string name="zk_hint">الزكاة 2.5% من المال الذي بلغ النصاب وحال عليه الحول.</string>
     <string name="zk_currency">ج.م</string>
 
+    <string name="rd_reader_settings">إعدادات القراءة</string>
+    <string name="rd_reader_view">طريقة العرض</string>
+    <string name="rd_reader_view_mushaf">مصحف</string>
+    <string name="rd_reader_view_list">قائمة</string>
+    <string name="rd_reader_font">حجم الخط</string>
+    <string name="rd_reader_background">الخلفية</string>
+    <string name="rd_reader_bg_normal">عادي</string>
+    <string name="rd_reader_bg_sepia">بنّي</string>
+    <string name="rd_reader_bg_night">ليلي</string>
+
     <string name="rd_common_retry">إعادة المحاولة</string>
     <string name="rd_common_loading">جاري التحميل…</string>
     <string name="rd_common_error">حصل خطأ ما</string>

@@ -29,10 +29,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.MenuBook
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AutoStories
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.ViewAgenda
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -50,6 +53,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
@@ -60,6 +64,7 @@ import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zakrni.app.R
@@ -106,7 +111,10 @@ fun QuranReaderScreen(
     var showReciterSheet by remember { mutableStateOf(false) }
     var showTafsirSheet by remember { mutableStateOf(false) }
     var showAyahTafsir by remember { mutableStateOf(false) }
-    var mushafMode by remember { mutableStateOf(true) }
+    var mushafMode by remember { mutableStateOf(readReaderMushaf(context)) }
+    var fontScale by remember { mutableStateOf(readReaderFontScale(context)) }
+    var readingMode by remember { mutableStateOf(readReaderMode(context)) }
+    var showReaderSettings by remember { mutableStateOf(false) }
     var optionsAyah by remember { mutableStateOf<DomainAyah?>(null) }
 
     LaunchedEffect(surahNumber) { viewModel.loadQuranVerses(surahNumber) }
@@ -121,10 +129,10 @@ fun QuranReaderScreen(
             onBack = onBack,
             action = {
                 Icon(
-                    imageVector = if (mushafMode) Icons.Filled.ViewAgenda else Icons.Filled.AutoStories,
-                    contentDescription = stringResource(if (mushafMode) R.string.qrn_list_mode else R.string.qrn_mushaf_mode),
+                    imageVector = Icons.Filled.Tune,
+                    contentDescription = stringResource(R.string.rd_reader_settings),
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(38.dp).clickable { mushafMode = !mushafMode }.padding(7.dp),
+                    modifier = Modifier.size(38.dp).clickable { showReaderSettings = true }.padding(7.dp),
                 )
             },
         )
@@ -147,6 +155,8 @@ fun QuranReaderScreen(
                     isArabic = isArabic,
                     highlightedNumber = optionsAyah?.number,
                     onAyahClick = { optionsAyah = it },
+                    fontScale = fontScale,
+                    readingMode = readingMode,
                 )
 
                 else -> AyahList(
@@ -210,6 +220,18 @@ fun QuranReaderScreen(
             },
             ayahText = ayah.text,
             onDismiss = { optionsAyah = null },
+        )
+    }
+
+    if (showReaderSettings) {
+        ReaderSettingsSheet(
+            mushafMode = mushafMode,
+            fontScale = fontScale,
+            readingMode = readingMode,
+            onMushafModeChange = { mushafMode = it; writeReaderMushaf(context, it) },
+            onFontScaleChange = { fontScale = it; writeReaderFontScale(context, it) },
+            onReadingModeChange = { readingMode = it; writeReaderMode(context, it) },
+            onDismiss = { showReaderSettings = false },
         )
     }
 
@@ -280,9 +302,17 @@ private fun MushafView(
     isArabic: Boolean,
     highlightedNumber: Int?,
     onAyahClick: (DomainAyah) -> Unit,
+    fontScale: Float,
+    readingMode: Int,
 ) {
     val showBismillah = surahNumber != 1 && surahNumber != 9
-    val highlight = MaterialTheme.colorScheme.primary.copy(alpha = 0.22f)
+    val palette = readingPalette(readingMode)
+    val highlight = palette.accent.copy(alpha = 0.22f)
+    val mushafStyle = AyahTextStyle.copy(
+        fontFamily = QuranFamily,
+        fontSize = (26 * fontScale).sp,
+        lineHeight = (46 * fontScale).sp,
+    )
 
     // Continuous justified Mushaf text. Each ayah is tracked by its char range so a tap
     // can resolve which ayah was touched, and the selected ayah gets a highlight span.
@@ -314,8 +344,8 @@ private fun MushafView(
     ) {
         Surface(
             shape = RoundedCornerShape(20.dp),
-            color = MaterialTheme.colorScheme.surface,
-            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+            color = palette.bg,
+            border = androidx.compose.foundation.BorderStroke(1.dp, palette.border),
             shadowElevation = 1.dp,
             modifier = Modifier.fillMaxWidth(),
         ) {
@@ -323,16 +353,16 @@ private fun MushafView(
                 if (showBismillah) {
                     Text(
                         text = stringResource(R.string.qrn_bismillah),
-                        style = AyahTextStyle.copy(fontFamily = QuranFamily),
-                        color = MaterialTheme.colorScheme.primary,
+                        style = mushafStyle,
+                        color = palette.accent,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth().padding(bottom = 14.dp),
                     )
                 }
                 Text(
                     text = annotated,
-                    style = AyahTextStyle.copy(fontFamily = QuranFamily),
-                    color = MaterialTheme.colorScheme.onSurface,
+                    style = mushafStyle,
+                    color = palette.text,
                     textAlign = TextAlign.Justify,
                     onTextLayout = { layout = it },
                     modifier = Modifier
@@ -489,6 +519,98 @@ private fun OptionRow(icon: androidx.compose.ui.graphics.vector.ImageVector, lab
         Spacer(Modifier.size(16.dp))
         Text(label, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ReaderSettingsSheet(
+    mushafMode: Boolean,
+    fontScale: Float,
+    readingMode: Int,
+    onMushafModeChange: (Boolean) -> Unit,
+    onFontScaleChange: (Float) -> Unit,
+    onReadingModeChange: (Int) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState()) {
+        Column(modifier = Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp, bottom = 28.dp)) {
+            Text(
+                text = stringResource(R.string.rd_reader_settings),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(bottom = 16.dp),
+            )
+
+            Text(stringResource(R.string.rd_reader_view), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Spacer(Modifier.height(8.dp))
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                ChoiceChip(stringResource(R.string.rd_reader_view_mushaf), mushafMode, Modifier.weight(1f)) { onMushafModeChange(true) }
+                ChoiceChip(stringResource(R.string.rd_reader_view_list), !mushafMode, Modifier.weight(1f)) { onMushafModeChange(false) }
+            }
+
+            Spacer(Modifier.height(18.dp))
+            Text(stringResource(R.string.rd_reader_font), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Spacer(Modifier.height(8.dp))
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                StepButton(Icons.Filled.Remove) { onFontScaleChange((fontScale - 0.1f).coerceIn(0.8f, 1.6f)) }
+                Text("${Math.round(fontScale * 100f)}%", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+                StepButton(Icons.Filled.Add) { onFontScaleChange((fontScale + 0.1f).coerceIn(0.8f, 1.6f)) }
+            }
+
+            Spacer(Modifier.height(18.dp))
+            Text(stringResource(R.string.rd_reader_background), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Spacer(Modifier.height(8.dp))
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                ChoiceChip(stringResource(R.string.rd_reader_bg_normal), readingMode == 0, Modifier.weight(1f)) { onReadingModeChange(0) }
+                ChoiceChip(stringResource(R.string.rd_reader_bg_sepia), readingMode == 1, Modifier.weight(1f)) { onReadingModeChange(1) }
+                ChoiceChip(stringResource(R.string.rd_reader_bg_night), readingMode == 2, Modifier.weight(1f)) { onReadingModeChange(2) }
+            }
+        }
+    }
+}
+
+@Composable
+private fun RowScope.ChoiceChip(label: String, selected: Boolean, modifier: Modifier = Modifier, onClick: () -> Unit) {
+    Surface(
+        onClick = onClick,
+        shape = RoundedCornerShape(14.dp),
+        color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+        modifier = modifier,
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelLarge,
+            color = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
+        )
+    }
+}
+
+@Composable
+private fun StepButton(icon: androidx.compose.ui.graphics.vector.ImageVector, onClick: () -> Unit) {
+    Surface(onClick = onClick, shape = CircleShape, color = MaterialTheme.colorScheme.surfaceVariant) {
+        Icon(
+            icon,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(10.dp).size(24.dp),
+        )
+    }
+}
+
+private data class ReadingPalette(val bg: Color, val text: Color, val border: Color, val accent: Color)
+
+@Composable
+private fun readingPalette(mode: Int): ReadingPalette = when (mode) {
+    1 -> ReadingPalette(Color(0xFFF4E8CE), Color(0xFF4A3B26), Color(0x33000000), Color(0xFF8A6D3B))
+    2 -> ReadingPalette(Color(0xFF15120D), Color(0xFFE9D9B6), Color(0x22FFFFFF), Color(0xFF8FD3C8))
+    else -> ReadingPalette(
+        MaterialTheme.colorScheme.surface,
+        MaterialTheme.colorScheme.onSurface,
+        MaterialTheme.colorScheme.outlineVariant,
+        MaterialTheme.colorScheme.primary,
+    )
 }
 
 private fun surahTitleFallback(surahNumber: Int, isArabic: Boolean): String =

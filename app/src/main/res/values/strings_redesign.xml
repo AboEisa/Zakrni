@@ -44,6 +44,16 @@
     <string name="zk_hint">Zakat is 2.5% of eligible wealth that reaches the nisab and is held for a lunar year.</string>
     <string name="zk_currency">EGP</string>
 
+    <string name="rd_reader_settings">Reading settings</string>
+    <string name="rd_reader_view">View</string>
+    <string name="rd_reader_view_mushaf">Mushaf</string>
+    <string name="rd_reader_view_list">List</string>
+    <string name="rd_reader_font">Font size</string>
+    <string name="rd_reader_background">Background</string>
+    <string name="rd_reader_bg_normal">Normal</string>
+    <string name="rd_reader_bg_sepia">Sepia</string>
+    <string name="rd_reader_bg_night">Night</string>
+
     <string name="rd_common_retry">Retry</string>
     <string name="rd_common_loading">Loading…</string>
     <string name="rd_common_error">Something went wrong</string>
