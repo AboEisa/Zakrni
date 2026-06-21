@@ -29,6 +29,21 @@
     <string name="fk_khatma_reset">New khatma</string>
     <string name="fk_juz">Juz %1$d</string>
 
+    <string name="rd_cat_zakat">Zakat Calculator</string>
+    <string name="zk_cash">Cash &amp; savings</string>
+    <string name="zk_gold">Gold value</string>
+    <string name="zk_silver">Silver value</string>
+    <string name="zk_trade">Trade goods / business</string>
+    <string name="zk_receivables">Money owed to you</string>
+    <string name="zk_debts">Debts you owe (subtracted)</string>
+    <string name="zk_gold_price">Gold price per gram (for nisab)</string>
+    <string name="zk_net">Zakatable wealth</string>
+    <string name="zk_nisab">Nisab (85g gold)</string>
+    <string name="zk_due">Zakat due (2.5%)</string>
+    <string name="zk_below">Below the nisab — no zakat is due.</string>
+    <string name="zk_hint">Zakat is 2.5% of eligible wealth that reaches the nisab and is held for a lunar year.</string>
+    <string name="zk_currency">EGP</string>
+
     <string name="rd_common_retry">Retry</string>
     <string name="rd_common_loading">Loading…</string>
     <string name="rd_common_error">Something went wrong</string>

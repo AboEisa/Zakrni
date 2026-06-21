@@ -28,6 +28,21 @@
     <string name="fk_khatma_reset">ختمة جديدة</string>
     <string name="fk_juz">جزء %1$d</string>
 
+    <string name="rd_cat_zakat">حاسبة الزكاة</string>
+    <string name="zk_cash">النقود والمدخرات</string>
+    <string name="zk_gold">قيمة الذهب</string>
+    <string name="zk_silver">قيمة الفضة</string>
+    <string name="zk_trade">عروض التجارة</string>
+    <string name="zk_receivables">ديون لك عند الناس</string>
+    <string name="zk_debts">الديون التي عليك (تُخصم)</string>
+    <string name="zk_gold_price">سعر جرام الذهب (لحساب النصاب)</string>
+    <string name="zk_net">المال الخاضع للزكاة</string>
+    <string name="zk_nisab">النصاب (85 جم ذهب)</string>
+    <string name="zk_due">الزكاة المستحقة (2.5%)</string>
+    <string name="zk_below">لم يبلغ النصاب — لا زكاة عليه.</string>
+    <string name="zk_hint">الزكاة 2.5% من المال الذي بلغ النصاب وحال عليه الحول.</string>
+    <string name="zk_currency">ج.م</string>
+
     <string name="rd_common_retry">إعادة المحاولة</string>
     <string name="rd_common_loading">جاري التحميل…</string>
     <string name="rd_common_error">حصل خطأ ما</string>
