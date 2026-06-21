@@ -60,6 +60,7 @@
     <string name="rd_fav_removed">تمت الإزالة من المفضّلة</string>
     <string name="rd_fav_empty">لا توجد آيات مفضّلة بعد</string>
     <string name="rd_home_continue">تابع القراءة</string>
+    <string name="rd_share_image">مشاركة كصورة</string>
 
     <string name="rd_common_retry">إعادة المحاولة</string>
     <string name="rd_common_loading">جاري التحميل…</string>

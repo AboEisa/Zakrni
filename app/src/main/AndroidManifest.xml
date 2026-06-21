@@ -120,6 +120,17 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_zakrni_info" />
         </receiver>
+
+        <!-- Shares rendered verse images from the app cache. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
     </application>
 
 </manifest>

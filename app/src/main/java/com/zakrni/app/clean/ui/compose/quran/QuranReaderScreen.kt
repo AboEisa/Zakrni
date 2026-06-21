@@ -34,6 +34,7 @@ import androidx.compose.material.icons.filled.AutoStories
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Share
@@ -240,6 +241,15 @@ fun QuranReaderScreen(
                         Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, ayah.text),
                         null,
                     ),
+                )
+                optionsAyah = null
+            },
+            onShareImage = {
+                shareVerseAsImage(
+                    context,
+                    ayah.text,
+                    "${surahTitle(currentSurah, surahNumber, isArabic)} • ${localizeNumber(ayahInSurah, isArabic)}",
+                    context.getString(R.string.app_name),
                 )
                 optionsAyah = null
             },
@@ -500,6 +510,7 @@ private fun AyahOptionsSheet(
     onTafsir: () -> Unit,
     onCopy: () -> Unit,
     onShare: () -> Unit,
+    onShareImage: () -> Unit,
     onDismiss: () -> Unit,
 ) {
     val clipboard = LocalClipboardManager.current
@@ -532,6 +543,7 @@ private fun AyahOptionsSheet(
                 clipboard.setText(AnnotatedString(ayahText)); onCopy()
             }
             OptionRow(Icons.Filled.Share, stringResource(R.string.qrn_ayah_share), onShare)
+            OptionRow(Icons.Filled.Image, stringResource(R.string.rd_share_image), onShareImage)
         }
     }
 }

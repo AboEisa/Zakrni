@@ -61,6 +61,7 @@
     <string name="rd_fav_removed">Removed from favorites</string>
     <string name="rd_fav_empty">No favorite ayat yet</string>
     <string name="rd_home_continue">Continue reading</string>
+    <string name="rd_share_image">Share as image</string>
 
     <string name="rd_common_retry">Retry</string>
     <string name="rd_common_loading">Loading…</string>
