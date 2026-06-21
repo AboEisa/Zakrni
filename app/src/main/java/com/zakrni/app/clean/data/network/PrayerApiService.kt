@@ -11,7 +11,8 @@ interface PrayerApiService {
         suspend fun getPrayerTimes(
             @Query("latitude") latitude: Double,
             @Query("longitude") longitude: Double,
-            @Query("method") method: Int = 5
+            @Query("method") method: Int = 5,
+            @Query("school") school: Int = 0
         ): PrayerTimesResponse
 
 

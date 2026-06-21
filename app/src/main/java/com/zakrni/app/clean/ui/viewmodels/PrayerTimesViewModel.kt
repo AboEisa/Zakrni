@@ -11,6 +11,7 @@ import com.zakrni.app.clean.service.PrayerNotificationService
 import com.zakrni.app.clean.ui.models.PresentationPrayerTimesResponse
 import com.zakrni.app.clean.ui.models.mapToPresentation
 import com.zakrni.app.clean.ui.utils.NetworkManager
+import com.zakrni.app.clean.ui.utils.PrayerCalcSettings
 import com.zakrni.app.clean.ui.utils.PrayerStorageManager
 import com.zakrni.app.clean.ui.utils.PrayerTimeUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -171,10 +172,18 @@ class PrayerTimesViewModel @Inject constructor(
         }
     }
 
+    /** Forces a fresh fetch (e.g. after the user changes the calculation method/madhab). */
+    fun reloadPrayerTimes() {
+        _prayerTimes.value = null
+        loadPrayerTimes()
+    }
+
     private suspend fun getPrayerTimes(latitude: Double, longitude: Double) {
         try {
-            Log.d(TAG, "🌐 Fetching prayer times from API for ($latitude, $longitude)...")
-            val result = prayerTimesUseCase(latitude, longitude)
+            val method = PrayerCalcSettings.method(context)
+            val school = PrayerCalcSettings.school(context)
+            Log.d(TAG, "🌐 Fetching prayer times from API for ($latitude, $longitude) method=$method school=$school...")
+            val result = prayerTimesUseCase(latitude, longitude, method, school)
             if (result.isSuccess) {
                 val presentationData = result.getOrThrow().mapToPresentation()
                 _prayerTimes.value = presentationData

@@ -29,10 +29,11 @@ class RemoteDataSource @Inject constructor(
     override suspend fun getPrayerTimes(
         latitude: Double,
         longitude: Double,
-        method: Int
+        method: Int,
+        school: Int
     ): Result<PrayerTimesResponse> {
         return try {
-            val response = apiPrayerServices.getPrayerTimes(latitude, longitude)
+            val response = apiPrayerServices.getPrayerTimes(latitude, longitude, method, school)
             Result.success(response)
         } catch (e: Exception) {
             Result.failure(e)

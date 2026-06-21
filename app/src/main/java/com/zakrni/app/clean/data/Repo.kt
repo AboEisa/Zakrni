@@ -195,27 +195,29 @@ class Repo @Inject constructor(
     }
     override suspend fun getPrayerTimes(
         latitude: Double,
-        longitude: Double
+        longitude: Double,
+        method: Int,
+        school: Int
     ): Result<DomainPrayerTimesResponse> {
         return try {
             // Check cache first
-            val cacheKey = cacheManager.getPrayerTimesKey(latitude, longitude)
+            val cacheKey = cacheManager.getPrayerTimesKey(latitude, longitude, method, school)
             if (cacheManager.hasCache(cacheKey)) {
                 val cached = cacheManager.getFromCache<DomainPrayerTimesResponse>(cacheKey)
                 if (cached != null) return Result.success(cached)
             }
-            
+
             // Fetch from API
-            val data = remoteDataSource.getPrayerTimes(latitude, longitude)
+            val data = remoteDataSource.getPrayerTimes(latitude, longitude, method, school)
             val result = data.getOrThrow().mapToDomain()
-            
+
             // Save to cache
             cacheManager.saveToCache(cacheKey, result)
-            
+
             Result.success(result)
         } catch (e: Exception) {
             // Try to return cached data on error
-            val cacheKey = cacheManager.getPrayerTimesKey(latitude, longitude)
+            val cacheKey = cacheManager.getPrayerTimesKey(latitude, longitude, method, school)
             val cached = cacheManager.getFromCache<DomainPrayerTimesResponse>(cacheKey)
             if (cached != null) Result.success(cached) else Result.failure(e)
         }

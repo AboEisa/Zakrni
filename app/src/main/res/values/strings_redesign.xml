@@ -63,6 +63,18 @@
     <string name="rd_home_continue">Continue reading</string>
     <string name="rd_share_image">Share as image</string>
 
+    <string name="set_section_prayer_calc">Prayer calculation</string>
+    <string name="set_calc_method">Calculation method</string>
+    <string name="set_madhab">Asr time (madhab)</string>
+    <string name="set_madhab_standard">Standard</string>
+    <string name="set_madhab_hanafi">Hanafi</string>
+    <string name="set_method_egypt">Egyptian Authority</string>
+    <string name="set_method_makkah">Umm al-Qura (Makkah)</string>
+    <string name="set_method_mwl">Muslim World League</string>
+    <string name="set_method_karachi">Karachi</string>
+    <string name="set_method_isna">ISNA (N. America)</string>
+    <string name="set_method_dubai">Dubai / Gulf</string>
+
     <string name="rd_common_retry">Retry</string>
     <string name="rd_common_loading">Loading…</string>
     <string name="rd_common_error">Something went wrong</string>

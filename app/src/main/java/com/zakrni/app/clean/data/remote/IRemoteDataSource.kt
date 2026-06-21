@@ -16,7 +16,8 @@ interface IRemoteDataSource {
     suspend fun getPrayerTimes(
         latitude: Double,
         longitude: Double,
-        method: Int = 5
+        method: Int = 5,
+        school: Int = 0
     ): Result<PrayerTimesResponse>
 
     suspend fun getAllahNames(): Result<AsmaAlHusnaResponse>

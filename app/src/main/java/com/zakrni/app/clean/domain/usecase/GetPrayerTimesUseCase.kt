@@ -10,8 +10,10 @@ class GetPrayerTimesUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(
         latitude: Double,
-        longitude: Double
+        longitude: Double,
+        method: Int = 5,
+        school: Int = 0
     ): Result<DomainPrayerTimesResponse> {
-        return repo.getPrayerTimes(latitude, longitude)
+        return repo.getPrayerTimes(latitude, longitude, method, school)
     }
 }

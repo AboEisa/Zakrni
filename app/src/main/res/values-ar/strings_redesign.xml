@@ -62,6 +62,18 @@
     <string name="rd_home_continue">تابع القراءة</string>
     <string name="rd_share_image">مشاركة كصورة</string>
 
+    <string name="set_section_prayer_calc">حساب المواقيت</string>
+    <string name="set_calc_method">طريقة الحساب</string>
+    <string name="set_madhab">وقت العصر (المذهب)</string>
+    <string name="set_madhab_standard">الجمهور</string>
+    <string name="set_madhab_hanafi">الحنفي</string>
+    <string name="set_method_egypt">الهيئة المصرية</string>
+    <string name="set_method_makkah">أم القرى (مكة)</string>
+    <string name="set_method_mwl">رابطة العالم الإسلامي</string>
+    <string name="set_method_karachi">كراتشي</string>
+    <string name="set_method_isna">ISNA (أمريكا)</string>
+    <string name="set_method_dubai">دبي / الخليج</string>
+
     <string name="rd_common_retry">إعادة المحاولة</string>
     <string name="rd_common_loading">جاري التحميل…</string>
     <string name="rd_common_error">حصل خطأ ما</string>

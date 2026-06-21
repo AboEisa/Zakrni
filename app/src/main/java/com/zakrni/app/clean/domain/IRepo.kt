@@ -16,7 +16,9 @@ import com.zakrni.app.clean.domain.models.DomainSurah
 interface IRepo {
     suspend fun getPrayerTimes(
         latitude: Double,
-        longitude: Double
+        longitude: Double,
+        method: Int = 5,
+        school: Int = 0
     ): Result<DomainPrayerTimesResponse>
 
     suspend fun getAllahNames(): Result<DomainAsmaAlHusnaResponse>

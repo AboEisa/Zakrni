@@ -102,13 +102,14 @@ class CacheManager @Inject constructor(
     }
 
     // Specific cache keys getters
-    fun getPrayerTimesKey(lat: Double, lng: Double): String {
+    fun getPrayerTimesKey(lat: Double, lng: Double, method: Int = 5, school: Int = 0): String {
         // Round to 2 decimal places so nearby locations share cache
         val roundedLat = String.format(Locale.US, "%.2f", lat)
         val roundedLng = String.format(Locale.US, "%.2f", lng)
         // Include today's date so cache refreshes daily
         val today = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
-        return "${KEY_PRAYER_TIMES}_${roundedLat}_${roundedLng}_$today"
+        // Include method + school so changing the calculation re-fetches instead of reusing cache
+        return "${KEY_PRAYER_TIMES}_${roundedLat}_${roundedLng}_${method}_${school}_$today"
     }
     fun getAllahNamesKey(): String = KEY_ALLAH_NAMES
     fun getHadithsKey(page: Int): String = "${KEY_HADITHS}_$page"

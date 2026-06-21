@@ -89,6 +89,14 @@ fun PrayerTimesScreen(
         if (granted) viewModel.checkLocationPermission()
     }
 
+    // Re-fetch when the user changed the calculation method/madhab in Settings.
+    val reloadContext = androidx.compose.ui.platform.LocalContext.current
+    androidx.lifecycle.compose.LifecycleEventEffect(androidx.lifecycle.Lifecycle.Event.ON_RESUME) {
+        if (com.zakrni.app.clean.ui.utils.PrayerCalcSettings.consumeDirty(reloadContext)) {
+            viewModel.reloadPrayerTimes()
+        }
+    }
+
     Column(modifier = modifier.fillMaxSize()) {
         ZTopBar(title = stringResource(R.string.prn_title))
 
