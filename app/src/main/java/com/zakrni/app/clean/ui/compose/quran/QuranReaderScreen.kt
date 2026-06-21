@@ -69,7 +69,7 @@ import com.zakrni.app.clean.ui.theme.AyahTextStyle
 import com.zakrni.app.clean.ui.theme.BrandGold
 import com.zakrni.app.clean.ui.theme.QuranFamily
 import com.zakrni.app.clean.ui.theme.components.ErrorState
-import com.zakrni.app.clean.ui.theme.components.LoadingState
+import com.zakrni.app.clean.ui.theme.components.ShimmerBox
 import com.zakrni.app.clean.ui.theme.components.ZTopBar
 import com.zakrni.app.clean.ui.utils.QuranUtils
 import com.zakrni.app.clean.ui.utils.SurahTafsirProvider
@@ -131,21 +131,15 @@ fun QuranReaderScreen(
 
         Box(modifier = Modifier.weight(1f)) {
             when {
-                error != null && verses.isEmpty() && !isLoading -> ErrorState(
+                error != null && verses.isEmpty() -> ErrorState(
                     message = error ?: stringResource(R.string.qrn_loading_error),
                     onRetry = { viewModel.clearError(); viewModel.loadQuranVerses(surahNumber) },
                     retryLabel = stringResource(R.string.qrn_retry),
                 )
 
-                isLoading && verses.isEmpty() -> LoadingState()
-
-                verses.isEmpty() -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(
-                        text = stringResource(R.string.qrn_reader_empty),
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
+                // A valid surah always has verses, so "empty" means it's still loading —
+                // show an animated Mushaf-page skeleton instead of an "unavailable" message.
+                verses.isEmpty() -> QuranLoadingState()
 
                 mushafMode -> MushafView(
                     surahNumber = surahNumber,
@@ -353,6 +347,24 @@ private fun MushafView(
                         },
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun QuranLoadingState() {
+    val widths = listOf(0.92f, 0.72f, 0.86f, 0.62f, 0.80f, 0.70f, 0.50f)
+    Column(
+        modifier = Modifier.fillMaxSize().padding(horizontal = 28.dp, vertical = 26.dp),
+        verticalArrangement = Arrangement.spacedBy(18.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Spacer(Modifier.height(8.dp))
+        widths.forEach { w ->
+            ShimmerBox(
+                modifier = Modifier.fillMaxWidth(w).height(20.dp),
+                shape = RoundedCornerShape(8.dp),
+            )
         }
     }
 }

@@ -128,6 +128,7 @@ fun SurahListScreen(
                             surah = surah,
                             isArabic = isArabic,
                             onClick = { onOpenSurah(surah.number) },
+                            modifier = Modifier.animateItem(),
                         )
                     }
                 }
@@ -172,6 +173,7 @@ private fun SurahCard(
     surah: DomainSurah,
     isArabic: Boolean,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val ayahCount = QuranUtils.getAyahCount(surah.number)
         .takeIf { it > 0 } ?: surah.ayahs.size
@@ -184,7 +186,7 @@ private fun SurahCard(
         surah.englishNameTranslation.ifBlank { surah.name }
     }
 
-    ZCard(onClick = onClick, contentPadding = 14.dp) {
+    ZCard(onClick = onClick, contentPadding = 14.dp, modifier = modifier) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
