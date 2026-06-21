@@ -60,6 +60,11 @@ class App: Application() {
         if (ThemeManager.isAzkarRemindersEnabled(this)) {
             com.zakrni.app.clean.service.AzkarReminderWorker.schedule(this)
         }
+
+        // Start the once-a-day helpful reminder (reading/khatma/tasbih/fasting nudge).
+        if (ThemeManager.isNotificationsEnabled(this)) {
+            com.zakrni.app.clean.service.DailyReminderWorker.schedule(this)
+        }
     }
 
     private fun createNotificationChannels() {
