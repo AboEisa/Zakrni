@@ -15,6 +15,19 @@
     <string name="rd_cat_hadith">Hadith</string>
     <string name="rd_cat_allah_names">Names of Allah</string>
     <string name="rd_cat_tasbih">Tasbih</string>
+    <string name="rd_cat_fasting">Fasting &amp; Khatma</string>
+
+    <string name="fk_fasting_title">Fasting tracker</string>
+    <string name="fk_fasting_today">I fasted today</string>
+    <string name="fk_fasting_hint">Tap any day to mark or unmark a fast.</string>
+    <string name="fk_fasting_month_count">Fasted this month: %1$d</string>
+    <string name="fk_khatma_title">Quran Khatma</string>
+    <string name="fk_khatma_hint">Tap a juz when you finish reading it.</string>
+    <string name="fk_khatma_progress">%1$d of 30 juz</string>
+    <string name="fk_khatma_remaining">%1$d juz left</string>
+    <string name="fk_khatma_complete">Khatma complete — may Allah accept it!</string>
+    <string name="fk_khatma_reset">New khatma</string>
+    <string name="fk_juz">Juz %1$d</string>
 
     <string name="rd_common_retry">Retry</string>
     <string name="rd_common_loading">Loading…</string>

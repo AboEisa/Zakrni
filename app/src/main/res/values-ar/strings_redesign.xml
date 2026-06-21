@@ -14,6 +14,19 @@
     <string name="rd_cat_hadith">الأحاديث</string>
     <string name="rd_cat_allah_names">أسماء الله الحسنى</string>
     <string name="rd_cat_tasbih">التسبيح</string>
+    <string name="rd_cat_fasting">الصيام والختمة</string>
+
+    <string name="fk_fasting_title">متابعة الصيام</string>
+    <string name="fk_fasting_today">صُمت النهاردة</string>
+    <string name="fk_fasting_hint">دوس على أي يوم لتسجيل/إلغاء الصيام.</string>
+    <string name="fk_fasting_month_count">أيام الصيام هذا الشهر: %1$d</string>
+    <string name="fk_khatma_title">ختمة القرآن</string>
+    <string name="fk_khatma_hint">دوس على الجزء لما تخلّص قراءته.</string>
+    <string name="fk_khatma_progress">%1$d من 30 جزء</string>
+    <string name="fk_khatma_remaining">باقي %1$d جزء</string>
+    <string name="fk_khatma_complete">تمّت الختمة — تقبّل الله!</string>
+    <string name="fk_khatma_reset">ختمة جديدة</string>
+    <string name="fk_juz">جزء %1$d</string>
 
     <string name="rd_common_retry">إعادة المحاولة</string>
     <string name="rd_common_loading">جاري التحميل…</string>

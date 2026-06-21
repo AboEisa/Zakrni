@@ -31,6 +31,7 @@ import com.zakrni.app.clean.ui.compose.home.HomeRoutes
 import com.zakrni.app.clean.ui.compose.home.homeGraph
 import com.zakrni.app.clean.ui.compose.media.mediaGraph
 import com.zakrni.app.clean.ui.compose.prayer.prayerGraph
+import com.zakrni.app.clean.ui.compose.fasting.fastingGraph
 import com.zakrni.app.clean.ui.compose.qibla.qiblaGraph
 import com.zakrni.app.clean.ui.compose.quran.quranGraph
 import com.zakrni.app.clean.ui.compose.settings.settingsGraph
@@ -110,6 +111,7 @@ fun ZakrniApp() {
             azkarDuaGraph(navController, onBack = { navController.popBackStack() })
             tasbihGraph(navController, onBack = { navController.popBackStack() })
             trackerGraph(navController)
+            fastingGraph(navController, onBack = { navController.popBackStack() })
             qiblaGraph(navController)
             hijriGraph(navController)
             settingsGraph(navController)
