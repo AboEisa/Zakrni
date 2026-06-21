@@ -98,7 +98,7 @@ fun QuranReaderScreen(
 
     var showReciterSheet by remember { mutableStateOf(false) }
     var showTafsirSheet by remember { mutableStateOf(false) }
-    var mushafMode by remember { mutableStateOf(false) }
+    var mushafMode by remember { mutableStateOf(true) }
     var optionsAyah by remember { mutableStateOf<DomainAyah?>(null) }
 
     LaunchedEffect(surahNumber) { viewModel.loadQuranVerses(surahNumber) }
@@ -280,12 +280,13 @@ private fun MushafView(surahNumber: Int, verses: List<DomainAyah>, isArabic: Boo
             .padding(16.dp),
     ) {
         Surface(
-            shape = RoundedCornerShape(18.dp),
-            color = MaterialTheme.colorScheme.surfaceVariant,
-            border = androidx.compose.foundation.BorderStroke(1.dp, BrandGold.copy(alpha = 0.35f)),
+            shape = RoundedCornerShape(20.dp),
+            color = MaterialTheme.colorScheme.surface,
+            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+            shadowElevation = 1.dp,
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Column(modifier = Modifier.padding(18.dp)) {
+            Column(modifier = Modifier.padding(22.dp)) {
                 if (showBismillah) {
                     Text(
                         text = stringResource(R.string.qrn_bismillah),

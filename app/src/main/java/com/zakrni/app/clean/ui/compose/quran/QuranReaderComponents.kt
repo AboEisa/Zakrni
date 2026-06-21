@@ -42,12 +42,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.zakrni.app.R
-import com.zakrni.app.clean.ui.theme.BrandGold
 
 /**
  * Bottom audio player bar wired to the existing AudioPlayerManager (via the ViewModel).
@@ -122,8 +122,8 @@ internal fun AudioPlayerBar(
                 valueRange = 0f..sliderMax,
                 enabled = duration > 0,
                 colors = SliderDefaults.colors(
-                    thumbColor = BrandGold,
-                    activeTrackColor = BrandGold,
+                    thumbColor = MaterialTheme.colorScheme.primary,
+                    activeTrackColor = MaterialTheme.colorScheme.primary,
                     inactiveTrackColor = MaterialTheme.colorScheme.outlineVariant,
                 ),
             )
@@ -157,7 +157,8 @@ private fun PlayPauseButton(
     Box(
         modifier = Modifier
             .scale(scale)
-            .size(52.dp)
+            .size(54.dp)
+            .shadow(6.dp, CircleShape)
             .background(MaterialTheme.colorScheme.primary, CircleShape)
             .clickableNoLoading(enabled = !isLoading, onClick = onClick),
         contentAlignment = Alignment.Center,
@@ -264,7 +265,7 @@ internal fun ReciterPickerSheet(
                         modifier = Modifier
                             .size(36.dp)
                             .background(
-                                if (selected) BrandGold.copy(alpha = 0.18f)
+                                if (selected) MaterialTheme.colorScheme.primary.copy(alpha = 0.16f)
                                 else MaterialTheme.colorScheme.surfaceVariant,
                                 CircleShape,
                             ),
