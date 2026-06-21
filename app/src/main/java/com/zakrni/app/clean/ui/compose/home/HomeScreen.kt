@@ -28,12 +28,14 @@ import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.FormatQuote
 import androidx.compose.material.icons.filled.Mosque
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Spa
 import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material.icons.filled.VolunteerActivism
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -97,11 +99,35 @@ fun HomeScreen(
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
         GreetingHeader(onOpenSettings = { onOpen("settings") })
+        HomeSearchBar(onClick = { onOpen("search") })
         NextPrayerCard(onClick = { onOpen("prayer") })
         TodayPrayersStrip(onClick = { onOpen("prayer") })
         ContinueReadingCard(onOpen = onOpen)
         DailyAyahCard(modifier = Modifier.fillMaxWidth(), onClick = { onOpen("quran_list") })
         CategoriesSection(onOpen = onOpen)
+    }
+}
+
+@Composable
+private fun HomeSearchBar(onClick: () -> Unit) {
+    Surface(
+        onClick = onClick,
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(Icons.Filled.Search, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(20.dp))
+            Spacer(Modifier.size(10.dp))
+            Text(
+                text = stringResource(R.string.rd_search_hint),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
     }
 }
 

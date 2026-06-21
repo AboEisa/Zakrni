@@ -61,6 +61,13 @@
     <string name="rd_fav_empty">لا توجد آيات مفضّلة بعد</string>
     <string name="rd_home_continue">تابع القراءة</string>
     <string name="rd_share_image">مشاركة كصورة</string>
+    <string name="rd_home_search">ابحث</string>
+    <string name="rd_search_title">بحث</string>
+    <string name="rd_search_hint">ابحث في الأقسام والسور</string>
+    <string name="rd_search_prompt">اكتب للبحث في التطبيق</string>
+    <string name="rd_search_empty">لا توجد نتائج</string>
+    <string name="rd_search_sections">الأقسام</string>
+    <string name="rd_search_surahs">السور</string>
 
     <string name="set_section_prayer_calc">حساب المواقيت</string>
     <string name="set_calc_method">طريقة الحساب</string>

@@ -62,6 +62,13 @@
     <string name="rd_fav_empty">No favorite ayat yet</string>
     <string name="rd_home_continue">Continue reading</string>
     <string name="rd_share_image">Share as image</string>
+    <string name="rd_home_search">Search</string>
+    <string name="rd_search_title">Search</string>
+    <string name="rd_search_hint">Search sections and surahs</string>
+    <string name="rd_search_prompt">Type to search the app</string>
+    <string name="rd_search_empty">No results found</string>
+    <string name="rd_search_sections">Sections</string>
+    <string name="rd_search_surahs">Surahs</string>
 
     <string name="set_section_prayer_calc">Prayer calculation</string>
     <string name="set_calc_method">Calculation method</string>
