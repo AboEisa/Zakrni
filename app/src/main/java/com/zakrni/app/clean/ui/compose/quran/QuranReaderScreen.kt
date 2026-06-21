@@ -9,6 +9,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -49,10 +50,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -92,12 +97,15 @@ fun QuranReaderScreen(
     val audioDuration by viewModel.audioDuration.collectAsStateWithLifecycle()
     val playingSurah by viewModel.currentPlayingSurah.collectAsStateWithLifecycle()
     val selectedReciter by viewModel.selectedReciter.collectAsStateWithLifecycle()
+    val ayahTafsir by viewModel.ayahTafsir.collectAsStateWithLifecycle()
+    val ayahTafsirLoading by viewModel.ayahTafsirLoading.collectAsStateWithLifecycle()
 
     val isArabic = isArabicUi()
     val context = LocalContext.current
 
     var showReciterSheet by remember { mutableStateOf(false) }
     var showTafsirSheet by remember { mutableStateOf(false) }
+    var showAyahTafsir by remember { mutableStateOf(false) }
     var mushafMode by remember { mutableStateOf(true) }
     var optionsAyah by remember { mutableStateOf<DomainAyah?>(null) }
 
@@ -147,7 +155,13 @@ fun QuranReaderScreen(
                     )
                 }
 
-                mushafMode -> MushafView(surahNumber = surahNumber, verses = verses, isArabic = isArabic)
+                mushafMode -> MushafView(
+                    surahNumber = surahNumber,
+                    verses = verses,
+                    isArabic = isArabic,
+                    highlightedNumber = optionsAyah?.number,
+                    onAyahClick = { optionsAyah = it },
+                )
 
                 else -> AyahList(
                     surahNumber = surahNumber,
@@ -190,7 +204,11 @@ fun QuranReaderScreen(
                 viewModel.playAyahAudio(ayah.number, surahNumber)
                 optionsAyah = null
             },
-            onTafsir = { optionsAyah = null; showTafsirSheet = true },
+            onTafsir = {
+                viewModel.loadAyahTafsir(surahNumber, ayah.numberInSurah.coerceAtLeast(1))
+                showAyahTafsir = true
+                optionsAyah = null
+            },
             onCopy = {
                 Toast.makeText(context, R.string.qrn_ayah_copied, Toast.LENGTH_SHORT).show()
                 optionsAyah = null
@@ -228,6 +246,17 @@ fun QuranReaderScreen(
             onDismiss = { showTafsirSheet = false },
         )
     }
+
+    // Per-ayah tafsir (Tafsir al-Muyassar), shown when an ayah's "Tafsir" option is tapped.
+    if (showAyahTafsir) {
+        val text = if (ayahTafsirLoading) stringResource(R.string.rd_common_loading)
+        else (ayahTafsir ?: stringResource(R.string.qrn_tafsir_unavailable))
+        TafsirSheet(
+            title = stringResource(R.string.qrn_ayah_tafsir),
+            tafsirText = text,
+            onDismiss = { showAyahTafsir = false; viewModel.clearAyahTafsir() },
+        )
+    }
 }
 
 @Composable
@@ -259,19 +288,37 @@ private fun AyahList(
 }
 
 @Composable
-private fun MushafView(surahNumber: Int, verses: List<DomainAyah>, isArabic: Boolean) {
+private fun MushafView(
+    surahNumber: Int,
+    verses: List<DomainAyah>,
+    isArabic: Boolean,
+    highlightedNumber: Int?,
+    onAyahClick: (DomainAyah) -> Unit,
+) {
     val showBismillah = surahNumber != 1 && surahNumber != 9
-    // Continuous justified Mushaf text with ornate ayah-end markers ﴿n﴾.
-    val pageText = remember(verses, isArabic) {
-        buildString {
+    val highlight = MaterialTheme.colorScheme.primary.copy(alpha = 0.22f)
+
+    // Continuous justified Mushaf text. Each ayah is tracked by its char range so a tap
+    // can resolve which ayah was touched, and the selected ayah gets a highlight span.
+    val data = remember(verses, isArabic, highlightedNumber, highlight) {
+        val ranges = ArrayList<IntRange>(verses.size)
+        val str = buildAnnotatedString {
             verses.forEach { ayah ->
+                val start = length
                 append(ayah.text.trim())
                 append("  ﴿")
                 append(localizeNumber(if (ayah.numberInSurah > 0) ayah.numberInSurah else 1, isArabic))
                 append("﴾  ")
+                val end = length
+                if (ayah.number == highlightedNumber) addStyle(SpanStyle(background = highlight), start, end)
+                ranges.add(start until end)
             }
-        }.trim()
+        }
+        str to ranges
     }
+    val annotated = data.first
+    val ranges = data.second
+    var layout by remember { mutableStateOf<TextLayoutResult?>(null) }
 
     Column(
         modifier = Modifier
@@ -291,17 +338,27 @@ private fun MushafView(surahNumber: Int, verses: List<DomainAyah>, isArabic: Boo
                     Text(
                         text = stringResource(R.string.qrn_bismillah),
                         style = AyahTextStyle.copy(fontFamily = QuranFamily),
-                        color = MaterialTheme.colorScheme.tertiary,
+                        color = MaterialTheme.colorScheme.primary,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth().padding(bottom = 14.dp),
                     )
                 }
                 Text(
-                    text = pageText,
+                    text = annotated,
                     style = AyahTextStyle.copy(fontFamily = QuranFamily),
                     color = MaterialTheme.colorScheme.onSurface,
                     textAlign = TextAlign.Justify,
-                    modifier = Modifier.fillMaxWidth(),
+                    onTextLayout = { layout = it },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .pointerInput(ranges) {
+                            detectTapGestures { pos ->
+                                val lr = layout ?: return@detectTapGestures
+                                val offset = lr.getOffsetForPosition(pos)
+                                val idx = ranges.indexOfFirst { offset in it }
+                                if (idx in verses.indices) onAyahClick(verses[idx])
+                            }
+                        },
                 )
             }
         }

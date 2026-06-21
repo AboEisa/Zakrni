@@ -19,10 +19,16 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.MenuBook
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Explore
+import androidx.compose.material.icons.filled.FormatQuote
 import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Spa
+import androidx.compose.material.icons.filled.TouchApp
+import androidx.compose.material.icons.filled.VolunteerActivism
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -69,12 +75,12 @@ private data class CategoryUi(
 )
 
 private val categories = listOf(
-    CategoryUi(R.string.rd_cat_quran, CategoryRoutes.QURAN, icon = R.drawable.ic_quran),
-    CategoryUi(R.string.rd_cat_azkar, CategoryRoutes.AZKAR, icon = R.drawable.ic_azkar),
-    CategoryUi(R.string.rd_cat_dua, CategoryRoutes.DUA, icon = R.drawable.ic_dua),
-    CategoryUi(R.string.rd_cat_hadith, CategoryRoutes.HADITH, icon = R.drawable.ic_hadith),
-    CategoryUi(R.string.rd_cat_allah_names, CategoryRoutes.ALLAH_NAMES, icon = R.drawable.ic_allah_names),
-    CategoryUi(R.string.rd_cat_tasbih, CategoryRoutes.TASBIH, icon = R.drawable.ic_tasbeh),
+    CategoryUi(R.string.rd_cat_quran, CategoryRoutes.QURAN, iconVector = Icons.AutoMirrored.Filled.MenuBook),
+    CategoryUi(R.string.rd_cat_azkar, CategoryRoutes.AZKAR, iconVector = Icons.Filled.Spa),
+    CategoryUi(R.string.rd_cat_dua, CategoryRoutes.DUA, iconVector = Icons.Filled.VolunteerActivism),
+    CategoryUi(R.string.rd_cat_hadith, CategoryRoutes.HADITH, iconVector = Icons.Filled.FormatQuote),
+    CategoryUi(R.string.rd_cat_allah_names, CategoryRoutes.ALLAH_NAMES, iconVector = Icons.Filled.AutoAwesome),
+    CategoryUi(R.string.rd_cat_tasbih, CategoryRoutes.TASBIH, iconVector = Icons.Filled.TouchApp),
     CategoryUi(R.string.rd_cat_qibla, CategoryRoutes.QIBLA, iconVector = Icons.Filled.Explore),
     CategoryUi(R.string.rd_cat_hijri, CategoryRoutes.HIJRI, iconVector = Icons.Filled.CalendarMonth),
     CategoryUi(R.string.rd_cat_tracker, CategoryRoutes.TRACKER, iconVector = Icons.Filled.LocalFireDepartment),

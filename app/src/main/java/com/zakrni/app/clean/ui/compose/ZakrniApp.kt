@@ -1,6 +1,5 @@
 package com.zakrni.app.clean.ui.compose
 
-import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -91,18 +90,11 @@ fun ZakrniApp() {
             navController = navController,
             startDestination = Routes.HOME,
             modifier = Modifier.fillMaxSize().padding(innerPadding),
-            enterTransition = {
-                slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Start, tween(320)) + fadeIn(tween(320))
-            },
-            exitTransition = {
-                slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Start, tween(320)) + fadeOut(tween(320))
-            },
-            popEnterTransition = {
-                slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.End, tween(320)) + fadeIn(tween(320))
-            },
-            popExitTransition = {
-                slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.End, tween(320)) + fadeOut(tween(320))
-            },
+            // Calm crossfade — no slide/size animation (avoids the stretch/squeeze feel).
+            enterTransition = { fadeIn(tween(200)) },
+            exitTransition = { fadeOut(tween(160)) },
+            popEnterTransition = { fadeIn(tween(200)) },
+            popExitTransition = { fadeOut(tween(160)) },
         ) {
             // Landing + main tabs
             homeGraph(navController, onOpen = open)

@@ -21,12 +21,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.AccessTime
-import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Explore
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material.icons.filled.FormatQuote
 import androidx.compose.material.icons.filled.Mosque
+import androidx.compose.material.icons.filled.Spa
+import androidx.compose.material.icons.filled.TouchApp
+import androidx.compose.material.icons.filled.VolunteerActivism
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -60,11 +60,11 @@ private data class QuickAction(val labelRes: Int, val icon: ImageVector, val rou
 // Six most-used shortcuts (the full set lives in the Categories tab).
 private val homeQuickActions = listOf(
     QuickAction(R.string.home_action_quran, Icons.AutoMirrored.Filled.MenuBook, "quran_list"),
-    QuickAction(R.string.home_action_azkar, Icons.Filled.AutoAwesome, "azkar"),
-    QuickAction(R.string.home_action_dua, Icons.Filled.Favorite, "dua"),
+    QuickAction(R.string.home_action_azkar, Icons.Filled.Spa, "azkar"),
+    QuickAction(R.string.home_action_dua, Icons.Filled.VolunteerActivism, "dua"),
     QuickAction(R.string.home_action_hadith, Icons.Filled.FormatQuote, "hadith"),
     QuickAction(R.string.home_action_qibla, Icons.Filled.Explore, "qibla"),
-    QuickAction(R.string.home_action_tasbih, Icons.Filled.Fingerprint, "tasbih"),
+    QuickAction(R.string.home_action_tasbih, Icons.Filled.TouchApp, "tasbih"),
 )
 
 /**

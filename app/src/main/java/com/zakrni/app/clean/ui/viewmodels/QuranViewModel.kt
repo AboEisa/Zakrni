@@ -449,6 +449,33 @@ class QuranViewModel @Inject constructor(
         )
     }
 
+    // ----- Per-ayah tafsir (Tafsir al-Muyassar), fetched on demand from alquran.cloud -----
+    private val _ayahTafsir = MutableStateFlow<String?>(null)
+    val ayahTafsir: StateFlow<String?> = _ayahTafsir.asStateFlow()
+    private val _ayahTafsirLoading = MutableStateFlow(false)
+    val ayahTafsirLoading: StateFlow<Boolean> = _ayahTafsirLoading.asStateFlow()
+
+    fun clearAyahTafsir() {
+        _ayahTafsir.value = null
+        _ayahTafsirLoading.value = false
+    }
+
+    fun loadAyahTafsir(surahNumber: Int, ayahInSurah: Int) {
+        _ayahTafsir.value = null
+        _ayahTafsirLoading.value = true
+        viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            val text = try {
+                val url = "https://api.alquran.cloud/v1/ayah/$surahNumber:$ayahInSurah/ar.muyassar"
+                val body = java.net.URL(url).readText()
+                org.json.JSONObject(body).getJSONObject("data").getString("text")
+            } catch (e: Exception) {
+                null
+            }
+            _ayahTafsir.value = text
+            _ayahTafsirLoading.value = false
+        }
+    }
+
     private fun playAudioFromUrl(audioUrl: String, surahNumber: Int, requestId: Int) {
         if (!isActivePlaybackRequest(requestId)) return
 
