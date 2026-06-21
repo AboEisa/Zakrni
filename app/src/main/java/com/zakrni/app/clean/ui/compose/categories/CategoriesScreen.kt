@@ -75,14 +75,14 @@ object CategoryRoutes {
     const val SETTINGS = "settings"
 }
 
-private data class CategoryUi(
+internal data class CategoryUi(
     @StringRes val title: Int,
     val route: String,
     @DrawableRes val icon: Int? = null,
     val iconVector: ImageVector? = null,
 )
 
-private val categories = listOf(
+internal val categories = listOf(
     CategoryUi(R.string.rd_cat_quran, CategoryRoutes.QURAN, iconVector = Icons.AutoMirrored.Filled.MenuBook),
     CategoryUi(R.string.rd_cat_azkar, CategoryRoutes.AZKAR, iconVector = Icons.Filled.Spa),
     CategoryUi(R.string.rd_cat_dua, CategoryRoutes.DUA, iconVector = Icons.Filled.VolunteerActivism),

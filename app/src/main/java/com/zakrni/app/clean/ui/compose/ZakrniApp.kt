@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.AccessTime
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Scaffold
@@ -47,9 +48,10 @@ object Routes {
     const val PRAYER = "prayer"
     const val QURAN = "quran_list"
     const val CATEGORIES = "categories"
+    const val FAVORITES = "favorites"
 }
 
-private val topLevelRoutes = setOf(Routes.HOME, Routes.PRAYER, Routes.QURAN, Routes.CATEGORIES)
+private val topLevelRoutes = setOf(Routes.HOME, Routes.PRAYER, Routes.QURAN, Routes.FAVORITES)
 
 /** Root of the redesigned Compose app: animated bottom bar + the full NavHost. */
 @Composable
@@ -60,7 +62,7 @@ fun ZakrniApp() {
         ZBottomNavItem(stringResource(R.string.rd_nav_home), Icons.Filled.Home, Routes.HOME),
         ZBottomNavItem(stringResource(R.string.player_times), Icons.Filled.AccessTime, Routes.PRAYER),
         ZBottomNavItem(stringResource(R.string.rd_nav_quran), Icons.AutoMirrored.Filled.MenuBook, Routes.QURAN),
-        ZBottomNavItem(stringResource(R.string.rd_categories_title), Icons.Filled.GridView, Routes.CATEGORIES),
+        ZBottomNavItem(stringResource(R.string.rd_cat_favorites), Icons.Filled.Favorite, Routes.FAVORITES),
     )
 
     val backStackEntry by navController.currentBackStackEntryAsState()

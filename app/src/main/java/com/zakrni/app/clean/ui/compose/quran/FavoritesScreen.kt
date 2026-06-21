@@ -37,7 +37,7 @@ import com.zakrni.app.clean.ui.theme.components.ZCard
 import com.zakrni.app.clean.ui.theme.components.ZTopBar
 
 @Composable
-fun FavoritesScreen(onBack: () -> Unit, onOpenSurah: (Int) -> Unit) {
+fun FavoritesScreen(onOpenSurah: (Int) -> Unit, onBack: (() -> Unit)? = null) {
     val context = LocalContext.current
     val arabic = isArabicUi()
     var favorites by remember { mutableStateOf(readFavorites(context)) }

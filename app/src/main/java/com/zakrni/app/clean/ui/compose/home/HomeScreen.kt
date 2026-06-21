@@ -18,8 +18,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.AccessTime
@@ -51,6 +53,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.zakrni.app.R
+import com.zakrni.app.clean.ui.compose.categories.CategoryUi
+import com.zakrni.app.clean.ui.compose.categories.categories
 import com.zakrni.app.clean.ui.compose.quran.QuranRoutes
 import com.zakrni.app.clean.ui.compose.quran.readLastReadName
 import com.zakrni.app.clean.ui.compose.quran.readLastReadSurah
@@ -88,6 +92,7 @@ fun HomeScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .padding(horizontal = 16.dp, vertical = 14.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
@@ -95,8 +100,8 @@ fun HomeScreen(
         NextPrayerCard(onClick = { onOpen("prayer") })
         TodayPrayersStrip(onClick = { onOpen("prayer") })
         ContinueReadingCard(onOpen = onOpen)
-        DailyAyahCard(modifier = Modifier.weight(1f), onClick = { onOpen("quran_list") })
-        QuickActionsGrid(onOpen = onOpen)
+        DailyAyahCard(modifier = Modifier.fillMaxWidth(), onClick = { onOpen("quran_list") })
+        CategoriesSection(onOpen = onOpen)
     }
 }
 
@@ -301,7 +306,7 @@ private fun DailyAyahCard(modifier: Modifier = Modifier, onClick: () -> Unit = {
         }
     }
     ZCard(onClick = onClick, contentPadding = 20.dp, modifier = modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = stringResource(R.string.home_daily_ayah),
                 style = MaterialTheme.typography.labelMedium,
@@ -332,6 +337,53 @@ private fun DailyAyahCard(modifier: Modifier = Modifier, onClick: () -> Unit = {
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun CategoriesSection(onOpen: (String) -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = stringResource(R.string.rd_categories_title),
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.padding(top = 4.dp, bottom = 2.dp),
+        )
+        categories.chunked(3).forEach { row ->
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
+                row.forEach { cat ->
+                    CategoryTileHome(cat = cat, onClick = { onOpen(cat.route) }, modifier = Modifier.weight(1f))
+                }
+                repeat(3 - row.size) { Spacer(Modifier.weight(1f)) }
+            }
+        }
+    }
+}
+
+@Composable
+private fun CategoryTileHome(cat: CategoryUi, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    ZCard(onClick = onClick, contentPadding = 12.dp, modifier = modifier) {
+        Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+            Box(
+                modifier = Modifier
+                    .size(44.dp)
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f), CircleShape),
+                contentAlignment = Alignment.Center,
+            ) {
+                cat.iconVector?.let {
+                    Icon(it, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
+                }
+            }
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text = stringResource(cat.title),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
         }
     }
 }
