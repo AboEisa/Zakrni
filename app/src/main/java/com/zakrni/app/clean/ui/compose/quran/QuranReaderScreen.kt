@@ -120,20 +120,12 @@ fun QuranReaderScreen(
             title = surahTitle(currentSurah, surahNumber, isArabic),
             onBack = onBack,
             action = {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = if (mushafMode) Icons.Filled.ViewAgenda else Icons.Filled.AutoStories,
-                        contentDescription = stringResource(if (mushafMode) R.string.qrn_list_mode else R.string.qrn_mushaf_mode),
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(38.dp).clickable { mushafMode = !mushafMode }.padding(7.dp),
-                    )
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.MenuBook,
-                        contentDescription = stringResource(R.string.qrn_tafsir),
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(38.dp).clickable { showTafsirSheet = true }.padding(7.dp),
-                    )
-                }
+                Icon(
+                    imageVector = if (mushafMode) Icons.Filled.ViewAgenda else Icons.Filled.AutoStories,
+                    contentDescription = stringResource(if (mushafMode) R.string.qrn_list_mode else R.string.qrn_mushaf_mode),
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(38.dp).clickable { mushafMode = !mushafMode }.padding(7.dp),
+                )
             },
         )
 
@@ -445,10 +437,20 @@ private fun AyahOptionsSheet(
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState()) {
         Column(modifier = Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp, bottom = 28.dp)) {
             Text(
+                text = ayahText,
+                style = AyahTextStyle.copy(fontFamily = QuranFamily),
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Center,
+                maxLines = 2,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp),
+            )
+            Text(
                 text = "${stringResource(R.string.qrn_ayah_options_title)} • ${localizeNumber(ayahNumber, isArabic)}",
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(bottom = 12.dp),
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp),
             )
             OptionRow(Icons.Filled.PlayArrow, stringResource(R.string.qrn_ayah_listen), onListen)
             OptionRow(Icons.AutoMirrored.Filled.MenuBook, stringResource(R.string.qrn_ayah_tafsir), onTafsir)
@@ -463,10 +465,15 @@ private fun AyahOptionsSheet(
 @Composable
 private fun OptionRow(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, onClick: () -> Unit) {
     Row(
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).padding(vertical = 14.dp),
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).padding(vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
+        Box(
+            modifier = Modifier.size(40.dp).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f), CircleShape),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(22.dp))
+        }
         Spacer(Modifier.size(16.dp))
         Text(label, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
     }

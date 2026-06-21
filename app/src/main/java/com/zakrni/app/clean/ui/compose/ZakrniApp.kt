@@ -90,11 +90,11 @@ fun ZakrniApp() {
             navController = navController,
             startDestination = Routes.HOME,
             modifier = Modifier.fillMaxSize().padding(innerPadding),
-            // Calm crossfade — no slide/size animation (avoids the stretch/squeeze feel).
-            enterTransition = { fadeIn(tween(200)) },
-            exitTransition = { fadeOut(tween(160)) },
-            popEnterTransition = { fadeIn(tween(200)) },
-            popExitTransition = { fadeOut(tween(160)) },
+            // Fast, light crossfade — no slide/size animation (no stretch, no jank).
+            enterTransition = { fadeIn(tween(120)) },
+            exitTransition = { fadeOut(tween(90)) },
+            popEnterTransition = { fadeIn(tween(120)) },
+            popExitTransition = { fadeOut(tween(90)) },
         ) {
             // Landing + main tabs
             homeGraph(navController, onOpen = open)

@@ -114,7 +114,7 @@ fun ZBottomBar(
             val itemWidth = maxWidth / items.size.coerceAtLeast(1)
             val indicatorOffset by animateDpAsState(
                 targetValue = itemWidth * selectedIndex,
-                animationSpec = spring(dampingRatio = 0.7f, stiffness = 400f),
+                animationSpec = spring(dampingRatio = 0.82f, stiffness = 190f),
                 label = "nav-indicator",
             )
 

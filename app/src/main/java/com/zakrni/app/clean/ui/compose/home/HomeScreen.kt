@@ -33,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -176,7 +177,18 @@ private fun NextPrayerCard(onClick: () -> Unit) {
 
 @Composable
 private fun DailyAyahCard(modifier: Modifier = Modifier) {
-    val ayah = remember { dailyAyahCarousel.getOrNull(dailyAyahStartIndex()) }
+    val ayahs = remember { dailyAyahCarousel }
+    if (ayahs.isEmpty()) {
+        ZCard(contentPadding = 20.dp, modifier = modifier.fillMaxWidth()) {}
+        return
+    }
+    var index by remember { mutableIntStateOf(dailyAyahStartIndex().coerceIn(0, ayahs.lastIndex)) }
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(7000L)
+            index = (index + 1) % ayahs.size
+        }
+    }
     ZCard(contentPadding = 20.dp, modifier = modifier.fillMaxWidth()) {
         Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
@@ -185,22 +197,29 @@ private fun DailyAyahCard(modifier: Modifier = Modifier) {
                 color = MaterialTheme.colorScheme.primary,
             )
             Spacer(Modifier.height(10.dp))
-            if (ayah != null) {
-                Text(
-                    text = ayah.arabic,
-                    style = AyahTextStyle,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    textAlign = TextAlign.Center,
-                    maxLines = 4,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                Spacer(Modifier.height(10.dp))
-                Text(
-                    text = "${ayah.surahName} • ${ayah.ayahNumber}",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+            AnimatedContent(
+                targetState = index,
+                transitionSpec = { fadeIn(tween(500)) togetherWith fadeOut(tween(500)) },
+                label = "daily-ayah",
+            ) { i ->
+                val ayah = ayahs[i]
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = ayah.arabic,
+                        style = AyahTextStyle,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        textAlign = TextAlign.Center,
+                        maxLines = 4,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    Spacer(Modifier.height(10.dp))
+                    Text(
+                        text = "${ayah.surahName} • ${ayah.ayahNumber}",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
         }
     }
