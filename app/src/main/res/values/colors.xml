@@ -68,6 +68,9 @@
     <color name="islamic_gold">#D4AF37</color>
     <color name="islamic_gold_soft">#F0C040</color>
     <color name="islamic_teal">#008B8B</color>
+    <!-- Theme teal accents (match the Compose refined-teal palette) -->
+    <color name="prayer_accent">#2DD4BF</color>
+    <color name="notif_accent">#14B8A6</color>
 
     <!-- Error Colors -->
     <color name="error">#B00020</color>

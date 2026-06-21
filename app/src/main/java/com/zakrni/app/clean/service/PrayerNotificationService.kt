@@ -337,12 +337,13 @@ class PrayerNotificationService : Service() {
                 setTextViewText(R.id.countdown_text, "-$countdown")
                 setTextColor(
                     R.id.countdown_text,
-                    ContextCompat.getColor(context, R.color.primary_color)
+                    ContextCompat.getColor(context, R.color.notif_accent)
                 )
             }
 
             val notification = NotificationCompat.Builder(context, App.PRAYER_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_dua)
+                .setColor(ContextCompat.getColor(context, R.color.notif_accent))
                 .setContentIntent(pendingIntent)
                 .setOngoing(true)
                 .setCustomContentView(remoteView)

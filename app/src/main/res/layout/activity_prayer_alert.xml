@@ -93,7 +93,7 @@
                     android:layout_height="40dp"
                     android:layout_gravity="center"
                     android:src="@drawable/ic_prayer"
-                    app:tint="@color/islamic_gold" />
+                    app:tint="@color/prayer_accent" />
 
             </FrameLayout>
 
@@ -176,7 +176,7 @@
                     android:fontFamily="sans-serif-black"
                     android:letterSpacing="0.03"
                     android:text="@string/prayer_alert_default_time"
-                    android:textColor="@color/islamic_gold"
+                    android:textColor="@color/prayer_accent"
                     android:textSize="34sp"
                     android:textStyle="bold" />
 
@@ -261,7 +261,7 @@
                 android:textColor="@color/prayer_action_text"
                 android:textSize="15sp"
                 android:textStyle="bold"
-                app:backgroundTint="@color/islamic_gold"
+                app:backgroundTint="@color/prayer_accent"
                 app:cornerRadius="24dp"
                 app:elevation="0dp"
                 app:icon="@drawable/ic_apps"

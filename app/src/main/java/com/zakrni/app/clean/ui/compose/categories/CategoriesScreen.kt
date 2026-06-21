@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.FormatQuote
 import androidx.compose.material.icons.filled.LocalFireDepartment
+import androidx.compose.material.icons.filled.OndemandVideo
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Spa
 import androidx.compose.material.icons.filled.TouchApp
@@ -61,6 +62,7 @@ object CategoryRoutes {
     const val HADITH = "hadith"
     const val ALLAH_NAMES = "allah_names"
     const val TASBIH = "tasbih"
+    const val MEDIA = "media"
     const val QIBLA = "qibla"
     const val HIJRI = "hijri"
     const val TRACKER = "tracker"
@@ -81,6 +83,7 @@ private val categories = listOf(
     CategoryUi(R.string.rd_cat_hadith, CategoryRoutes.HADITH, iconVector = Icons.Filled.FormatQuote),
     CategoryUi(R.string.rd_cat_allah_names, CategoryRoutes.ALLAH_NAMES, iconVector = Icons.Filled.AutoAwesome),
     CategoryUi(R.string.rd_cat_tasbih, CategoryRoutes.TASBIH, iconVector = Icons.Filled.TouchApp),
+    CategoryUi(R.string.media_hub_title, CategoryRoutes.MEDIA, iconVector = Icons.Filled.OndemandVideo),
     CategoryUi(R.string.rd_cat_qibla, CategoryRoutes.QIBLA, iconVector = Icons.Filled.Explore),
     CategoryUi(R.string.rd_cat_hijri, CategoryRoutes.HIJRI, iconVector = Icons.Filled.CalendarMonth),
     CategoryUi(R.string.rd_cat_tracker, CategoryRoutes.TRACKER, iconVector = Icons.Filled.LocalFireDepartment),
