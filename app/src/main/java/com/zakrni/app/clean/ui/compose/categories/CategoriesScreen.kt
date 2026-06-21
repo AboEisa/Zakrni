@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Explore
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FormatQuote
 import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material.icons.filled.OndemandVideo
@@ -70,6 +71,7 @@ object CategoryRoutes {
     const val TRACKER = "tracker"
     const val FASTING = "fasting"
     const val ZAKAT = "zakat"
+    const val FAVORITES = "favorites"
     const val SETTINGS = "settings"
 }
 
@@ -93,6 +95,7 @@ private val categories = listOf(
     CategoryUi(R.string.rd_cat_tracker, CategoryRoutes.TRACKER, iconVector = Icons.Filled.LocalFireDepartment),
     CategoryUi(R.string.rd_cat_fasting, CategoryRoutes.FASTING, iconVector = Icons.Filled.DarkMode),
     CategoryUi(R.string.rd_cat_zakat, CategoryRoutes.ZAKAT, iconVector = Icons.Filled.Calculate),
+    CategoryUi(R.string.rd_cat_favorites, CategoryRoutes.FAVORITES, iconVector = Icons.Filled.Favorite),
     CategoryUi(R.string.rd_cat_settings, CategoryRoutes.SETTINGS, iconVector = Icons.Filled.Settings),
 )
 

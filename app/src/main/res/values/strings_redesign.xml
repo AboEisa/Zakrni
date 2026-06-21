@@ -54,6 +54,14 @@
     <string name="rd_reader_bg_sepia">Sepia</string>
     <string name="rd_reader_bg_night">Night</string>
 
+    <string name="rd_cat_favorites">Favorites</string>
+    <string name="rd_fav_add">Add to favorites</string>
+    <string name="rd_fav_remove">Remove from favorites</string>
+    <string name="rd_fav_saved">Saved to favorites</string>
+    <string name="rd_fav_removed">Removed from favorites</string>
+    <string name="rd_fav_empty">No favorite ayat yet</string>
+    <string name="rd_home_continue">Continue reading</string>
+
     <string name="rd_common_retry">Retry</string>
     <string name="rd_common_loading">Loading…</string>
     <string name="rd_common_error">Something went wrong</string>

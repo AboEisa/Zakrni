@@ -32,6 +32,8 @@ import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AutoStories
 import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Share
@@ -120,6 +122,14 @@ fun QuranReaderScreen(
     LaunchedEffect(surahNumber) { viewModel.loadQuranVerses(surahNumber) }
     DisposableEffect(Unit) { onDispose { viewModel.stopAudio() } }
 
+    // Remember this surah as the last-read one for the Home "continue reading" card.
+    LaunchedEffect(currentSurah, surahNumber) {
+        val s = currentSurah
+        if (s != null && s.number == surahNumber) {
+            writeLastRead(context, surahNumber, s.name, s.englishName)
+        }
+    }
+
     val isThisSurahPlaying = isPlaying && playingSurah == surahNumber
     val reciterName = remember(selectedReciter, isArabic) { viewModel.getCurrentReciterName() }
 
@@ -193,9 +203,24 @@ fun QuranReaderScreen(
 
     // Per-ayah options sheet.
     optionsAyah?.let { ayah ->
+        val ayahInSurah = if (ayah.numberInSurah > 0) ayah.numberInSurah else 1
+        var favState by remember(ayah) { mutableStateOf(isFavorite(context, surahNumber, ayahInSurah)) }
         AyahOptionsSheet(
-            ayahNumber = if (ayah.numberInSurah > 0) ayah.numberInSurah else 1,
+            ayahNumber = ayahInSurah,
             isArabic = isArabic,
+            isFavorite = favState,
+            onFavorite = {
+                val now = toggleFavorite(
+                    context,
+                    FavoriteAyah(surahNumber, ayahInSurah, surahTitle(currentSurah, surahNumber, isArabic), ayah.text),
+                )
+                favState = now
+                Toast.makeText(
+                    context,
+                    if (now) R.string.rd_fav_saved else R.string.rd_fav_removed,
+                    Toast.LENGTH_SHORT,
+                ).show()
+            },
             onListen = {
                 viewModel.playAyahAudio(ayah.number, surahNumber)
                 optionsAyah = null
@@ -468,6 +493,8 @@ private fun AyahRow(ayah: DomainAyah, isArabic: Boolean, highlighted: Boolean, o
 private fun AyahOptionsSheet(
     ayahNumber: Int,
     isArabic: Boolean,
+    isFavorite: Boolean,
+    onFavorite: () -> Unit,
     ayahText: String,
     onListen: () -> Unit,
     onTafsir: () -> Unit,
@@ -493,6 +520,11 @@ private fun AyahOptionsSheet(
                 color = MaterialTheme.colorScheme.primary,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp),
+            )
+            OptionRow(
+                if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                stringResource(if (isFavorite) R.string.rd_fav_remove else R.string.rd_fav_add),
+                onFavorite,
             )
             OptionRow(Icons.Filled.PlayArrow, stringResource(R.string.qrn_ayah_listen), onListen)
             OptionRow(Icons.AutoMirrored.Filled.MenuBook, stringResource(R.string.qrn_ayah_tafsir), onTafsir)
@@ -570,7 +602,7 @@ private fun ReaderSettingsSheet(
 }
 
 @Composable
-private fun RowScope.ChoiceChip(label: String, selected: Boolean, modifier: Modifier = Modifier, onClick: () -> Unit) {
+private fun ChoiceChip(label: String, selected: Boolean, modifier: Modifier = Modifier, onClick: () -> Unit) {
     Surface(
         onClick = onClick,
         shape = RoundedCornerShape(14.dp),

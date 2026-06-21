@@ -53,6 +53,14 @@
     <string name="rd_reader_bg_sepia">بنّي</string>
     <string name="rd_reader_bg_night">ليلي</string>
 
+    <string name="rd_cat_favorites">المفضّلة</string>
+    <string name="rd_fav_add">أضف للمفضّلة</string>
+    <string name="rd_fav_remove">إزالة من المفضّلة</string>
+    <string name="rd_fav_saved">تمت الإضافة للمفضّلة</string>
+    <string name="rd_fav_removed">تمت الإزالة من المفضّلة</string>
+    <string name="rd_fav_empty">لا توجد آيات مفضّلة بعد</string>
+    <string name="rd_home_continue">تابع القراءة</string>
+
     <string name="rd_common_retry">إعادة المحاولة</string>
     <string name="rd_common_loading">جاري التحميل…</string>
     <string name="rd_common_error">حصل خطأ ما</string>

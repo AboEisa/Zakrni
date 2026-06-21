@@ -44,12 +44,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.zakrni.app.R
+import com.zakrni.app.clean.ui.compose.quran.QuranRoutes
+import com.zakrni.app.clean.ui.compose.quran.readLastReadName
+import com.zakrni.app.clean.ui.compose.quran.readLastReadSurah
 import com.zakrni.app.clean.ui.theme.AyahTextStyle
 import com.zakrni.app.clean.ui.theme.components.ZCard
 import com.zakrni.app.clean.ui.utils.PrayerTimeUtils
@@ -90,6 +94,7 @@ fun HomeScreen(
         GreetingHeader(onOpenSettings = { onOpen("settings") })
         NextPrayerCard(onClick = { onOpen("prayer") })
         TodayPrayersStrip(onClick = { onOpen("prayer") })
+        ContinueReadingCard(onOpen = onOpen)
         DailyAyahCard(modifier = Modifier.weight(1f), onClick = { onOpen("quran_list") })
         QuickActionsGrid(onOpen = onOpen)
     }
@@ -196,6 +201,49 @@ private fun NextPrayerCard(onClick: () -> Unit) {
                         color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
                     )
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ContinueReadingCard(onOpen: (String) -> Unit) {
+    val context = LocalContext.current
+    val surah = remember { readLastReadSurah(context) }
+    if (surah <= 0) return
+    @Suppress("DEPRECATION")
+    val arabic = LocalConfiguration.current.locale.language == "ar"
+    val name = remember(surah) {
+        readLastReadName(context, arabic).ifBlank { if (arabic) "سورة $surah" else "Surah $surah" }
+    }
+    ZCard(
+        onClick = { onOpen(QuranRoutes.reader(surah)) },
+        contentPadding = 14.dp,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                modifier = Modifier
+                    .size(42.dp)
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f), CircleShape),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(Icons.AutoMirrored.Filled.MenuBook, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(22.dp))
+            }
+            Spacer(Modifier.size(12.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.rd_home_continue),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+                Text(
+                    text = name,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
             }
         }
     }
