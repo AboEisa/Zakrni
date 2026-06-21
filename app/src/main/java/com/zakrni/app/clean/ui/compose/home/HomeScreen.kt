@@ -25,7 +25,6 @@ import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.FormatQuote
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.Mosque
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Spa
 import androidx.compose.material.icons.filled.TouchApp
@@ -89,16 +88,15 @@ fun HomeScreen(
             .padding(horizontal = 16.dp, vertical = 14.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
-        GreetingHeader(onOpenSearch = { onOpen("search") }, onOpenSettings = { onOpen("settings") })
+        GreetingHeader(onOpenSettings = { onOpen("settings") })
         NextPrayerCard(onClick = { onOpen("prayer") })
-        DailyAyahCard(onClick = { onOpen("quran_list") })
-        Spacer(Modifier.weight(1f))
+        DailyAyahCard(modifier = Modifier.weight(1f), onClick = { onOpen("quran_list") })
         QuickAccessGrid(onOpen = onOpen)
     }
 }
 
 @Composable
-private fun GreetingHeader(onOpenSearch: () -> Unit, onOpenSettings: () -> Unit) {
+private fun GreetingHeader(onOpenSettings: () -> Unit) {
     val context = LocalContext.current
     val dateText = remember { android.text.format.DateFormat.getLongDateFormat(context).format(java.util.Date()) }
     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -114,8 +112,6 @@ private fun GreetingHeader(onOpenSearch: () -> Unit, onOpenSettings: () -> Unit)
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
-        HeaderIconButton(Icons.Filled.Search, onOpenSearch)
-        Spacer(Modifier.size(8.dp))
         HeaderIconButton(Icons.Filled.Settings, onOpenSettings)
     }
 }
@@ -202,7 +198,7 @@ private fun NextPrayerCard(onClick: () -> Unit) {
 }
 
 @Composable
-private fun DailyAyahCard(onClick: () -> Unit) {
+private fun DailyAyahCard(modifier: Modifier = Modifier, onClick: () -> Unit) {
     val ayahs = remember { dailyAyahCarousel }
     if (ayahs.isEmpty()) return
     var index by remember { mutableIntStateOf(dailyAyahStartIndex().coerceIn(0, ayahs.lastIndex)) }
@@ -212,8 +208,8 @@ private fun DailyAyahCard(onClick: () -> Unit) {
             index = (index + 1) % ayahs.size
         }
     }
-    ZCard(onClick = onClick, contentPadding = 20.dp, modifier = Modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+    ZCard(onClick = onClick, contentPadding = 20.dp, modifier = modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = stringResource(R.string.home_daily_ayah),
                 style = MaterialTheme.typography.labelMedium,

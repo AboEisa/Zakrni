@@ -139,59 +139,24 @@ private fun PrayerContent(
 ) {
     val isArabic = stringResource(R.string.prn_fajr) == "الفجر"
 
-    // Ring progress: 1 - remaining/total, where `total` is the full window captured when the
-    // next prayer first appears. We track the largest remaining seen for this prayer as the total.
-    var totalSeconds by remember { mutableStateOf(0L) }
-    var lastKey by remember { mutableStateOf<String?>(null) }
-    val remainingSeconds = parseRemaining(remainingTime)
-    androidx.compose.runtime.LaunchedEffect(nextPrayer?.name, remainingSeconds) {
-        if (nextPrayer?.name != lastKey) {
-            lastKey = nextPrayer?.name
-            totalSeconds = remainingSeconds.coerceAtLeast(1)
-        } else if (remainingSeconds > totalSeconds) {
-            totalSeconds = remainingSeconds
-        }
-    }
-    val progress = if (totalSeconds > 0L) {
-        1f - (remainingSeconds.toFloat() / totalSeconds.toFloat()).coerceIn(0f, 1f)
-    } else 0f
-
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         item {
-            LocationRow(locationName = locationName)
-        }
-        item {
             NextPrayerHero(
                 nextPrayer = nextPrayer,
                 remainingTime = remainingTime,
-                progress = progress,
+                locationName = locationName,
                 isArabic = isArabic,
             )
         }
-        item {
-            Text(
-                text = stringResource(R.string.prn_title),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.padding(top = 4.dp, bottom = 4.dp),
-            )
-        }
         items(rows, key = { it.key }) { row ->
-            val isCurrent = row.key == currentPrayer?.name
-            val isNext = row.key == nextPrayer?.name
-            PrayerTimelineRow(row = row, isCurrent = isCurrent, isNext = isNext)
-        }
-        item {
-            Spacer(Modifier.height(4.dp))
-            ZButton(
-                text = stringResource(R.string.prn_view_all),
-                onClick = onViewAll,
-                style = ZButtonStyle.Gold,
-                modifier = Modifier.fillMaxWidth(),
+            PrayerTimelineRow(
+                row = row,
+                isCurrent = row.key == currentPrayer?.name,
+                isNext = row.key == nextPrayer?.name,
             )
         }
     }
@@ -225,44 +190,57 @@ private fun LocationRow(locationName: String) {
 private fun NextPrayerHero(
     nextPrayer: PrayerTimeUtils.PrayerInfo?,
     remainingTime: String,
-    progress: Float,
+    locationName: String,
     isArabic: Boolean,
 ) {
     ZCard(
+        color = MaterialTheme.colorScheme.primary,
+        contentColor = MaterialTheme.colorScheme.onPrimary,
         modifier = Modifier.fillMaxWidth(),
-        contentPadding = 20.dp,
+        contentPadding = 24.dp,
     ) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
+        Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Filled.LocationOn,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.85f),
+                    modifier = Modifier.size(15.dp),
+                )
+                Spacer(Modifier.size(5.dp))
+                Text(
+                    text = locationName,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.85f),
+                    maxLines = 1,
+                    textAlign = TextAlign.Center,
+                )
+            }
+            Spacer(Modifier.height(18.dp))
             Text(
                 text = stringResource(R.string.prn_next_prayer),
                 style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
             )
             val displayName = nextPrayer?.let { if (isArabic) it.nameArabic else it.name }
-            if (displayName != null) {
-                Text(
-                    text = stringResource(R.string.prn_time_for_prayer, displayName),
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(top = 4.dp, bottom = 16.dp),
-                )
-            }
-            CountdownRing(
-                progress = progress,
-                label = remainingTime.ifBlank { "--:--" },
-                ringColor = BrandGold,
-                trackColor = MaterialTheme.colorScheme.surfaceVariant,
+            Text(
+                text = displayName ?: "—",
+                style = MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.padding(top = 2.dp),
+            )
+            Spacer(Modifier.height(10.dp))
+            Text(
+                text = remainingTime.ifBlank { "--:--" },
+                style = MaterialTheme.typography.displaySmall,
+                color = MaterialTheme.colorScheme.onPrimary,
             )
             if (nextPrayer != null) {
                 Text(
                     text = "${stringResource(R.string.prn_remaining)} • ${nextPrayer.time}",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = 12.dp),
+                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
+                    modifier = Modifier.padding(top = 8.dp),
                 )
             }
         }
@@ -271,69 +249,44 @@ private fun NextPrayerHero(
 
 @Composable
 private fun PrayerTimelineRow(row: PrayerRowUi, isCurrent: Boolean, isNext: Boolean) {
-    val highlightColor by animateFloatAsState(
-        targetValue = if (isCurrent) 1f else 0f,
-        animationSpec = tween(400),
-        label = "row-highlight",
-    )
-    val containerColor = if (isCurrent) {
-        BrandGold.copy(alpha = 0.04f + 0.10f * highlightColor)
-    } else {
-        MaterialTheme.colorScheme.surface
-    }
+    val active = isCurrent || isNext
+    val accent = MaterialTheme.colorScheme.primary
+    val containerColor = if (active) accent.copy(alpha = 0.08f) else MaterialTheme.colorScheme.surface
 
-    ZCard(
-        modifier = Modifier.fillMaxWidth(),
-        color = containerColor,
-        contentPadding = 14.dp,
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
+    ZCard(modifier = Modifier.fillMaxWidth(), color = containerColor, contentPadding = 14.dp) {
+        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Box(
                 modifier = Modifier
                     .size(44.dp)
                     .background(
-                        color = if (isCurrent) BrandGold.copy(alpha = 0.22f)
-                        else MaterialTheme.colorScheme.surfaceVariant,
+                        color = if (active) accent.copy(alpha = 0.16f) else MaterialTheme.colorScheme.surfaceVariant,
                         shape = CircleShape,
                     ),
                 contentAlignment = Alignment.Center,
             ) {
-                Image(
-                    painter = painterResource(row.icon),
-                    contentDescription = null,
-                    modifier = Modifier.size(24.dp),
-                )
+                Image(painter = painterResource(row.icon), contentDescription = null, modifier = Modifier.size(24.dp))
             }
             Spacer(Modifier.size(14.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = stringResource(row.nameRes),
                     style = MaterialTheme.typography.titleSmall,
-                    fontWeight = if (isCurrent || isNext) FontWeight.Bold else FontWeight.Normal,
-                    color = if (isCurrent) BrandGold else MaterialTheme.colorScheme.onSurface,
+                    fontWeight = if (active) FontWeight.Bold else FontWeight.Normal,
+                    color = if (active) accent else MaterialTheme.colorScheme.onSurface,
                 )
-                AnimatedVisibility(
-                    visible = isCurrent || isNext,
-                    enter = fadeIn(),
-                    exit = fadeOut(),
-                ) {
+                if (active) {
                     Text(
-                        text = stringResource(
-                            if (isCurrent) R.string.prn_now_label else R.string.prn_next_label,
-                        ),
+                        text = stringResource(if (isCurrent) R.string.prn_now_label else R.string.prn_next_label),
                         style = MaterialTheme.typography.labelSmall,
-                        color = if (isCurrent) BrandGold else MaterialTheme.colorScheme.primary,
+                        color = accent,
                     )
                 }
             }
             Text(
                 text = row.time,
-                style = MaterialTheme.typography.titleSmall,
+                style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
-                color = if (isCurrent) BrandGold else MaterialTheme.colorScheme.onSurface,
+                color = if (active) accent else MaterialTheme.colorScheme.onSurface,
             )
         }
     }
