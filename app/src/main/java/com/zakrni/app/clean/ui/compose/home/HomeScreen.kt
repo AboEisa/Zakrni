@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.AccessTime
@@ -88,7 +89,8 @@ fun HomeScreen(
     ) {
         GreetingHeader(onOpenSettings = { onOpen("settings") })
         NextPrayerCard(onClick = { onOpen("prayer") })
-        DailyAyahCard(modifier = Modifier.weight(1f))
+        TodayPrayersStrip(onClick = { onOpen("prayer") })
+        DailyAyahCard(modifier = Modifier.weight(1f), onClick = { onOpen("quran_list") })
         QuickActionsGrid(onOpen = onOpen)
     }
 }
@@ -200,7 +202,44 @@ private fun NextPrayerCard(onClick: () -> Unit) {
 }
 
 @Composable
-private fun DailyAyahCard(modifier: Modifier = Modifier) {
+private fun TodayPrayersStrip(onClick: () -> Unit) {
+    val context = LocalContext.current
+    val prayers = remember { readTodayPrayers(context) }
+    if (prayers.isEmpty()) return
+    val nextKey = remember { readNextPrayer(context)?.name }
+    ZCard(onClick = onClick, contentPadding = 8.dp, modifier = Modifier.fillMaxWidth()) {
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            prayers.forEach { p ->
+                val active = p.key == nextKey
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clip(RoundedCornerShape(12.dp))
+                        .then(if (active) Modifier.background(MaterialTheme.colorScheme.primary.copy(alpha = 0.14f)) else Modifier)
+                        .padding(vertical = 8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text(
+                        text = p.nameArabic,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                    )
+                    Spacer(Modifier.height(3.dp))
+                    Text(
+                        text = p.time,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                        maxLines = 1,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun DailyAyahCard(modifier: Modifier = Modifier, onClick: () -> Unit = {}) {
     val ayahs = remember { dailyAyahCarousel }
     if (ayahs.isEmpty()) {
         ZCard(contentPadding = 20.dp, modifier = modifier.fillMaxWidth()) {}
@@ -213,7 +252,7 @@ private fun DailyAyahCard(modifier: Modifier = Modifier) {
             index = (index + 1) % ayahs.size
         }
     }
-    ZCard(contentPadding = 20.dp, modifier = modifier.fillMaxWidth()) {
+    ZCard(onClick = onClick, contentPadding = 20.dp, modifier = modifier.fillMaxWidth()) {
         Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = stringResource(R.string.home_daily_ayah),
@@ -233,7 +272,7 @@ private fun DailyAyahCard(modifier: Modifier = Modifier) {
                         style = AyahTextStyle,
                         color = MaterialTheme.colorScheme.onSurface,
                         textAlign = TextAlign.Center,
-                        maxLines = 4,
+                        maxLines = 3,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.fillMaxWidth(),
                     )

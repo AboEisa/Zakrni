@@ -71,3 +71,18 @@ fun readNextPrayer(context: Context): PrayerTimeUtils.PrayerInfo? {
     val timings = readCachedTimings(context) ?: return null
     return PrayerTimeUtils.getCurrentAndNextPrayer(timings).second
 }
+
+/** One prayer in the Home "today at a glance" strip. [key] matches [PrayerTimeUtils.PrayerInfo.name]. */
+data class PrayerSlot(val key: String, val nameArabic: String, val time: String)
+
+/** The five daily prayers (name + cached time) for the at-a-glance Home strip, or empty if uncached. */
+fun readTodayPrayers(context: Context): List<PrayerSlot> {
+    val t = readCachedTimings(context) ?: return emptyList()
+    return listOf(
+        PrayerSlot("Fajr", "الفجر", t.Fajr),
+        PrayerSlot("Dhuhr", "الظهر", t.Dhuhr),
+        PrayerSlot("Asr", "العصر", t.Asr),
+        PrayerSlot("Maghrib", "المغرب", t.Maghrib),
+        PrayerSlot("Isha", "العشاء", t.Isha),
+    )
+}
