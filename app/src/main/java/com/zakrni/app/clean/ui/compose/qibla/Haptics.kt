@@ -20,15 +20,20 @@ class Haptics(context: Context) {
         context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
     }
 
-    /** Fire a short, crisp confirmation tick. */
+    /** Fire a short, crisp confirmation tick. No-ops safely if vibration is unavailable/denied. */
     fun tick() {
         val v = vibrator ?: return
         if (!v.hasVibrator()) return
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            v.vibrate(VibrationEffect.createOneShot(40L, VibrationEffect.DEFAULT_AMPLITUDE))
-        } else {
-            @Suppress("DEPRECATION")
-            v.vibrate(40L)
+        // Guard against SecurityException (missing VIBRATE permission) or OEM quirks.
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                v.vibrate(VibrationEffect.createOneShot(40L, VibrationEffect.DEFAULT_AMPLITUDE))
+            } else {
+                @Suppress("DEPRECATION")
+                v.vibrate(40L)
+            }
+        } catch (e: Exception) {
+            // Ignore — the haptic tick is a non-critical nicety.
         }
     }
 }
