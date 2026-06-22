@@ -64,6 +64,10 @@
     <string name="rd_share_image">Share as image</string>
     <string name="rd_home_search">Search</string>
     <string name="rd_home_all">All sections</string>
+    <string name="azr_prev">Previous</string>
+    <string name="azr_next">Next</string>
+    <string name="azr_of">of</string>
+    <string name="azr_tap_hint">Tap the screen to count one</string>
     <string name="rd_search_title">Search</string>
     <string name="rd_search_hint">Search sections and surahs</string>
     <string name="rd_search_prompt">Type to search the app</string>

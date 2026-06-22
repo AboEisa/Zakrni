@@ -63,6 +63,10 @@
     <string name="rd_share_image">مشاركة كصورة</string>
     <string name="rd_home_search">ابحث</string>
     <string name="rd_home_all">كل الأقسام</string>
+    <string name="azr_prev">السابق</string>
+    <string name="azr_next">التالي</string>
+    <string name="azr_of">من</string>
+    <string name="azr_tap_hint">المس الشاشة لتعدّ مرة</string>
     <string name="rd_search_title">بحث</string>
     <string name="rd_search_hint">ابحث في الأقسام والسور</string>
     <string name="rd_search_prompt">اكتب للبحث في التطبيق</string>

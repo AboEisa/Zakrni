@@ -3,18 +3,24 @@ package com.zakrni.app.clean.ui.compose.azkardua
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.MenuBook
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -29,6 +35,7 @@ import com.zakrni.app.clean.ui.theme.components.ErrorState
 import com.zakrni.app.clean.ui.theme.components.ExpandableSection
 import com.zakrni.app.clean.ui.theme.components.appear
 import com.zakrni.app.clean.ui.theme.components.LoadingState
+import com.zakrni.app.clean.ui.theme.components.ZCard
 import com.zakrni.app.clean.ui.theme.components.ZTopBar
 import com.zakrni.app.clean.ui.utils.AzkarType
 import com.zakrni.app.clean.ui.utils.HisnLocalizationUtils
@@ -55,6 +62,8 @@ fun AzkarScreen(
     val expandedHisnSections by viewModel.expandedHisnSections.collectAsStateWithLifecycle()
 
     val isArabic = isArabicUi()
+    var selectedSection by remember { mutableStateOf<AzkarSectionUi?>(null) }
+    androidx.activity.compose.BackHandler(enabled = selectedSection != null) { selectedSection = null }
 
     Column(modifier = modifier.fillMaxSize()) {
         ZTopBar(title = stringResource(R.string.azd_azkar_title), onBack = onBack)
@@ -65,6 +74,18 @@ fun AzkarScreen(
         }
 
         when {
+            // A section is open -> the swipeable dhikr reader (slides + tap-to-count).
+            selectedSection != null -> {
+                val sel = selectedSection!!
+                AzkarReaderView(
+                    title = sel.title,
+                    slides = remember(sel, isArabic) { sectionSlides(sel, isArabic) },
+                    arabic = isArabic,
+                    sectionKey = sel.key,
+                    onBack = { selectedSection = null },
+                )
+            }
+
             // Hard error: no data at all -> full error state with retry.
             error != null && azkarData == null && sections.isEmpty() -> {
                 ErrorState(
@@ -93,25 +114,11 @@ fun AzkarScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     items(sections, key = { it.key }) { section ->
-                        val expanded = when (section) {
-                            is AzkarSectionUi.General ->
-                                expandedSections.contains(section.type)
-                            is AzkarSectionUi.Hisn ->
-                                expandedHisnSections.contains(section.sectionKey)
-                        }
-                        ExpandableSection(
-                            modifier = Modifier.appear(AppearStyle.FadeSlideStart),
+                        AzkarSectionCard(
                             title = section.title,
-                            expanded = expanded,
-                            onToggle = {
-                                when (section) {
-                                    is AzkarSectionUi.General -> viewModel.toggleSection(section.type)
-                                    is AzkarSectionUi.Hisn -> viewModel.toggleHisnSection(section.sectionKey)
-                                }
-                            },
-                        ) {
-                            AzkarSectionContent(section = section, isArabic = isArabic)
-                        }
+                            modifier = Modifier.appear(AppearStyle.FadeSlideStart),
+                            onClick = { selectedSection = section },
+                        )
                     }
                 }
             }
@@ -178,6 +185,36 @@ private fun countLabel(count: Int): String =
     } else {
         stringResource(R.string.azd_count_once)
     }
+
+/** A tappable section card that opens the dhikr reader. */
+@Composable
+private fun AzkarSectionCard(title: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
+    ZCard(onClick = onClick, contentPadding = 16.dp, modifier = modifier.fillMaxWidth()) {
+        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.weight(1f),
+            )
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+            )
+        }
+    }
+}
+
+/** Maps a section's items to localized dhikr slides for the reader. */
+private fun sectionSlides(section: AzkarSectionUi, isArabic: Boolean): List<DhikrSlide> = when (section) {
+    is AzkarSectionUi.General -> section.items.map {
+        DhikrSlide(HisnLocalizationUtils.localizeGenericAzkarText(it.text, isArabic), it.count.coerceAtLeast(1))
+    }
+    is AzkarSectionUi.Hisn -> section.items.map {
+        DhikrSlide(HisnLocalizationUtils.localizeDuaText(it, isArabic), it.count.coerceAtLeast(1))
+    }
+}
 
 /** Stable identity + display data for an azkar section. */
 private sealed interface AzkarSectionUi {
