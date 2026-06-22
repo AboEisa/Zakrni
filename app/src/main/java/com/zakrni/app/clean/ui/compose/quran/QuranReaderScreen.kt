@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -107,6 +108,7 @@ fun QuranReaderScreen(
     val selectedReciter by viewModel.selectedReciter.collectAsStateWithLifecycle()
     val ayahTafsir by viewModel.ayahTafsir.collectAsStateWithLifecycle()
     val ayahTafsirLoading by viewModel.ayahTafsirLoading.collectAsStateWithLifecycle()
+    val playingAyahNumber by viewModel.playingAyahNumber.collectAsStateWithLifecycle()
 
     val isArabic = isArabicUi()
     val context = LocalContext.current
@@ -164,7 +166,8 @@ fun QuranReaderScreen(
                     surahNumber = surahNumber,
                     verses = verses,
                     isArabic = isArabic,
-                    highlightedNumber = optionsAyah?.number,
+                    highlightedNumber = playingAyahNumber ?: optionsAyah?.number,
+                    playingAyahNumber = playingAyahNumber,
                     onAyahClick = { optionsAyah = it },
                     fontScale = fontScale,
                     readingMode = readingMode,
@@ -174,7 +177,8 @@ fun QuranReaderScreen(
                     surahNumber = surahNumber,
                     verses = verses,
                     isArabic = isArabic,
-                    highlighted = optionsAyah?.number,
+                    highlighted = playingAyahNumber ?: optionsAyah?.number,
+                    playingAyahNumber = playingAyahNumber,
                     onAyahClick = { optionsAyah = it },
                 )
             }
@@ -194,7 +198,8 @@ fun QuranReaderScreen(
                 isArabic = isArabic,
                 onPlayPause = {
                     if (isThisSurahPlaying) viewModel.pauseAudio()
-                    else viewModel.playSurahAudio(surahNumber)
+                    else if (playingAyahNumber != null) viewModel.resumeAudio()
+                    else viewModel.playFollow(surahNumber, verses, 0)
                 },
                 onSeek = { viewModel.seekToPosition(it) },
                 onPickReciter = { showReciterSheet = true },
@@ -308,10 +313,18 @@ private fun AyahList(
     verses: List<DomainAyah>,
     isArabic: Boolean,
     highlighted: Int?,
+    playingAyahNumber: Int?,
     onAyahClick: (DomainAyah) -> Unit,
 ) {
     val showBismillah = surahNumber != 1 && surahNumber != 9
+    val listState = rememberLazyListState()
+    LaunchedEffect(playingAyahNumber) {
+        val pin = playingAyahNumber ?: return@LaunchedEffect
+        val idx = verses.indexOfFirst { it.number == pin }
+        if (idx >= 0) listState.animateScrollToItem(idx + 1)
+    }
     LazyColumn(
+        state = listState,
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 24.dp),
         verticalArrangement = Arrangement.spacedBy(6.dp),
@@ -336,6 +349,7 @@ private fun MushafView(
     verses: List<DomainAyah>,
     isArabic: Boolean,
     highlightedNumber: Int?,
+    playingAyahNumber: Int?,
     onAyahClick: (DomainAyah) -> Unit,
     fontScale: Float,
     readingMode: Int,
@@ -370,11 +384,21 @@ private fun MushafView(
     val annotated = data.first
     val ranges = data.second
     var layout by remember { mutableStateOf<TextLayoutResult?>(null) }
+    val scrollState = rememberScrollState()
+    LaunchedEffect(playingAyahNumber, layout) {
+        val ln = layout ?: return@LaunchedEffect
+        val pin = playingAyahNumber ?: return@LaunchedEffect
+        val idx = verses.indexOfFirst { it.number == pin }
+        if (idx in ranges.indices) {
+            val top = ln.getBoundingBox(ranges[idx].first).top
+            scrollState.animateScrollTo((top.toInt() - 180).coerceAtLeast(0))
+        }
+    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
+            .verticalScroll(scrollState)
             .padding(16.dp),
     ) {
         Surface(
