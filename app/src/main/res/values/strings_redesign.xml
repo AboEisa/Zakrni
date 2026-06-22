@@ -70,6 +70,7 @@
     <string name="azr_tap_hint">Tap the screen to count one</string>
     <string name="content_name_of_day">Name of the day</string>
     <string name="content_tap_flip">Tap a name to reveal its meaning</string>
+    <string name="tsb_today">Today: %1$d</string>
     <string name="rd_search_title">Search</string>
     <string name="rd_search_hint">Search sections and surahs</string>
     <string name="rd_search_prompt">Type to search the app</string>

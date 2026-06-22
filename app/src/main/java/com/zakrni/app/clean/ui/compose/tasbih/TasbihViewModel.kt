@@ -27,6 +27,7 @@ data class TasbihDhikr(
 data class TasbihUiState(
     val dhikrs: List<TasbihDhikr> = emptyList(),
     val currentIndex: Int = 0,
+    val dailyTotal: Int = 0,
 ) {
     val current: TasbihDhikr? get() = dhikrs.getOrNull(currentIndex)
 }
@@ -39,6 +40,7 @@ data class TasbihUiState(
 class TasbihViewModel(
     private val preferences: TasbehPreferences,
     private val isArabic: Boolean,
+    private val appContext: Context,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(TasbihUiState())
@@ -49,7 +51,7 @@ class TasbihViewModel(
         val items = if (saved.isNotEmpty()) saved else defaultDhikrs()
         var index = preferences.getCurrentDhikrIndex()
         if (index !in items.indices) index = 0
-        _state.value = TasbihUiState(items.map { it.toUi() }, index)
+        _state.value = TasbihUiState(items.map { it.toUi() }, index, loadDailyTotal())
         if (saved.isEmpty()) persist()
     }
 
@@ -66,7 +68,8 @@ class TasbihViewModel(
         val current = s.current ?: return false
         if (current.count >= current.target) return false
         val updated = current.copy(count = current.count + 1)
-        _state.value = s.copy(dhikrs = s.dhikrs.replaceAt(s.currentIndex, updated))
+        val newDaily = saveDailyTotal(s.dailyTotal + 1)
+        _state.value = s.copy(dhikrs = s.dhikrs.replaceAt(s.currentIndex, updated), dailyTotal = newDaily)
         persist()
         return true
     }
@@ -119,6 +122,22 @@ class TasbihViewModel(
         preferences.saveDhikrList(_state.value.dhikrs.map { it.toEntity() })
     }
 
+    // ----- Daily tasbih total (resets each new day) -----
+    private fun today(): String =
+        java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(java.util.Date())
+
+    private fun dailyPrefs() = appContext.getSharedPreferences("zakrni_tasbih_daily", Context.MODE_PRIVATE)
+
+    private fun loadDailyTotal(): Int {
+        val p = dailyPrefs()
+        return if (p.getString("date", "") == today()) p.getInt("total", 0) else 0
+    }
+
+    private fun saveDailyTotal(value: Int): Int {
+        dailyPrefs().edit().putString("date", today()).putInt("total", value).apply()
+        return value
+    }
+
     private fun defaultDhikrs(): List<DhikrItem> = if (isArabic) {
         listOf(
             DhikrItem(0, "سبحان الله", 33, "#27AE60"),
@@ -165,6 +184,7 @@ class TasbihViewModel(
                 return TasbihViewModel(
                     preferences = TasbehPreferences(appContext),
                     isArabic = LocaleHelper.isArabic(context),
+                    appContext = appContext,
                 ) as T
             }
         }

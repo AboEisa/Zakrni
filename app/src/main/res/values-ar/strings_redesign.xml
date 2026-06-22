@@ -69,6 +69,7 @@
     <string name="azr_tap_hint">المس الشاشة لتعدّ مرة</string>
     <string name="content_name_of_day">اسم اليوم</string>
     <string name="content_tap_flip">اضغط على الاسم لمعرفة معناه</string>
+    <string name="tsb_today">تسبيح اليوم: %1$d</string>
     <string name="rd_search_title">بحث</string>
     <string name="rd_search_hint">ابحث في الأقسام والسور</string>
     <string name="rd_search_prompt">اكتب للبحث في التطبيق</string>

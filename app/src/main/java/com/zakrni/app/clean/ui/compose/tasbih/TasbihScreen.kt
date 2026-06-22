@@ -131,6 +131,13 @@ fun TasbihScreen(onBack: () -> Unit) {
                     modifier = Modifier.padding(top = 20.dp),
                 )
 
+                Text(
+                    text = stringResource(R.string.tsb_today, state.dailyTotal),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(top = 6.dp),
+                )
+
                 TextButton(onClick = { showResetConfirm = true }, modifier = Modifier.padding(top = 8.dp)) {
                     Icon(Icons.Filled.Refresh, contentDescription = null, modifier = Modifier.size(18.dp))
                     Text(
