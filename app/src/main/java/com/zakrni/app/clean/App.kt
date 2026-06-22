@@ -53,8 +53,8 @@ class App: Application() {
         // Initialize subscription manager first (to check if ads should show)
         subscriptionManager.initialize()
 
-        // Initialize AdMob as early as possible.
-        adManager.initialize()
+        // Ads are fully disabled (shouldShowAds = false), so the AdMob SDK is not initialized.
+        // adManager.initialize()
 
         // Start azkar reminders if enabled
         if (ThemeManager.isAzkarRemindersEnabled(this)) {
