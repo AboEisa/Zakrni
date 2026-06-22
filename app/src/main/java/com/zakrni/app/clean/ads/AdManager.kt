@@ -129,7 +129,8 @@ class AdManager @Inject constructor(
 
     fun buildAdRequest(): AdRequest = AdRequest.Builder().build()
 
-    fun shouldShowAds(): Boolean = !subscriptionManager.isSubscribed()
+    // Ads are fully disabled for everyone (kill switch). Every ad load/show path checks this.
+    fun shouldShowAds(): Boolean = false
 
     fun preloadAllAdTypes() {
         loadInterstitialAd()

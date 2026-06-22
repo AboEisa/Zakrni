@@ -251,17 +251,13 @@ private fun NextPrayerHero(
 private fun PrayerTimelineRow(row: PrayerRowUi, isCurrent: Boolean, isNext: Boolean) {
     val active = isCurrent || isNext
     val accent = MaterialTheme.colorScheme.primary
-    val containerColor = if (active) accent.copy(alpha = 0.08f) else MaterialTheme.colorScheme.surface
 
-    ZCard(modifier = Modifier.fillMaxWidth(), color = containerColor, contentPadding = 14.dp) {
+    ZCard(modifier = Modifier.fillMaxWidth(), contentPadding = 14.dp) {
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Box(
                 modifier = Modifier
                     .size(44.dp)
-                    .background(
-                        color = if (active) accent.copy(alpha = 0.16f) else MaterialTheme.colorScheme.surfaceVariant,
-                        shape = CircleShape,
-                    ),
+                    .background(color = MaterialTheme.colorScheme.surfaceVariant, shape = CircleShape),
                 contentAlignment = Alignment.Center,
             ) {
                 Image(painter = painterResource(row.icon), contentDescription = null, modifier = Modifier.size(24.dp))
