@@ -18,7 +18,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -58,6 +60,8 @@ fun DuaScreen(
     val expandedSections by viewModel.expandedSections.collectAsStateWithLifecycle()
 
     val isArabic = isArabicUi()
+    var selectedSection by remember { mutableStateOf<DuaSectionUi?>(null) }
+    androidx.activity.compose.BackHandler(enabled = selectedSection != null) { selectedSection = null }
 
     Column(modifier = modifier.fillMaxSize()) {
         ZTopBar(title = stringResource(R.string.azd_dua_title), onBack = onBack)
@@ -68,6 +72,18 @@ fun DuaScreen(
         }
 
         when {
+            // A section is open -> the swipeable dua reader (slides + tap-to-count).
+            selectedSection != null -> {
+                val sel = selectedSection!!
+                AzkarReaderView(
+                    title = sel.title,
+                    slides = remember(sel, isArabic) { duaSectionSlides(sel, isArabic) },
+                    arabic = isArabic,
+                    sectionKey = sel.key,
+                    onBack = { selectedSection = null },
+                )
+            }
+
             // Hard error with no data to fall back on -> full error state with retry.
             error != null && sections.isEmpty() -> {
                 ErrorState(
@@ -96,14 +112,11 @@ fun DuaScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     items(sections, key = { it.key }) { section ->
-                        ExpandableSection(
-                            modifier = Modifier.appear(AppearStyle.FadeUp),
+                        AzkarSectionCard(
                             title = section.title,
-                            expanded = expandedSections.contains(section.sectionKey),
-                            onToggle = { viewModel.toggleSection(section.sectionKey) },
-                        ) {
-                            DuaSectionContent(section = section, isArabic = isArabic)
-                        }
+                            modifier = Modifier.appear(AppearStyle.FadeUp),
+                            onClick = { selectedSection = section },
+                        )
                     }
                 }
             }
@@ -162,6 +175,10 @@ private fun DuaNumberBadge(number: Int) {
         }
     }
 }
+
+/** Maps a dua section's items to localized slides for the shared reader. */
+private fun duaSectionSlides(section: DuaSectionUi, isArabic: Boolean): List<DhikrSlide> =
+    section.items.map { DhikrSlide(HisnLocalizationUtils.localizeDuaText(it, isArabic), it.count.coerceAtLeast(1)) }
 
 /** Stable identity + display data for a dua section. */
 private data class DuaSectionUi(

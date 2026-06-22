@@ -186,9 +186,9 @@ private fun countLabel(count: Int): String =
         stringResource(R.string.azd_count_once)
     }
 
-/** A tappable section card that opens the dhikr reader. */
+/** A tappable section card that opens the dhikr reader (shared by Azkar + Dua screens). */
 @Composable
-private fun AzkarSectionCard(title: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
+internal fun AzkarSectionCard(title: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
     ZCard(onClick = onClick, contentPadding = 16.dp, modifier = modifier.fillMaxWidth()) {
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text(
