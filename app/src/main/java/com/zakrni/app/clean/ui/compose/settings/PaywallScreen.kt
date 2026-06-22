@@ -158,24 +158,23 @@ private fun Hero() {
 
 @Composable
 private fun FeatureComparison() {
-    val features = listOf(
-        stringResource(R.string.set_feature_all_content) to true,
-        stringResource(R.string.set_feature_prayer_times) to true,
-        stringResource(R.string.set_feature_no_ads) to false,
-        stringResource(R.string.set_feature_themes) to false,
-        stringResource(R.string.set_feature_support) to false,
+    val items = listOf(
+        stringResource(R.string.set_feature_all_content),
+        stringResource(R.string.set_feature_prayer_times),
+        stringResource(R.string.set_feature_no_ads),
+        stringResource(R.string.set_feature_support),
     )
     ZCard {
-        Row(modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)) {
-            Text("", modifier = Modifier.weight(1f))
-            Text(stringResource(R.string.set_compare_free), style = MaterialTheme.typography.labelMedium, modifier = Modifier.width(64.dp), textAlign = TextAlign.Center)
-            Text(stringResource(R.string.set_compare_premium), style = MaterialTheme.typography.labelMedium, color = BrandGold, modifier = Modifier.width(64.dp), textAlign = TextAlign.Center)
-        }
-        features.forEach { (label, freeHas) ->
+        Text(
+            text = stringResource(R.string.set_support_note),
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(bottom = 10.dp),
+        )
+        items.forEach { label ->
             Row(modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-                Text(label, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
-                Box(modifier = Modifier.width(64.dp), contentAlignment = Alignment.Center) { Mark(freeHas) }
-                Box(modifier = Modifier.width(64.dp), contentAlignment = Alignment.Center) { Mark(true) }
+                Icon(Icons.Filled.Check, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                Text(label, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(start = 10.dp).weight(1f))
             }
         }
     }

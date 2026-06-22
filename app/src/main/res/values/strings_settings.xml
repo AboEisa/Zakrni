@@ -39,10 +39,10 @@
     <string name="set_auto_play_subtitle">Play recitation automatically</string>
 
     <!-- Premium card -->
-    <string name="set_premium_title">Zakrni Premium</string>
-    <string name="set_premium_subtitle">Remove ads and unlock cosmetics</string>
-    <string name="set_premium_cta">Upgrade</string>
-    <string name="set_premium_active">Premium active</string>
+    <string name="set_premium_title">Support Zakrni</string>
+    <string name="set_premium_subtitle">Everything is free — help keep it ad-free</string>
+    <string name="set_premium_cta">Support</string>
+    <string name="set_premium_active">Thank you for your support</string>
 
     <!-- About -->
     <string name="set_about_version">Version</string>
@@ -50,9 +50,10 @@
     <string name="set_about_share">Share app</string>
 
     <!-- ============ Paywall screen ============ -->
-    <string name="set_paywall_title">Zakrni Premium</string>
-    <string name="set_paywall_hero_title">Unlock the full experience</string>
-    <string name="set_paywall_hero_subtitle">All worship content stays free, forever. Premium just removes ads and adds a few extras.</string>
+    <string name="set_paywall_title">Support the app</string>
+    <string name="set_paywall_hero_title">Support Zakrni</string>
+    <string name="set_paywall_hero_subtitle">Every feature is free for everyone. Your subscription is an optional way to support development and keep the app ad-free.</string>
+    <string name="set_support_note">Everything is completely free — your subscription is just support.</string>
 
     <!-- Feature comparison -->
     <string name="set_compare_free">Free</string>

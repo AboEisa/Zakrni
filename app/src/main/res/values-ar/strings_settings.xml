@@ -39,10 +39,10 @@
     <string name="set_auto_play_subtitle">تشغيل التلاوة تلقائياً</string>
 
     <!-- بطاقة بريميوم -->
-    <string name="set_premium_title">ذكرني بريميوم</string>
-    <string name="set_premium_subtitle">إزالة الإعلانات وفتح الميزات التجميلية</string>
-    <string name="set_premium_cta">الترقية</string>
-    <string name="set_premium_active">بريميوم مفعّل</string>
+    <string name="set_premium_title">ادعم ذكرني</string>
+    <string name="set_premium_subtitle">كل المميزات مجانية — ساعد في إبقائه بدون إعلانات</string>
+    <string name="set_premium_cta">ادعم</string>
+    <string name="set_premium_active">شكراً لدعمك</string>
 
     <!-- حول -->
     <string name="set_about_version">الإصدار</string>
@@ -50,9 +50,10 @@
     <string name="set_about_share">مشاركة التطبيق</string>
 
     <!-- ============ شاشة الاشتراك ============ -->
-    <string name="set_paywall_title">ذكرني بريميوم</string>
-    <string name="set_paywall_hero_title">افتح التجربة الكاملة</string>
-    <string name="set_paywall_hero_subtitle">يبقى كل محتوى العبادة مجانياً للأبد. بريميوم يزيل الإعلانات ويضيف بعض الإضافات فقط.</string>
+    <string name="set_paywall_title">ادعم التطبيق</string>
+    <string name="set_paywall_hero_title">ادعم ذكرني</string>
+    <string name="set_paywall_hero_subtitle">كل المميزات مجانية للجميع. اشتراكك وسيلة اختيارية لدعم التطوير وإبقاء التطبيق بدون إعلانات.</string>
+    <string name="set_support_note">كل المميزات مجانية بالكامل — اشتراكك مجرد دعم.</string>
 
     <!-- مقارنة الميزات -->
     <string name="set_compare_free">مجاني</string>
