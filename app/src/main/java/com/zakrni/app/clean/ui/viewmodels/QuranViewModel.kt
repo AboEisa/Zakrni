@@ -453,6 +453,13 @@ class QuranViewModel @Inject constructor(
     private val _playingAyahNumber = MutableStateFlow<Int?>(null)
     val playingAyahNumber: StateFlow<Int?> = _playingAyahNumber.asStateFlow()
 
+    private var followJob: kotlinx.coroutines.Job? = null
+
+    /**
+     * Audio follow: plays the whole surah ayah-by-ayah as one gapless ExoPlayer playlist
+     * (continuous, no rebuild/stop between ayat) and mirrors the playing item index back to
+     * [playingAyahNumber] so the reader can highlight and auto-scroll to it.
+     */
     fun playFollow(surahNumber: Int, verses: List<DomainAyah>, startIndex: Int) {
         if (verses.isEmpty()) return
         beginNewPlaybackRequest()
@@ -461,25 +468,26 @@ class QuranViewModel @Inject constructor(
         val surahName = getSurahName(surahNumber) ?: getLocalizedSurahFallback(surahNumber)
         val reciterName = getAvailableReciters().find { it.first == _selectedReciter.value }?.second
             ?: getLocalizedDefaultReciterName()
-        audioPlayerManager.setSurahInfo(surahName, reciterName)
+        val start = startIndex.coerceIn(0, verses.lastIndex)
+        val urls = verses.map { "https://cdn.islamic.network/quran/audio/128/$edition/${it.number}.mp3" }
 
-        fun playAt(i: Int) {
-            if (i !in verses.indices) {
-                _playingAyahNumber.value = null
-                return
+        _playingAyahNumber.value = verses[start].number
+        audioPlayerManager.playPlaylist(
+            urls = urls,
+            surahNumber = surahNumber,
+            surahName = surahName,
+            reciterName = reciterName,
+            startIndex = start,
+            onCompletion = { followJob?.cancel(); _playingAyahNumber.value = null },
+            onError = { e -> _error.value = e; followJob?.cancel(); _playingAyahNumber.value = null },
+        )
+
+        followJob?.cancel()
+        followJob = viewModelScope.launch {
+            audioPlayerManager.currentItemIndex.collect { idx ->
+                _playingAyahNumber.value = verses.getOrNull(idx)?.number
             }
-            val ayah = verses[i]
-            _playingAyahNumber.value = ayah.number
-            audioPlayerManager.playAudio(
-                audioUrl = "https://cdn.islamic.network/quran/audio/128/$edition/${ayah.number}.mp3",
-                surahNumber = surahNumber,
-                surahName = surahName,
-                reciterName = reciterName,
-                onCompletion = { playAt(i + 1) },
-                onError = { e -> _error.value = e; _playingAyahNumber.value = null },
-            )
         }
-        playAt(startIndex.coerceIn(0, verses.lastIndex))
     }
 
     // ----- Per-ayah tafsir (Tafsir al-Muyassar), fetched on demand from alquran.cloud -----
@@ -746,6 +754,7 @@ class QuranViewModel @Inject constructor(
     }
 
     fun stopAudio() {
+        followJob?.cancel()
         invalidatePlaybackRequests()
         audioPlayerManager.stop()
         _playingAyahNumber.value = null

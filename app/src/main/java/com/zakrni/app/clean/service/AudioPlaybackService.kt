@@ -52,6 +52,8 @@ class AudioPlaybackService : Service(), AudioManager.OnAudioFocusChangeListener 
         const val ACTION_PLAY_PAUSE = "com.zakrni.app.audio.PLAY_PAUSE"
         
         const val EXTRA_AUDIO_URL = "audio_url"
+        const val EXTRA_AUDIO_URLS = "audio_urls"
+        const val EXTRA_START_INDEX = "start_index"
         const val EXTRA_SURAH_NAME = "surah_name"
         const val EXTRA_SURAH_NUMBER = "surah_number"
         const val EXTRA_RECITER_NAME = "reciter_name"
@@ -76,7 +78,27 @@ class AudioPlaybackService : Service(), AudioManager.OnAudioFocusChangeListener 
             }
             context.startForegroundService(intent)
         }
-        
+
+        /** Gapless ayah-by-ayah playback: one ExoPlayer, many media items, no rebuild between ayat. */
+        fun startPlaylist(
+            context: Context,
+            audioUrls: ArrayList<String>,
+            surahName: String,
+            surahNumber: Int,
+            reciterName: String,
+            startIndex: Int,
+        ) {
+            val intent = Intent(context, AudioPlaybackService::class.java).apply {
+                action = ACTION_PLAY
+                putStringArrayListExtra(EXTRA_AUDIO_URLS, audioUrls)
+                putExtra(EXTRA_START_INDEX, startIndex)
+                putExtra(EXTRA_SURAH_NAME, surahName)
+                putExtra(EXTRA_SURAH_NUMBER, surahNumber)
+                putExtra(EXTRA_RECITER_NAME, reciterName)
+            }
+            context.startForegroundService(intent)
+        }
+
         fun stopPlayback(context: Context) {
             val intent = Intent(context, AudioPlaybackService::class.java).apply {
                 action = ACTION_STOP
@@ -112,6 +134,10 @@ class AudioPlaybackService : Service(), AudioManager.OnAudioFocusChangeListener 
     private val _currentSurahNumber = MutableStateFlow(-1)
     val currentSurahNumber: StateFlow<Int> get() = _currentSurahNumber
 
+    // Index of the currently-playing item within a playlist (for ayah-follow highlighting).
+    private val _currentItemIndex = MutableStateFlow(0)
+    val currentItemIndex: StateFlow<Int> get() = _currentItemIndex
+
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> get() = _isLoading
 
@@ -146,12 +172,16 @@ class AudioPlaybackService : Service(), AudioManager.OnAudioFocusChangeListener 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
             ACTION_PLAY -> {
+                val audioUrls = intent.getStringArrayListExtra(EXTRA_AUDIO_URLS)
                 val audioUrl = intent.getStringExtra(EXTRA_AUDIO_URL) ?: ""
                 val surahName = intent.getStringExtra(EXTRA_SURAH_NAME) ?: ""
                 val surahNumber = intent.getIntExtra(EXTRA_SURAH_NUMBER, -1)
                 val reciterName = intent.getStringExtra(EXTRA_RECITER_NAME) ?: ""
-                
-                if (audioUrl.isNotEmpty()) {
+                val startIndex = intent.getIntExtra(EXTRA_START_INDEX, 0)
+
+                if (!audioUrls.isNullOrEmpty()) {
+                    playAudio(audioUrls.first(), surahName, surahNumber, reciterName, audioUrls, startIndex)
+                } else if (audioUrl.isNotEmpty()) {
                     playAudio(audioUrl, surahName, surahNumber, reciterName)
                 }
             }
@@ -260,7 +290,14 @@ class AudioPlaybackService : Service(), AudioManager.OnAudioFocusChangeListener 
         }
     }
 
-    fun playAudio(audioUrl: String, surahName: String, surahNumber: Int, reciterName: String) {
+    fun playAudio(
+        audioUrl: String,
+        surahName: String,
+        surahNumber: Int,
+        reciterName: String,
+        playlistUrls: List<String>? = null,
+        startIndex: Int = 0,
+    ) {
         val sessionId = playbackSessionCounter.incrementAndGet()
         activePlaybackSessionId = sessionId
         playJob?.cancel()
@@ -270,6 +307,7 @@ class AudioPlaybackService : Service(), AudioManager.OnAudioFocusChangeListener 
 
             _isLoading.value = true
             _currentSurahNumber.value = surahNumber
+            _currentItemIndex.value = startIndex
             _currentProgress.value = 0
             _duration.value = 0
             currentSurahName = surahName
@@ -347,6 +385,12 @@ class AudioPlaybackService : Service(), AudioManager.OnAudioFocusChangeListener 
                                 updateNotification()
                             }
 
+                            override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+                                if (!isCurrentPlaybackSession(sessionId)) return
+                                _currentItemIndex.value = player.currentMediaItemIndex
+                                _currentProgress.value = 0
+                            }
+
                             override fun onPlayerError(error: PlaybackException) {
                                 if (!isCurrentPlaybackSession(sessionId)) return
                                 if (!terminalCallbackHandled.compareAndSet(false, true)) return
@@ -363,7 +407,12 @@ class AudioPlaybackService : Service(), AudioManager.OnAudioFocusChangeListener 
                                 onPlaybackError?.invoke(errorMessage)
                             }
                         })
-                        player.setMediaItem(MediaItem.fromUri(audioUrl))
+                        if (!playlistUrls.isNullOrEmpty()) {
+                            val items = playlistUrls.map { MediaItem.fromUri(it) }
+                            player.setMediaItems(items, startIndex.coerceIn(0, items.lastIndex), C.TIME_UNSET)
+                        } else {
+                            player.setMediaItem(MediaItem.fromUri(audioUrl))
+                        }
                         player.prepare()
                         player.playWhenReady = true
                         // Start polling immediately so UI state stays in sync even if

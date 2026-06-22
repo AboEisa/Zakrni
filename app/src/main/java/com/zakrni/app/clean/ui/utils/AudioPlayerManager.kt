@@ -116,6 +116,10 @@ class AudioPlayerManager @Inject constructor(
     private val _currentSurahNumber = MutableStateFlow(-1)
     val currentSurahNumber: StateFlow<Int> get() = _currentSurahNumber
 
+    // Current item index within a playlist (mirrored from the service) for ayah-follow.
+    private val _currentItemIndex = MutableStateFlow(0)
+    val currentItemIndex: StateFlow<Int> get() = _currentItemIndex
+
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> get() = _isLoading
 
@@ -205,7 +209,44 @@ class AudioPlayerManager @Inject constructor(
         }
         startLoadingSafetyTimeout()
     }
-    
+
+    /** Gapless ayah-by-ayah playback. The current ayah is exposed via [currentItemIndex]. */
+    fun playPlaylist(
+        urls: List<String>,
+        surahNumber: Int,
+        surahName: String,
+        reciterName: String,
+        startIndex: Int,
+        onCompletion: () -> Unit,
+        onError: (String) -> Unit,
+    ) {
+        if (urls.isEmpty()) return
+        cancelLoadingSafetyTimeout()
+        _isLoading.value = true
+        _isPlaying.value = false
+        _currentSurahNumber.value = surahNumber
+        _currentItemIndex.value = startIndex
+        currentSurahName = surahName
+        currentReciterName = reciterName
+        playbackCompletionCallback = onCompletion
+        playbackErrorCallback = onError
+        pendingPlayRequest = PendingPlayRequest(urls.first(), surahNumber, surahName, reciterName, onCompletion, onError)
+
+        AudioPlaybackService.startPlaylist(
+            context = context,
+            audioUrls = ArrayList(urls),
+            surahName = surahName.ifEmpty { localizedSurahFallback(surahNumber) },
+            surahNumber = surahNumber,
+            reciterName = reciterName.ifEmpty { localizedDefaultReciterName() },
+            startIndex = startIndex,
+        )
+
+        bindToService()
+        startDirectStateSync()
+        activeService()?.let { readyService -> startServiceStateTracking(readyService) }
+        startLoadingSafetyTimeout()
+    }
+
     private fun startServiceStateTracking(readyService: AudioPlaybackService) {
         serviceStateTrackingJob?.cancel()
         serviceStateTrackingJob = scope.launch {
@@ -241,6 +282,11 @@ class AudioPlayerManager @Inject constructor(
                 launch {
                     readyService.currentSurahNumber.collect { surahNumber ->
                         _currentSurahNumber.value = surahNumber
+                    }
+                }
+                launch {
+                    readyService.currentItemIndex.collect { idx ->
+                        _currentItemIndex.value = idx
                     }
                 }
                 launch {
