@@ -136,6 +136,19 @@ fun QuranReaderScreen(
     val isThisSurahPlaying = isPlaying && playingSurah == surahNumber
     val reciterName = remember(selectedReciter, isArabic) { viewModel.getCurrentReciterName() }
 
+    // One continuous progress across the whole surah (which ayah + how far into it),
+    // instead of a per-ayah bar that resets each verse.
+    val playingIndex = remember(playingAyahNumber, verses) {
+        if (playingAyahNumber == null) -1 else verses.indexOfFirst { it.number == playingAyahNumber }
+    }
+    val surahProgress = if (playingIndex >= 0 && verses.isNotEmpty()) {
+        val within = if (audioDuration > 0) (audioProgress.toFloat() / audioDuration).coerceIn(0f, 1f) else 0f
+        ((playingIndex + within) / verses.size).coerceIn(0f, 1f)
+    } else -1f
+    val progressLabel = if (playingIndex >= 0) {
+        stringResource(R.string.qrn_ayah_of, localizeNumber(playingIndex + 1, isArabic), localizeNumber(verses.size, isArabic))
+    } else ""
+
     Column(modifier = modifier.fillMaxSize()) {
         ZTopBar(
             title = surahTitle(currentSurah, surahNumber, isArabic),
@@ -194,6 +207,8 @@ fun QuranReaderScreen(
                 isLoading = isAudioLoading && playingSurah == surahNumber,
                 progressMs = if (playingSurah == surahNumber) audioProgress else 0,
                 durationMs = if (playingSurah == surahNumber) audioDuration else 0,
+                surahProgress = surahProgress,
+                progressLabel = progressLabel,
                 reciterName = reciterName,
                 isArabic = isArabic,
                 onPlayPause = {
@@ -202,6 +217,10 @@ fun QuranReaderScreen(
                     else viewModel.playFollow(surahNumber, verses, 0)
                 },
                 onSeek = { viewModel.seekToPosition(it) },
+                onSeekToAyah = { frac ->
+                    val idx = (frac * verses.size).toInt().coerceIn(0, verses.lastIndex)
+                    viewModel.playFollow(surahNumber, verses, idx)
+                },
                 onPickReciter = { showReciterSheet = true },
             )
         }
@@ -356,7 +375,7 @@ private fun MushafView(
 ) {
     val showBismillah = surahNumber != 1 && surahNumber != 9
     val palette = readingPalette(readingMode)
-    val highlight = palette.accent.copy(alpha = 0.22f)
+    val highlight = palette.accent.copy(alpha = 0.14f)
     val mushafStyle = AyahTextStyle.copy(
         fontFamily = QuranFamily,
         fontSize = (26 * fontScale).sp,
@@ -375,7 +394,12 @@ private fun MushafView(
                 append(localizeNumber(if (ayah.numberInSurah > 0) ayah.numberInSurah else 1, isArabic))
                 append("﴾  ")
                 val end = length
-                if (ayah.number == highlightedNumber) addStyle(SpanStyle(background = highlight), start, end)
+                if (ayah.number == highlightedNumber) {
+                    // Tighten the highlight to the ayah itself (drop the trailing spaces) and
+                    // tint the text in the accent colour so it reads as a clean "now playing" mark.
+                    val hlEnd = (end - 2).coerceAtLeast(start)
+                    addStyle(SpanStyle(color = palette.accent, background = highlight), start, hlEnd)
+                }
                 ranges.add(start until end)
             }
         }

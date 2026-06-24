@@ -68,14 +68,24 @@ internal fun AudioPlayerBar(
     onSeek: (Int) -> Unit,
     onPickReciter: () -> Unit,
     modifier: Modifier = Modifier,
+    surahProgress: Float = -1f,
+    progressLabel: String = "",
+    onSeekToAyah: (Float) -> Unit = {},
 ) {
     var dragging by remember { mutableStateOf(false) }
     var dragValue by remember { mutableFloatStateOf(0f) }
 
+    // Follow mode drives one continuous bar across the whole surah (0f..1f); otherwise the
+    // bar tracks the current clip's milliseconds as before.
+    val followMode = surahProgress >= 0f
     val duration = durationMs.coerceAtLeast(0)
-    val sliderMax = duration.toFloat().coerceAtLeast(1f)
+    val sliderMax = if (followMode) 1f else duration.toFloat().coerceAtLeast(1f)
     val displayedMs = if (dragging) dragValue.toInt() else progressMs.coerceIn(0, duration)
-    val sliderValue = if (dragging) dragValue else progressMs.toFloat().coerceIn(0f, sliderMax)
+    val sliderValue = when {
+        dragging -> dragValue
+        followMode -> surahProgress
+        else -> progressMs.toFloat().coerceIn(0f, sliderMax)
+    }
 
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -116,11 +126,11 @@ internal fun AudioPlayerBar(
                     dragValue = it
                 },
                 onValueChangeFinished = {
-                    onSeek(dragValue.toInt())
+                    if (followMode) onSeekToAyah(dragValue.coerceIn(0f, 1f)) else onSeek(dragValue.toInt())
                     dragging = false
                 },
                 valueRange = 0f..sliderMax,
-                enabled = duration > 0,
+                enabled = if (followMode) true else duration > 0,
                 colors = SliderDefaults.colors(
                     thumbColor = MaterialTheme.colorScheme.primary,
                     activeTrackColor = MaterialTheme.colorScheme.primary,
@@ -133,12 +143,13 @@ internal fun AudioPlayerBar(
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
-                    text = formatAudioTime(displayedMs, isArabic),
+                    text = if (followMode) progressLabel else formatAudioTime(displayedMs, isArabic),
                     style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = if (followMode) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
-                    text = formatAudioTime(duration, isArabic),
+                    text = if (followMode) formatAudioTime(progressMs.coerceAtLeast(0), isArabic)
+                    else formatAudioTime(duration, isArabic),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
