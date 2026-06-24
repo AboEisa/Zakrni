@@ -13,3 +13,8 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Release signing — keep secrets and the upload key out of version control
+keystore.properties
+*.keystore
+*.jks

@@ -82,8 +82,8 @@
     <string name="set_paywall_unavailable_title">Plans coming soon</string>
     <string name="set_paywall_unavailable_message">Subscription plans aren\'t available right now. Please check back later.</string>
     <string name="set_paywall_retry">Retry</string>
-    <string name="set_paywall_already_premium_title">You\'re Premium</string>
-    <string name="set_paywall_already_premium_message">Thank you for supporting Zakrni. Ads are removed and all extras are unlocked.</string>
+    <string name="set_paywall_already_premium_title">⭐ You\'re a Zakrni supporter</string>
+    <string name="set_paywall_already_premium_message">Thank you for your support. Supporters like you keep the app free and ad-free for everyone.</string>
 
     <!-- Restore + legal -->
     <string name="set_restore_purchases">Restore purchases</string>

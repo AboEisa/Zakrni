@@ -72,7 +72,7 @@ fun PaywallScreen(onBack: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
             when {
-                isPremium -> StateCard(
+                isPremium -> SupporterCard(
                     title = stringResource(R.string.set_paywall_already_premium_title),
                     message = stringResource(R.string.set_paywall_already_premium_message),
                 )
@@ -222,6 +222,24 @@ private fun PlanCard(
                     }
                 }
                 ZButton(text = ctaText, onClick = onClick, style = if (highlight) ZButtonStyle.Gold else ZButtonStyle.Primary)
+            }
+        }
+    }
+}
+
+/** Shown when the user has an active support subscription — a visible "supporter" perk/badge. */
+@Composable
+private fun SupporterCard(title: String, message: String) {
+    ZCard(modifier = Modifier.fillMaxWidth()) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Surface(shape = RoundedCornerShape(50), color = BrandGold.copy(alpha = 0.15f), modifier = Modifier.size(48.dp)) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(Icons.Filled.Star, contentDescription = null, tint = BrandGold, modifier = Modifier.size(28.dp))
+                }
+            }
+            Column(modifier = Modifier.padding(start = 12.dp)) {
+                Text(title, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+                Text(message, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(top = 4.dp))
             }
         }
     }

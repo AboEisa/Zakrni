@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -5,6 +7,12 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
     id("com.google.dagger.hilt.android")
     id("androidx.navigation.safeargs.kotlin")
+}
+
+// Release signing credentials live in keystore.properties (gitignored), not in this file.
+val keystoreProperties = Properties().apply {
+    val f = rootProject.file("keystore.properties")
+    if (f.exists()) f.inputStream().use { load(it) }
 }
 
 android {
@@ -28,10 +36,10 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file("../zakrni-release.keystore")
-            storePassword = "zakrni2026"
-            keyAlias = "zakrni"
-            keyPassword = "zakrni2026"
+            storeFile = file(keystoreProperties.getProperty("storeFile", "../zakrni-release.keystore"))
+            storePassword = keystoreProperties.getProperty("storePassword")
+            keyAlias = keystoreProperties.getProperty("keyAlias")
+            keyPassword = keystoreProperties.getProperty("keyPassword")
         }
     }
 

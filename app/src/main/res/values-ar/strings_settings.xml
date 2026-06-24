@@ -82,8 +82,8 @@
     <string name="set_paywall_unavailable_title">الباقات قريباً</string>
     <string name="set_paywall_unavailable_message">باقات الاشتراك غير متاحة حالياً. يرجى المحاولة لاحقاً.</string>
     <string name="set_paywall_retry">إعادة المحاولة</string>
-    <string name="set_paywall_already_premium_title">أنت مشترك في بريميوم</string>
-    <string name="set_paywall_already_premium_message">شكراً لدعمك ذكرني. تمت إزالة الإعلانات وفتح كل الإضافات.</string>
+    <string name="set_paywall_already_premium_title">⭐ أنت داعم لذكرني</string>
+    <string name="set_paywall_already_premium_message">جزاك الله خيرًا على دعمك. بفضل الداعمين زيّك التطبيق بيفضل مجاني وبدون إعلانات للجميع.</string>
 
     <!-- الاستعادة والقانوني -->
     <string name="set_restore_purchases">استعادة المشتريات</string>
