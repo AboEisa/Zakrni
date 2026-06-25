@@ -490,6 +490,31 @@ class QuranViewModel @Inject constructor(
         }
     }
 
+    /** Memorization helper: repeat a single ayah [times] times, keeping it highlighted. */
+    fun playRepeat(globalAyahNumber: Int, surahNumber: Int, times: Int) {
+        if (globalAyahNumber <= 0) return
+        followJob?.cancel()
+        beginNewPlaybackRequest()
+        failedUrls.clear()
+        val edition = normalizeReciterIdentifier(_selectedReciter.value).ifBlank { "ar.alafasy" }
+        val surahName = getSurahName(surahNumber) ?: getLocalizedSurahFallback(surahNumber)
+        val reciterName = getAvailableReciters().find { it.first == _selectedReciter.value }?.second
+            ?: getLocalizedDefaultReciterName()
+        val urls = List(times.coerceIn(1, 99)) {
+            "https://cdn.islamic.network/quran/audio/128/$edition/$globalAyahNumber.mp3"
+        }
+        _playingAyahNumber.value = globalAyahNumber
+        audioPlayerManager.playPlaylist(
+            urls = urls,
+            surahNumber = surahNumber,
+            surahName = surahName,
+            reciterName = reciterName,
+            startIndex = 0,
+            onCompletion = { _playingAyahNumber.value = null },
+            onError = { e -> _error.value = e; _playingAyahNumber.value = null },
+        )
+    }
+
     // ----- Per-ayah tafsir (Tafsir al-Muyassar), fetched on demand from alquran.cloud -----
     private val _ayahTafsir = MutableStateFlow<String?>(null)
     val ayahTafsir: StateFlow<String?> = _ayahTafsir.asStateFlow()

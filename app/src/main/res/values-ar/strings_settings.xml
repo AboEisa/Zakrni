@@ -39,6 +39,9 @@
     <string name="set_auto_play_subtitle">تشغيل التلاوة تلقائياً</string>
     <string name="set_count_sound">صوت العدّ</string>
     <string name="set_count_sound_subtitle">صوت بسيط عند اللمس للعدّ</string>
+    <string name="set_adhan_voice">صوت الأذان</string>
+    <string name="set_adhan_minshawi">المنشاوي</string>
+    <string name="set_adhan_mishary">مشاري العفاسي</string>
 
     <!-- بطاقة بريميوم -->
     <string name="set_premium_title">ادعم ذكرني</string>

@@ -39,6 +39,9 @@
     <string name="set_auto_play_subtitle">Play recitation automatically</string>
     <string name="set_count_sound">Count sound</string>
     <string name="set_count_sound_subtitle">Play a click when you tap to count</string>
+    <string name="set_adhan_voice">Adhan voice</string>
+    <string name="set_adhan_minshawi">Al-Minshawi</string>
+    <string name="set_adhan_mishary">Mishary Alafasy</string>
 
     <!-- Premium card -->
     <string name="set_premium_title">Support Zakrni</string>

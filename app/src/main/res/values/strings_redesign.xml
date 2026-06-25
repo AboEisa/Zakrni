@@ -76,6 +76,7 @@
     <string name="qrn_juz_tab">Juz</string>
     <string name="qrn_surah_tab">Surahs</string>
     <string name="qrn_juz_label">Juz %1$s</string>
+    <string name="qrn_ayah_repeat">Repeat for memorization</string>
     <string name="rd_search_title">Search</string>
     <string name="rd_search_hint">Search sections and surahs</string>
     <string name="rd_search_prompt">Type to search the app</string>

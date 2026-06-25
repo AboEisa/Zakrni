@@ -38,6 +38,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Tune
@@ -260,6 +261,10 @@ fun QuranReaderScreen(
             },
             onListen = {
                 viewModel.playAyahAudio(ayah.number, surahNumber)
+                optionsAyah = null
+            },
+            onRepeat = {
+                viewModel.playRepeat(ayah.number, surahNumber, 10)
                 optionsAyah = null
             },
             onTafsir = {
@@ -578,6 +583,7 @@ private fun AyahOptionsSheet(
     onFavorite: () -> Unit,
     ayahText: String,
     onListen: () -> Unit,
+    onRepeat: () -> Unit,
     onTafsir: () -> Unit,
     onCopy: () -> Unit,
     onShare: () -> Unit,
@@ -609,6 +615,7 @@ private fun AyahOptionsSheet(
                 onFavorite,
             )
             OptionRow(Icons.Filled.PlayArrow, stringResource(R.string.qrn_ayah_listen), onListen)
+            OptionRow(Icons.Filled.Repeat, stringResource(R.string.qrn_ayah_repeat), onRepeat)
             OptionRow(Icons.AutoMirrored.Filled.MenuBook, stringResource(R.string.qrn_ayah_tafsir), onTafsir)
             OptionRow(Icons.Filled.ContentCopy, stringResource(R.string.qrn_ayah_copy)) {
                 clipboard.setText(AnnotatedString(ayahText)); onCopy()

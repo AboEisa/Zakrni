@@ -58,6 +58,7 @@ fun SettingsScreen(onBack: () -> Unit, onOpenPaywall: () -> Unit) {
     var countSound by remember { mutableStateOf(ThemeManager.isCountSoundEnabled(context)) }
     var calcMethod by remember { mutableIntStateOf(PrayerCalcSettings.method(context)) }
     var madhab by remember { mutableIntStateOf(PrayerCalcSettings.school(context)) }
+    var adhanVoice by remember { mutableStateOf(ThemeManager.getAdhanVoice(context)) }
 
     Column(modifier = Modifier.fillMaxSize()) {
         ZTopBar(title = stringResource(R.string.set_title), onBack = onBack)
@@ -145,6 +146,18 @@ fun SettingsScreen(onBack: () -> Unit, onOpenPaywall: () -> Unit) {
                     options = listOf(stringResource(R.string.set_madhab_standard), stringResource(R.string.set_madhab_hanafi)),
                     selectedIndex = madhab,
                     onSelect = { madhab = it; PrayerCalcSettings.setSchool(context, it) },
+                )
+            }
+            ZCard {
+                Text(stringResource(R.string.set_adhan_voice), style = MaterialTheme.typography.titleSmall, modifier = Modifier.padding(bottom = 8.dp))
+                SegmentedChoice(
+                    options = listOf(stringResource(R.string.set_adhan_minshawi), stringResource(R.string.set_adhan_mishary)),
+                    selectedIndex = if (adhanVoice == ThemeManager.ADHAN_MISHARY) 1 else 0,
+                    onSelect = { idx ->
+                        val v = if (idx == 1) ThemeManager.ADHAN_MISHARY else ThemeManager.ADHAN_MINSHAWI
+                        adhanVoice = v
+                        ThemeManager.setAdhanVoice(context, v)
+                    },
                 )
             }
 

@@ -75,6 +75,7 @@
     <string name="qrn_juz_tab">الأجزاء</string>
     <string name="qrn_surah_tab">السور</string>
     <string name="qrn_juz_label">الجزء %1$s</string>
+    <string name="qrn_ayah_repeat">كرّر للحفظ (١٠ مرات)</string>
     <string name="rd_search_title">بحث</string>
     <string name="rd_search_hint">ابحث في الأقسام والسور</string>
     <string name="rd_search_prompt">اكتب للبحث في التطبيق</string>

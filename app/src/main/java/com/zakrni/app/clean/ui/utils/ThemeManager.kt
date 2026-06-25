@@ -15,10 +15,14 @@ object ThemeManager {
     private const val KEY_FONT_SIZE = "font_size"
     private const val KEY_AUTO_PLAY = "auto_play"
     private const val KEY_COUNT_SOUND = "count_sound"
+    private const val KEY_ADHAN_VOICE = "adhan_voice"
     private const val KEY_APP_LANGUAGE = "app_language"
 
     const val LANGUAGE_ARABIC = "ar"
     const val LANGUAGE_ENGLISH = "en"
+
+    const val ADHAN_MINSHAWI = "minshawi"
+    const val ADHAN_MISHARY = "mishary"
     
     private fun getPrefs(context: Context): SharedPreferences {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -115,6 +119,14 @@ object ThemeManager {
 
     fun setCountSoundEnabled(context: Context, enabled: Boolean) {
         getPrefs(context).edit().putBoolean(KEY_COUNT_SOUND, enabled).apply()
+    }
+
+    // Adhan voice used for prayer-time alerts
+    fun getAdhanVoice(context: Context): String =
+        getPrefs(context).getString(KEY_ADHAN_VOICE, ADHAN_MINSHAWI) ?: ADHAN_MINSHAWI
+
+    fun setAdhanVoice(context: Context, value: String) {
+        getPrefs(context).edit().putString(KEY_ADHAN_VOICE, value).apply()
     }
 
     // Language

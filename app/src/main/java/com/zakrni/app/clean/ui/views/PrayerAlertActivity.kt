@@ -487,7 +487,12 @@ class PrayerAlertActivity : AppCompatActivity() {
     }
 
     private fun getBundledAdhanUri(): Uri? {
+        // Honour the user's chosen muezzin, falling back to the other bundled adhans.
+        val primary = if (com.zakrni.app.clean.ui.utils.ThemeManager.getAdhanVoice(this) ==
+            com.zakrni.app.clean.ui.utils.ThemeManager.ADHAN_MISHARY
+        ) R.raw.adhan_mishary else R.raw.adhan_minshawi
         val candidates = intArrayOf(
+            primary,
             R.raw.adhan_minshawi,
             R.raw.adhan_mishary,
             R.raw.adhan_alert
