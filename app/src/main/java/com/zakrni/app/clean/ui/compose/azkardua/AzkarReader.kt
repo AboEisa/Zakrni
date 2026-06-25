@@ -75,7 +75,6 @@ fun AzkarReaderView(
         return
     }
     val context = LocalContext.current
-    val view = androidx.compose.ui.platform.LocalView.current
     val pagerState = rememberPagerState(pageCount = { slides.size })
     val scope = rememberCoroutineScope()
     val readCounts = remember(slides, sectionKey) {
@@ -120,9 +119,7 @@ fun AzkarReaderView(
                     if (readCounts[page] < slides[page].count) {
                         readCounts[page] = readCounts[page] + 1
                         saveProgress(context, sectionKey, readCounts.toList())
-                        if (com.zakrni.app.clean.ui.utils.ThemeManager.isCountSoundEnabled(context)) {
-                            view.playSoundEffect(android.view.SoundEffectConstants.CLICK)
-                        }
+                        com.zakrni.app.clean.ui.utils.CountFeedback.click(context)
                         if (readCounts[page] >= slides[page].count && page < slides.lastIndex) {
                             scope.launch {
                                 delay(350)

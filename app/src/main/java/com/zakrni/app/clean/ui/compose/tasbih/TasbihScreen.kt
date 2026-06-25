@@ -62,7 +62,6 @@ fun TasbihScreen(onBack: () -> Unit) {
     val vm: TasbihViewModel = viewModel(factory = TasbihViewModel.factory(context))
     val state by vm.state.collectAsStateWithLifecycle()
     val haptics = LocalHapticFeedback.current
-    val view = androidx.compose.ui.platform.LocalView.current
 
     var showAdd by remember { mutableStateOf(false) }
     var showResetConfirm by remember { mutableStateOf(false) }
@@ -120,9 +119,7 @@ fun TasbihScreen(onBack: () -> Unit) {
                     onTap = {
                         if (vm.increment()) {
                             haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                            if (com.zakrni.app.clean.ui.utils.ThemeManager.isCountSoundEnabled(context)) {
-                                view.playSoundEffect(android.view.SoundEffectConstants.CLICK)
-                            }
+                            com.zakrni.app.clean.ui.utils.CountFeedback.click(context)
                         }
                     },
                     modifier = Modifier.padding(top = 24.dp),
