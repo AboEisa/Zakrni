@@ -9,7 +9,7 @@ const val FAVORITES_ROUTE = "favorites"
 fun NavGraphBuilder.favoritesGraph(navController: NavHostController, onBack: () -> Unit) {
     composable(FAVORITES_ROUTE) {
         FavoritesScreen(
-            onOpenSurah = { surahNumber -> navController.navigate(QuranRoutes.reader(surahNumber)) },
+            onOpenAyah = { surah, ayah -> navController.navigate(QuranRoutes.reader(surah, ayah)) },
         )
     }
 }

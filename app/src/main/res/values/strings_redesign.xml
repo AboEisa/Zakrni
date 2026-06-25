@@ -28,6 +28,8 @@
     <string name="fk_khatma_complete">Khatma complete — may Allah accept it!</string>
     <string name="fk_khatma_reset">New khatma</string>
     <string name="fk_juz">Juz %1$d</string>
+    <string name="fk_plan_title">Khatma plan (days)</string>
+    <string name="fk_plan_daily">Read ~%1$s juz/day to finish in %2$s days</string>
 
     <string name="rd_cat_zakat">Zakat Calculator</string>
     <string name="zk_cash">Cash &amp; savings</string>

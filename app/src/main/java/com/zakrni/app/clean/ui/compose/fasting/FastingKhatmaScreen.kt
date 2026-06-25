@@ -53,6 +53,7 @@ import java.util.Calendar
 private const val PREFS = "zakrni_fasting"
 private const val KEY_FASTED = "fasted_dates"
 private const val KEY_JUZ = "khatma_juz"
+private const val KEY_KHATMA_DAYS = "khatma_days"
 private const val JUZ_TOTAL = 30
 
 /**
@@ -177,6 +178,7 @@ private fun KhatmaSection(prefs: SharedPreferences, arabic: Boolean) {
         prefs.edit().remove(KEY_JUZ).apply()
     }
     val count = done.size
+    var planDays by remember { mutableStateOf(prefs.getInt(KEY_KHATMA_DAYS, 30)) }
 
     ZCard(contentPadding = 16.dp, modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.fillMaxWidth()) {
@@ -218,6 +220,44 @@ private fun KhatmaSection(prefs: SharedPreferences, arabic: Boolean) {
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+
+            // Reading plan: pick a target number of days -> suggested daily juz.
+            Spacer(Modifier.height(14.dp))
+            Text(stringResource(R.string.fk_plan_title), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurface)
+            Spacer(Modifier.height(6.dp))
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                listOf(7, 10, 15, 30).forEach { d ->
+                    val sel = planDays == d
+                    Surface(
+                        modifier = Modifier.weight(1f).clickable {
+                            planDays = d
+                            prefs.edit().putInt(KEY_KHATMA_DAYS, d).apply()
+                        },
+                        shape = RoundedCornerShape(10.dp),
+                        color = if (sel) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                        contentColor = if (sel) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
+                    ) {
+                        Text(
+                            text = localizeNum(d, arabic),
+                            style = MaterialTheme.typography.labelLarge,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                        )
+                    }
+                }
+            }
+            Spacer(Modifier.height(6.dp))
+            Text(
+                text = if (count >= JUZ_TOTAL) stringResource(R.string.fk_khatma_complete)
+                else stringResource(
+                    R.string.fk_plan_daily,
+                    localizeNum(kotlin.math.ceil((JUZ_TOTAL - count).toDouble() / planDays).toInt().coerceAtLeast(1), arabic),
+                    localizeNum(planDays, arabic),
+                ),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.primary,
+            )
+
             Spacer(Modifier.height(14.dp))
             (1..JUZ_TOTAL).toList().chunked(6).forEach { row ->
                 Row(

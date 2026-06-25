@@ -27,6 +27,8 @@
     <string name="fk_khatma_complete">تمّت الختمة — تقبّل الله!</string>
     <string name="fk_khatma_reset">ختمة جديدة</string>
     <string name="fk_juz">جزء %1$d</string>
+    <string name="fk_plan_title">خطة الختمة (أيام)</string>
+    <string name="fk_plan_daily">اقرأ ~%1$s جزء يوميًا لتختم في %2$s يوم</string>
 
     <string name="rd_cat_zakat">حاسبة الزكاة</string>
     <string name="zk_cash">النقود والمدخرات</string>
