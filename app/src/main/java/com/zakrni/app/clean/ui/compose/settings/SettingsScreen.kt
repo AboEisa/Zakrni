@@ -21,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -36,7 +37,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zakrni.app.BuildConfig
 import com.zakrni.app.R
-import com.zakrni.app.clean.ui.theme.BrandGold
 import com.zakrni.app.clean.ui.theme.components.ZCard
 import com.zakrni.app.clean.ui.theme.components.ZSectionHeader
 import com.zakrni.app.clean.ui.theme.components.ZTopBar
@@ -77,11 +77,11 @@ fun SettingsScreen(onBack: () -> Unit, onOpenPaywall: () -> Unit) {
                 ZCard(onClick = onOpenPaywall, color = MaterialTheme.colorScheme.tertiary, contentColor = MaterialTheme.colorScheme.onTertiary) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Column(modifier = Modifier.weight(1f)) {
-                            Text(stringResource(R.string.set_premium_title), style = MaterialTheme.typography.titleMedium, color = BrandGold)
-                            Text(stringResource(R.string.set_premium_subtitle), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onTertiary)
+                            Text(stringResource(R.string.set_premium_title), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onTertiary)
+                            Text(stringResource(R.string.set_premium_subtitle), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onTertiary.copy(alpha = 0.9f))
                         }
-                        Text(stringResource(R.string.set_premium_cta), style = MaterialTheme.typography.labelLarge, color = BrandGold)
-                        Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, tint = BrandGold)
+                        Text(stringResource(R.string.set_premium_cta), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onTertiary)
+                        Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, tint = MaterialTheme.colorScheme.onTertiary)
                     }
                 }
             }
@@ -193,7 +193,17 @@ private fun SwitchRow(title: String, subtitle: String, checked: Boolean, onCheck
             Text(title, style = MaterialTheme.typography.titleSmall)
             Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
-        Switch(checked = checked, onCheckedChange = onCheckedChange)
+        Switch(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
+                checkedTrackColor = MaterialTheme.colorScheme.primary,
+                uncheckedThumbColor = MaterialTheme.colorScheme.outline,
+                uncheckedTrackColor = MaterialTheme.colorScheme.surfaceVariant,
+                uncheckedBorderColor = MaterialTheme.colorScheme.outline,
+            ),
+        )
     }
 }
 

@@ -131,8 +131,9 @@ object ThemeManager {
     }
 
     fun applySavedLanguage(context: Context) {
+        // Default to Arabic on first launch; the user can switch to English in Settings.
         val savedLanguage = getPrefs(context).getString(KEY_APP_LANGUAGE, null)
-        if (savedLanguage.isNullOrBlank()) return
+            ?.takeIf { it.isNotBlank() } ?: LANGUAGE_ARABIC
 
         val targetLocales = LocaleListCompat.forLanguageTags(savedLanguage)
         if (AppCompatDelegate.getApplicationLocales() != targetLocales) {
