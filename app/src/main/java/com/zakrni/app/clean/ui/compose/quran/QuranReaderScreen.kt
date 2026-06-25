@@ -10,6 +10,7 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -189,6 +190,7 @@ fun QuranReaderScreen(
                     surahNumber = surahNumber,
                     verses = verses,
                     isArabic = isArabic,
+                    surahName = surahTitle(currentSurah, surahNumber, isArabic),
                     highlightedNumber = activeAyah ?: optionsAyah?.number,
                     playingAyahNumber = activeAyah,
                     onAyahClick = { optionsAyah = it },
@@ -377,6 +379,7 @@ private fun MushafView(
     surahNumber: Int,
     verses: List<DomainAyah>,
     isArabic: Boolean,
+    surahName: String,
     highlightedNumber: Int?,
     playingAyahNumber: Int?,
     onAyahClick: (DomainAyah) -> Unit,
@@ -400,9 +403,18 @@ private fun MushafView(
             verses.forEach { ayah ->
                 val start = length
                 append(ayah.text.trim())
-                append("  ﴿")
+                append("  ")
+                // Ornate, accent-coloured ayah-end medallion so verses read like a printed Mushaf.
+                val markStart = length
+                append("﴿")
                 append(localizeNumber(if (ayah.numberInSurah > 0) ayah.numberInSurah else 1, isArabic))
-                append("﴾  ")
+                append("﴾")
+                addStyle(
+                    SpanStyle(color = palette.accent, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold),
+                    markStart,
+                    length,
+                )
+                append("  ")
                 val end = length
                 if (ayah.number == highlightedNumber) {
                     // Tighten the highlight to the ayah itself (drop the trailing spaces) and
@@ -443,6 +455,7 @@ private fun MushafView(
             modifier = Modifier.fillMaxWidth(),
         ) {
             Column(modifier = Modifier.padding(22.dp)) {
+                MushafSurahBanner(surahName = surahName, isArabic = isArabic, palette = palette)
                 if (showBismillah) {
                     Text(
                         text = stringResource(R.string.qrn_bismillah),
@@ -708,11 +721,40 @@ private fun readingPalette(mode: Int): ReadingPalette = when (mode) {
     1 -> ReadingPalette(Color(0xFFF4E8CE), Color(0xFF4A3B26), Color(0x33000000), Color(0xFF8A6D3B))
     2 -> ReadingPalette(Color(0xFF15120D), Color(0xFFE9D9B6), Color(0x22FFFFFF), Color(0xFF8FD3C8))
     else -> ReadingPalette(
-        MaterialTheme.colorScheme.surface,
+        // Warm paper tone in light mode so the Mushaf feels like a printed page; theme surface in dark.
+        if (isSystemInDarkTheme()) MaterialTheme.colorScheme.surface else Color(0xFFFBF6EC),
         MaterialTheme.colorScheme.onSurface,
         MaterialTheme.colorScheme.outlineVariant,
         MaterialTheme.colorScheme.primary,
     )
+}
+
+/** Ornate surah-name banner at the top of a Mushaf page (cartouche flanked by Quranic ornaments). */
+@Composable
+private fun MushafSurahBanner(surahName: String, isArabic: Boolean, palette: ReadingPalette) {
+    val display = if (isArabic && !surahName.startsWith("سور")) "سورة $surahName" else surahName
+    Surface(
+        shape = RoundedCornerShape(14.dp),
+        color = palette.accent.copy(alpha = 0.06f),
+        border = androidx.compose.foundation.BorderStroke(1.5.dp, palette.accent.copy(alpha = 0.5f)),
+        modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+    ) {
+        Row(
+            modifier = Modifier.padding(vertical = 12.dp, horizontal = 16.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text("۞", style = AyahTextStyle.copy(fontFamily = QuranFamily, fontSize = 22.sp), color = palette.accent)
+            Text(
+                text = display,
+                style = AyahTextStyle.copy(fontFamily = QuranFamily, fontSize = 26.sp, lineHeight = 34.sp),
+                color = palette.text,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.weight(1f, fill = false).padding(horizontal = 16.dp),
+            )
+            Text("۞", style = AyahTextStyle.copy(fontFamily = QuranFamily, fontSize = 22.sp), color = palette.accent)
+        }
+    }
 }
 
 private fun surahTitleFallback(surahNumber: Int, isArabic: Boolean): String =
