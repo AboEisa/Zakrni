@@ -17,11 +17,14 @@ object QuranRoutes {
     /** Argument name for the surah number passed to the reader. */
     const val ARG_SURAH_NUMBER = "surahNumber"
 
-    /** Pattern for the reader destination, e.g. `quran_reader/18`. */
-    const val READER_PATTERN = "quran_reader/{$ARG_SURAH_NUMBER}"
+    /** Optional ayah-in-surah to open at (e.g. a Juz start). 0 = top of surah. */
+    const val ARG_AYAH = "ayah"
 
-    /** Builds a concrete reader route for [surahNumber]. */
-    fun reader(surahNumber: Int): String = "quran_reader/$surahNumber"
+    /** Pattern for the reader destination, e.g. `quran_reader/18?ayah=0`. */
+    const val READER_PATTERN = "quran_reader/{$ARG_SURAH_NUMBER}?$ARG_AYAH={$ARG_AYAH}"
+
+    /** Builds a concrete reader route for [surahNumber], optionally opening at [ayah]. */
+    fun reader(surahNumber: Int, ayah: Int = 0): String = "quran_reader/$surahNumber?$ARG_AYAH=$ayah"
 }
 
 /**
@@ -45,6 +48,9 @@ fun NavGraphBuilder.quranGraph(navController: NavHostController) {
             onOpenSurah = { surahNumber ->
                 navController.navigate(QuranRoutes.reader(surahNumber))
             },
+            onOpenJuz = { surahNumber, ayah ->
+                navController.navigate(QuranRoutes.reader(surahNumber, ayah))
+            },
         )
     }
 
@@ -55,14 +61,20 @@ fun NavGraphBuilder.quranGraph(navController: NavHostController) {
                 type = NavType.IntType
                 defaultValue = 1
             },
+            navArgument(QuranRoutes.ARG_AYAH) {
+                type = NavType.IntType
+                defaultValue = 0
+            },
         ),
     ) { backStackEntry ->
         val surahNumber = backStackEntry.arguments
             ?.getInt(QuranRoutes.ARG_SURAH_NUMBER, 1)
             ?.coerceIn(1, 114)
             ?: 1
+        val ayah = backStackEntry.arguments?.getInt(QuranRoutes.ARG_AYAH, 0) ?: 0
         QuranReaderScreen(
             surahNumber = surahNumber,
+            initialAyahInSurah = ayah,
             onBack = { navController.popBackStack() },
         )
     }

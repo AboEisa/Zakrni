@@ -28,6 +28,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -65,6 +67,7 @@ import com.zakrni.app.clean.ui.viewmodels.QuranViewModel
 fun SurahListScreen(
     onBack: () -> Unit,
     onOpenSurah: (surahNumber: Int) -> Unit,
+    onOpenJuz: (surahNumber: Int, ayah: Int) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier,
     viewModel: QuranViewModel = hiltViewModel(),
 ) {
@@ -74,6 +77,7 @@ fun SurahListScreen(
 
     val isArabic = isArabicUi()
     var query by rememberSaveable { mutableStateOf("") }
+    var tab by rememberSaveable { mutableStateOf(0) }
 
     val filtered = remember(surahs, query, isArabic) {
         filterSurahs(surahs, query)
@@ -81,6 +85,16 @@ fun SurahListScreen(
 
     Column(modifier = modifier.fillMaxSize()) {
         ZTopBar(title = stringResource(R.string.qrn_list_title), onBack = onBack)
+
+        TabRow(selectedTabIndex = tab, containerColor = MaterialTheme.colorScheme.surface) {
+            Tab(selected = tab == 0, onClick = { tab = 0 }, text = { Text(stringResource(R.string.qrn_surah_tab)) })
+            Tab(selected = tab == 1, onClick = { tab = 1 }, text = { Text(stringResource(R.string.qrn_juz_tab)) })
+        }
+
+        if (tab == 1) {
+            JuzList(surahs = surahs, isArabic = isArabic, onOpenJuz = onOpenJuz)
+            return@Column
+        }
 
         SurahSearchField(
             query = query,
@@ -307,3 +321,80 @@ private fun normalizeForSearch(input: String): String =
         .replace('ى', 'ي').replace('ئ', 'ي')
         .replace('ؤ', 'و').replace('ة', 'ه')
         .trim()
+
+// ----- Juz (الأجزاء) browsing -----
+
+private data class JuzStart(val juz: Int, val surah: Int, val ayah: Int)
+
+/** Standard start point (surah, ayah) of each of the 30 ajzaa. */
+private val juzStarts = listOf(
+    JuzStart(1, 1, 1), JuzStart(2, 2, 142), JuzStart(3, 2, 253), JuzStart(4, 3, 93), JuzStart(5, 4, 24),
+    JuzStart(6, 4, 148), JuzStart(7, 5, 82), JuzStart(8, 6, 111), JuzStart(9, 7, 88), JuzStart(10, 8, 41),
+    JuzStart(11, 9, 93), JuzStart(12, 11, 6), JuzStart(13, 12, 53), JuzStart(14, 15, 1), JuzStart(15, 17, 1),
+    JuzStart(16, 18, 75), JuzStart(17, 21, 1), JuzStart(18, 23, 1), JuzStart(19, 25, 21), JuzStart(20, 27, 56),
+    JuzStart(21, 29, 46), JuzStart(22, 33, 31), JuzStart(23, 36, 28), JuzStart(24, 39, 32), JuzStart(25, 41, 47),
+    JuzStart(26, 46, 1), JuzStart(27, 51, 31), JuzStart(28, 58, 1), JuzStart(29, 67, 1), JuzStart(30, 78, 1),
+)
+
+@Composable
+private fun JuzList(
+    surahs: List<DomainSurah>,
+    isArabic: Boolean,
+    onOpenJuz: (surahNumber: Int, ayah: Int) -> Unit,
+) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 24.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        items(juzStarts, key = { it.juz }) { jz ->
+            val surah = surahs.firstOrNull { it.number == jz.surah }
+            val surahName = surah?.let {
+                if (isArabic) it.name else it.englishName.ifBlank { "Surah ${it.number}" }
+            } ?: ""
+            ZCard(
+                onClick = { onOpenJuz(jz.surah, jz.ayah) },
+                contentPadding = 14.dp,
+                modifier = Modifier.animateItem(),
+            ) {
+                Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .size(46.dp)
+                            .background(BrandGold.copy(alpha = 0.16f), CircleShape),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            text = localizeNumber(jz.juz, isArabic),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.tertiary,
+                        )
+                    }
+                    Spacer(Modifier.width(14.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(R.string.qrn_juz_label, localizeNumber(jz.juz, isArabic)),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                        if (surahName.isNotBlank()) {
+                            Text(
+                                text = "$surahName • ${localizeNumber(jz.ayah, isArabic)}",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(top = 2.dp),
+                            )
+                        }
+                    }
+                    Text(
+                        text = surah?.name ?: "",
+                        style = MaterialTheme.typography.titleLarge.copy(fontFamily = QuranFamily),
+                        color = MaterialTheme.colorScheme.tertiary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+            }
+        }
+    }
+}

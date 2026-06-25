@@ -93,6 +93,7 @@ fun QuranReaderScreen(
     surahNumber: Int,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
+    initialAyahInSurah: Int = 0,
     viewModel: QuranViewModel = hiltViewModel(),
 ) {
     val verses by viewModel.verses.collectAsStateWithLifecycle()
@@ -109,6 +110,15 @@ fun QuranReaderScreen(
     val ayahTafsir by viewModel.ayahTafsir.collectAsStateWithLifecycle()
     val ayahTafsirLoading by viewModel.ayahTafsirLoading.collectAsStateWithLifecycle()
     val playingAyahNumber by viewModel.playingAyahNumber.collectAsStateWithLifecycle()
+
+    // When opened at a specific ayah (e.g. from a Juz tab), highlight + scroll to it once,
+    // until audio playback takes over the highlight.
+    var hasPlayed by remember { mutableStateOf(false) }
+    LaunchedEffect(playingAyahNumber) { if (playingAyahNumber != null) hasPlayed = true }
+    val initialAyahGlobal = remember(verses, initialAyahInSurah) {
+        if (initialAyahInSurah > 1) verses.firstOrNull { it.numberInSurah == initialAyahInSurah }?.number else null
+    }
+    val activeAyah = playingAyahNumber ?: initialAyahGlobal?.takeIf { !hasPlayed }
 
     val isArabic = isArabicUi()
     val context = LocalContext.current
@@ -179,8 +189,8 @@ fun QuranReaderScreen(
                     surahNumber = surahNumber,
                     verses = verses,
                     isArabic = isArabic,
-                    highlightedNumber = playingAyahNumber ?: optionsAyah?.number,
-                    playingAyahNumber = playingAyahNumber,
+                    highlightedNumber = activeAyah ?: optionsAyah?.number,
+                    playingAyahNumber = activeAyah,
                     onAyahClick = { optionsAyah = it },
                     fontScale = fontScale,
                     readingMode = readingMode,
@@ -190,8 +200,8 @@ fun QuranReaderScreen(
                     surahNumber = surahNumber,
                     verses = verses,
                     isArabic = isArabic,
-                    highlighted = playingAyahNumber ?: optionsAyah?.number,
-                    playingAyahNumber = playingAyahNumber,
+                    highlighted = activeAyah ?: optionsAyah?.number,
+                    playingAyahNumber = activeAyah,
                     onAyahClick = { optionsAyah = it },
                 )
             }
