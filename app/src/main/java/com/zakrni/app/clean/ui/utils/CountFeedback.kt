@@ -1,27 +1,38 @@
 package com.zakrni.app.clean.ui.utils
 
 import android.content.Context
-import android.media.AudioManager
-import android.media.ToneGenerator
+import android.media.AudioAttributes
+import android.media.SoundPool
+import com.zakrni.app.R
 
 /**
- * Plays a short, reliable click for tap-to-count (tasbih / azkar / dua).
+ * Plays a short, pleasant "tick" for tap-to-count (tasbih / azkar / dua).
  *
- * Uses [ToneGenerator] on the music stream instead of `View.playSoundEffect`, because the latter
- * is silenced whenever the device's system "touch sounds" setting is off. Gated by the user's
- * [ThemeManager.isCountSoundEnabled] preference.
+ * Uses a bundled click sample via [SoundPool] (not `View.playSoundEffect`, which is silenced when
+ * the device's system "touch sounds" setting is off, nor a harsh [android.media.ToneGenerator] beep).
+ * Gated by the user's [ThemeManager.isCountSoundEnabled] preference.
  */
 object CountFeedback {
-    @Volatile private var tone: ToneGenerator? = null
+    private var pool: SoundPool? = null
+    private var soundId: Int = 0
+    @Volatile private var loaded = false
+
+    private fun ensure(context: Context) {
+        if (pool != null) return
+        val attrs = AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION)
+            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+            .build()
+        pool = SoundPool.Builder().setMaxStreams(6).setAudioAttributes(attrs).build().also { sp ->
+            sp.setOnLoadCompleteListener { _, _, status -> loaded = status == 0 }
+            soundId = sp.load(context.applicationContext, R.raw.tick_count, 1)
+        }
+    }
 
     fun click(context: Context) {
         if (!ThemeManager.isCountSoundEnabled(context)) return
-        try {
-            val gen = tone ?: ToneGenerator(AudioManager.STREAM_MUSIC, 80).also { tone = it }
-            gen.startTone(ToneGenerator.TONE_PROP_BEEP, 80)
-        } catch (_: Exception) {
-            // Audio resource may be briefly unavailable; drop this click and reset.
-            tone = null
-        }
+        ensure(context)
+        val sp = pool ?: return
+        if (loaded) sp.play(soundId, 0.8f, 0.8f, 1, 0, 1f)
     }
 }
