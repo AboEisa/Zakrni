@@ -33,6 +33,6 @@ object CountFeedback {
         if (!ThemeManager.isCountSoundEnabled(context)) return
         ensure(context)
         val sp = pool ?: return
-        if (loaded) sp.play(soundId, 0.8f, 0.8f, 1, 0, 1f)
+        if (loaded) sp.play(soundId, 0.6f, 0.6f, 1, 0, 1f)
     }
 }
