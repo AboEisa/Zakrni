@@ -30,6 +30,8 @@
     <string name="fk_juz">Juz %1$d</string>
     <string name="fk_plan_title">Khatma plan (days)</string>
     <string name="fk_plan_daily">Read ~%1$s juz/day to finish in %2$s days</string>
+    <string name="prn_imsak">Imsak</string>
+    <string name="prn_iftar">Iftar</string>
 
     <string name="rd_cat_zakat">Zakat Calculator</string>
     <string name="zk_cash">Cash &amp; savings</string>

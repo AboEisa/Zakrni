@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -152,6 +153,12 @@ private fun PrayerContent(
                 isArabic = isArabic,
             )
         }
+        item {
+            ImsakiyyaCard(
+                imsak = rows.firstOrNull { it.key == "Fajr" }?.time ?: "",
+                iftar = rows.firstOrNull { it.key == "Maghrib" }?.time ?: "",
+            )
+        }
         items(rows, key = { it.key }) { row ->
             PrayerTimelineRow(
                 row = row,
@@ -159,6 +166,37 @@ private fun PrayerContent(
                 isNext = row.key == nextPrayer?.name,
             )
         }
+    }
+}
+
+/** Compact Imsak (Fajr) / Iftar (Maghrib) card for fasting days. */
+@Composable
+private fun ImsakiyyaCard(imsak: String, iftar: String) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surfaceContainer, RoundedCornerShape(18.dp))
+            .padding(16.dp),
+    ) {
+        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            ImsakCol("🌙", stringResource(R.string.prn_imsak), imsak, Modifier.weight(1f))
+            Box(
+                Modifier
+                    .width(1.dp)
+                    .height(44.dp)
+                    .background(MaterialTheme.colorScheme.outlineVariant),
+            )
+            ImsakCol("🌇", stringResource(R.string.prn_iftar), iftar, Modifier.weight(1f))
+        }
+    }
+}
+
+@Composable
+private fun ImsakCol(emoji: String, label: String, time: String, modifier: Modifier) {
+    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+        Text("$emoji  $label", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
+        Spacer(Modifier.height(4.dp))
+        Text(time, style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
     }
 }
 
