@@ -72,6 +72,10 @@
     <string name="content_tap_flip">Tap a name to reveal its meaning</string>
     <string name="tsb_today">Today: %1$d</string>
     <string name="qrn_ayah_of">Ayah %1$s / %2$s</string>
+    <string name="dua_khatm_title">Du\'a on Completing the Quran</string>
+    <string name="qrn_juz_tab">Juz</string>
+    <string name="qrn_surah_tab">Surahs</string>
+    <string name="qrn_juz_label">Juz %1$s</string>
     <string name="rd_search_title">Search</string>
     <string name="rd_search_hint">Search sections and surahs</string>
     <string name="rd_search_prompt">Type to search the app</string>

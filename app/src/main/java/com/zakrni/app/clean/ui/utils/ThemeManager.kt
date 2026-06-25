@@ -14,6 +14,7 @@ object ThemeManager {
     private const val KEY_AZKAR_REMINDERS = "azkar_reminders"
     private const val KEY_FONT_SIZE = "font_size"
     private const val KEY_AUTO_PLAY = "auto_play"
+    private const val KEY_COUNT_SOUND = "count_sound"
     private const val KEY_APP_LANGUAGE = "app_language"
 
     const val LANGUAGE_ARABIC = "ar"
@@ -102,9 +103,18 @@ object ThemeManager {
     fun isAutoPlayEnabled(context: Context): Boolean {
         return getPrefs(context).getBoolean(KEY_AUTO_PLAY, false)
     }
-    
+
     fun setAutoPlayEnabled(context: Context, enabled: Boolean) {
         getPrefs(context).edit().putBoolean(KEY_AUTO_PLAY, enabled).apply()
+    }
+
+    // Count tap sound (tasbih / azkar / dua tap-to-count)
+    fun isCountSoundEnabled(context: Context): Boolean {
+        return getPrefs(context).getBoolean(KEY_COUNT_SOUND, true)
+    }
+
+    fun setCountSoundEnabled(context: Context, enabled: Boolean) {
+        getPrefs(context).edit().putBoolean(KEY_COUNT_SOUND, enabled).apply()
     }
 
     // Language

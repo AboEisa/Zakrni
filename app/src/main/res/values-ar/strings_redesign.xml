@@ -71,6 +71,10 @@
     <string name="content_tap_flip">اضغط على الاسم لمعرفة معناه</string>
     <string name="tsb_today">تسبيح اليوم: %1$d</string>
     <string name="qrn_ayah_of">الآية %1$s / %2$s</string>
+    <string name="dua_khatm_title">دعاء ختم القرآن</string>
+    <string name="qrn_juz_tab">الأجزاء</string>
+    <string name="qrn_surah_tab">السور</string>
+    <string name="qrn_juz_label">الجزء %1$s</string>
     <string name="rd_search_title">بحث</string>
     <string name="rd_search_hint">ابحث في الأقسام والسور</string>
     <string name="rd_search_prompt">اكتب للبحث في التطبيق</string>

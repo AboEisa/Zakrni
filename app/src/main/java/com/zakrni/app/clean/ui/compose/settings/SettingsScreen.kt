@@ -55,6 +55,7 @@ fun SettingsScreen(onBack: () -> Unit, onOpenPaywall: () -> Unit) {
     var prayerNotif by remember { mutableStateOf(ThemeManager.isPrayerNotificationsEnabled(context)) }
     var azkarNotif by remember { mutableStateOf(ThemeManager.isAzkarRemindersEnabled(context)) }
     var autoPlay by remember { mutableStateOf(ThemeManager.isAutoPlayEnabled(context)) }
+    var countSound by remember { mutableStateOf(ThemeManager.isCountSoundEnabled(context)) }
     var calcMethod by remember { mutableIntStateOf(PrayerCalcSettings.method(context)) }
     var madhab by remember { mutableIntStateOf(PrayerCalcSettings.school(context)) }
 
@@ -151,6 +152,7 @@ fun SettingsScreen(onBack: () -> Unit, onOpenPaywall: () -> Unit) {
             ZSectionHeader(stringResource(R.string.set_section_audio))
             ZCard {
                 SwitchRow(stringResource(R.string.set_auto_play), stringResource(R.string.set_auto_play_subtitle), autoPlay) { autoPlay = it; ThemeManager.setAutoPlayEnabled(context, it) }
+                SwitchRow(stringResource(R.string.set_count_sound), stringResource(R.string.set_count_sound_subtitle), countSound) { countSound = it; ThemeManager.setCountSoundEnabled(context, it) }
             }
 
             // About

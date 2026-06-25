@@ -70,6 +70,11 @@ fun DuaScreen(
         val sections = remember(sectionDuasMap, isArabic) {
             buildDuaSections(sectionDuasMap, isArabic)
         }
+        // Always offer the Quran-completion dua at the top of the list.
+        val khatmTitle = stringResource(R.string.dua_khatm_title)
+        val allSections = remember(sections, khatmTitle) {
+            listOf(DuaSectionUi(KHATM_KEY, khatmTitle, emptyList())) + sections
+        }
 
         when {
             // A section is open -> the swipeable dua reader (slides + tap-to-count).
@@ -77,7 +82,9 @@ fun DuaScreen(
                 val sel = selectedSection!!
                 AzkarReaderView(
                     title = sel.title,
-                    slides = remember(sel, isArabic) { duaSectionSlides(sel, isArabic) },
+                    slides = remember(sel, isArabic) {
+                        if (sel.sectionKey == KHATM_KEY) khatmDuaSlides() else duaSectionSlides(sel, isArabic)
+                    },
                     arabic = isArabic,
                     sectionKey = sel.key,
                     onBack = { selectedSection = null },
@@ -111,7 +118,7 @@ fun DuaScreen(
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    items(sections, key = { it.key }) { section ->
+                    items(allSections, key = { it.key }) { section ->
                         AzkarSectionCard(
                             title = section.title,
                             modifier = Modifier.appear(AppearStyle.FadeUp),
@@ -179,6 +186,19 @@ private fun DuaNumberBadge(number: Int) {
 /** Maps a dua section's items to localized slides for the shared reader. */
 private fun duaSectionSlides(section: DuaSectionUi, isArabic: Boolean): List<DhikrSlide> =
     section.items.map { DhikrSlide(HisnLocalizationUtils.localizeDuaText(it, isArabic), it.count.coerceAtLeast(1)) }
+
+/** Stable key for the synthetic "Du'a on completing the Quran" section. */
+private const val KHATM_KEY = "khatm_quran"
+
+/** دعاء ختم القرآن الكريم — presented as slides in the shared reader. */
+private fun khatmDuaSlides(): List<DhikrSlide> = listOf(
+    DhikrSlide("اللَّهُمَّ ارْحَمْنِي بِالْقُرْآنِ، وَاجْعَلْهُ لِي إِمَامًا وَنُورًا وَهُدًى وَرَحْمَةً.", 1),
+    DhikrSlide("اللَّهُمَّ ذَكِّرْنِي مِنْهُ مَا نَسِيتُ، وَعَلِّمْنِي مِنْهُ مَا جَهِلْتُ، وَارْزُقْنِي تِلَاوَتَهُ آنَاءَ اللَّيْلِ وَأَطْرَافَ النَّهَارِ، وَاجْعَلْهُ لِي حُجَّةً يَا رَبَّ الْعَالَمِينَ.", 1),
+    DhikrSlide("اللَّهُمَّ أَصْلِحْ لِي دِينِيَ الَّذِي هُوَ عِصْمَةُ أَمْرِي، وَأَصْلِحْ لِي دُنْيَايَ الَّتِي فِيهَا مَعَاشِي، وَأَصْلِحْ لِي آخِرَتِيَ الَّتِي إِلَيْهَا مَعَادِي.", 1),
+    DhikrSlide("اللَّهُمَّ اجْعَلِ الْقُرْآنَ رَبِيعَ قَلْبِي، وَنُورَ صَدْرِي، وَجَلَاءَ حُزْنِي، وَذَهَابَ هَمِّي وَغَمِّي.", 1),
+    DhikrSlide("اللَّهُمَّ ثَبِّتْنِي عَلَى دِينِكَ حَتَّى أَلْقَاكَ، وَتَوَفَّنِي عَلَى مِلَّةِ نَبِيِّكَ مُحَمَّدٍ ﷺ، وَاحْشُرْنِي فِي زُمْرَةِ الصَّالِحِينَ.", 1),
+    DhikrSlide("اللَّهُمَّ تَقَبَّلْ مِنَّا إِنَّكَ أَنْتَ السَّمِيعُ الْعَلِيمُ، وَتُبْ عَلَيْنَا إِنَّكَ أَنْتَ التَّوَّابُ الرَّحِيمُ، وَصَلِّ اللَّهُمَّ عَلَى سَيِّدِنَا مُحَمَّدٍ وَعَلَى آلِهِ وَصَحْبِهِ أَجْمَعِينَ، وَالْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ.", 1),
+)
 
 /** Stable identity + display data for a dua section. */
 private data class DuaSectionUi(
