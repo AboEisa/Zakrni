@@ -90,7 +90,7 @@ fun HomeScreen(
         GreetingHeader(onOpenSettings = { onOpen("settings") })
         NextPrayerCard(onClick = { onOpen("prayer") })
         TodayPrayersStrip(onClick = { onOpen("prayer") })
-        DailyAyahCard(modifier = Modifier.weight(1f), onClick = { onOpen("quran_list") })
+        DailyAyahCard(modifier = Modifier.weight(1f))
         QuickActionsGrid(onOpen = onOpen)
     }
 }
@@ -239,7 +239,7 @@ private fun TodayPrayersStrip(onClick: () -> Unit) {
 }
 
 @Composable
-private fun DailyAyahCard(modifier: Modifier = Modifier, onClick: () -> Unit = {}) {
+private fun DailyAyahCard(modifier: Modifier = Modifier) {
     val ayahs = remember { dailyAyahCarousel }
     if (ayahs.isEmpty()) {
         ZCard(contentPadding = 20.dp, modifier = modifier.fillMaxWidth()) {}
@@ -252,7 +252,7 @@ private fun DailyAyahCard(modifier: Modifier = Modifier, onClick: () -> Unit = {
             index = (index + 1) % ayahs.size
         }
     }
-    ZCard(onClick = onClick, contentPadding = 20.dp, modifier = modifier.fillMaxWidth()) {
+    ZCard(contentPadding = 20.dp, modifier = modifier.fillMaxWidth()) {
         Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = stringResource(R.string.home_daily_ayah),

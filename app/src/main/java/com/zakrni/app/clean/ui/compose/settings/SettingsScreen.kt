@@ -106,8 +106,11 @@ fun SettingsScreen(onBack: () -> Unit, onOpenPaywall: () -> Unit) {
                     selectedIndex = if (language == ThemeManager.LANGUAGE_ENGLISH) 1 else 0,
                     onSelect = { idx ->
                         val code = if (idx == 1) ThemeManager.LANGUAGE_ENGLISH else ThemeManager.LANGUAGE_ARABIC
-                        language = code
-                        ThemeManager.setAppLanguage(context, code)
+                        if (code != language) {
+                            language = code
+                            ThemeManager.setAppLanguage(context, code)
+                            (context as? android.app.Activity)?.recreate()
+                        }
                     },
                 )
             }

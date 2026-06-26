@@ -3,8 +3,6 @@ package com.zakrni.app.clean.ui.utils
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.os.LocaleListCompat
-import java.util.Locale
 
 object ThemeManager {
     private const val PREFS_NAME = "zakrni_settings"
@@ -129,37 +127,15 @@ object ThemeManager {
         getPrefs(context).edit().putString(KEY_ADHAN_VOICE, value).apply()
     }
 
-    // Language
-    fun getCurrentAppLanguage(context: Context): String {
-        val appLocales = AppCompatDelegate.getApplicationLocales()
-        val appLocale = appLocales[0]?.language
-        if (!appLocale.isNullOrBlank()) return appLocale
-
-        val savedLanguage = getPrefs(context).getString(KEY_APP_LANGUAGE, null)
-        if (!savedLanguage.isNullOrBlank()) return savedLanguage
-
-        return when (Locale.getDefault().language) {
-            LANGUAGE_ENGLISH -> LANGUAGE_ENGLISH
-            else -> LANGUAGE_ARABIC
-        }
-    }
+    // Language — stored as a pref, applied via LocaleHelper.wrap in attachBaseContext (default Arabic).
+    fun getCurrentAppLanguage(context: Context): String =
+        getPrefs(context).getString(KEY_APP_LANGUAGE, null)?.takeIf { it.isNotBlank() } ?: LANGUAGE_ARABIC
 
     fun setAppLanguage(context: Context, languageCode: String) {
         getPrefs(context).edit().putString(KEY_APP_LANGUAGE, languageCode).apply()
-        val targetLocales = LocaleListCompat.forLanguageTags(languageCode)
-        if (AppCompatDelegate.getApplicationLocales() != targetLocales) {
-            AppCompatDelegate.setApplicationLocales(targetLocales)
-        }
     }
 
     fun applySavedLanguage(context: Context) {
-        // Default to Arabic on first launch; the user can switch to English in Settings.
-        val savedLanguage = getPrefs(context).getString(KEY_APP_LANGUAGE, null)
-            ?.takeIf { it.isNotBlank() } ?: LANGUAGE_ARABIC
-
-        val targetLocales = LocaleListCompat.forLanguageTags(savedLanguage)
-        if (AppCompatDelegate.getApplicationLocales() != targetLocales) {
-            AppCompatDelegate.setApplicationLocales(targetLocales)
-        }
+        // No-op: language is applied through LocaleHelper.wrap(attachBaseContext).
     }
 }

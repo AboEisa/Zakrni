@@ -25,6 +25,10 @@ class MainComposeActivity : AppCompatActivity() {
 
     private enum class Stage { Splash, Onboarding, App }
 
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(com.zakrni.app.clean.ui.utils.LocaleHelper.wrap(newBase))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val prefs = getSharedPreferences("zakrni_settings", Context.MODE_PRIVATE)
