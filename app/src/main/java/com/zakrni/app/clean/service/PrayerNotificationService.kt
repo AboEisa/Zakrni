@@ -210,6 +210,24 @@ class PrayerNotificationService : Service() {
         return START_STICKY
     }
 
+    /**
+     * Android 14+ foreground-service timeout. A long-lived `dataSync` FGS (the prayer countdown)
+     * must stop itself when the system calls this, otherwise Android throws
+     * [android.app.RemoteServiceException.ForegroundServiceDidNotStopInTimeException]. The countdown
+     * is re-armed on the next prayer update / app open.
+     */
+    override fun onTimeout(startId: Int) {
+        Log.w(TAG, "⏱️ FGS timeout — stopping prayer countdown service")
+        try { stopForeground(true) } catch (_: Exception) {}
+        stopSelf()
+    }
+
+    override fun onTimeout(startId: Int, fgsType: Int) {
+        Log.w(TAG, "⏱️ FGS timeout ($fgsType) — stopping prayer countdown service")
+        try { stopForeground(true) } catch (_: Exception) {}
+        stopSelf()
+    }
+
     private fun createLoadingNotification(): Notification {
         val context = contextRef?.get() ?: this
 
